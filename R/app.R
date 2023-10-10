@@ -7,7 +7,24 @@
 #'        Rafaela Forzza
 #'        
 #' @seealso \code{\link[utils]{download.file}}, \code{\link[utils]{aspell}}
-#'        
+#' 
+#' @import dplyr
+#' @import tidyr
+#' @import readr
+#' @import stringr
+#' @import lubridate
+#' @import jsonlite
+#' @import sqldf
+#' @import rvest
+#' @import shiny
+#' @import shinydashboard
+#' @import rhandsontable
+#' @import DT
+#' @import rhandsontable
+#' @import shinyWidgets
+#' @import measurements
+#' @import downloader
+#' 
 #' @examples
 #' \donttest{
 #' app()
