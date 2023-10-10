@@ -1,4 +1,4 @@
-Package: catalogo.ucs.br
+Package: catalogoUCsBR
 Type: Package
 Title: An R package for preparing species listings for the Plant Catalog of Units of Brazilian Conservation.
 Version: 1.0.0
@@ -34,6 +34,6 @@ Imports:
     tidyselect,
     utils
 Remotes:
-    github::pablopains/catalogo.ucs.br
+    github::pablopains/catalogoUCsBR
 Depends:
     R (>= 3.5.0)
