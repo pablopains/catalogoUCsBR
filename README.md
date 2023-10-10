@@ -27,7 +27,9 @@ catalogoUCsBR, run
 devtools::install_github("pablopains/catalogoUCsBR")
 ```
 
-## **Workflow performed in just a few clicks using the app**
+## **Use the online application in: [pablopains.shinyapps.io/catalogoUCsBR/](https://pablopains.shinyapps.io/catalogoUCsBR/)**
+
+## **Workflow performed in just a few clicks using the application locally**
 
 We recommend using the application locally.
 
