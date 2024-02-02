@@ -35,7 +35,7 @@ devtools::install_github("pablopains/catalogoUCsBR")
 We recommend using the application locally.
 
 ``` r
-catalogoUCsBR::load_app()
+catalogoUCsBR::load_app_data_review()
 ```
 
 ## **Consult the [catalogoUCsBR Manual](https://github.com/pablopains/catalogoUCsBR/blob/main/catalogoUCsBR_1.0.0.pdf) for a case study with a complete and replicable workflow**
