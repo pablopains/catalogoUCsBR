@@ -1,5 +1,5 @@
 #' @title Plant Catalog of Units of Brazilian Conservation App
-#' @name load_app_data_review
+#' @name app_review
 #' @description An R app for preparing species listings for the Plant Catalog of Units of Brazilian Conservation.
 #' @return CSV files
 #' @author Pablo Hendrigo Alves de Melo,
@@ -30,7 +30,7 @@
 #' load_app_data_review()
 #' }
 #' @export
-load_app_data_review <- function()
+app_review <- function()
 {
   # require(dplyr)
   # require(tidyr)
