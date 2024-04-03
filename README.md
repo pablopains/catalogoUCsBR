@@ -28,14 +28,24 @@ catalogoUCsBR, run
 devtools::install_github("pablopains/catalogoUCsBR")
 ```
 
-## **Use the online application in: [pablopains.shinyapps.io/catalogoUCsBR/](https://pablopains.shinyapps.io/catalogoUCsBR/)**
+# **Botanical experts**
 
-## **Workflow performed in just a few clicks using the application locally**
+## **Use the online review app at ** [pablopains.shinyapps.io/catalogoUCsBR/](https://pablopains.shinyapps.io/catalogoUCsBR/)\*\*
+
+## **Use the prepare app locally in RStudio**
 
 We recommend using the application locally.
 
 ``` r
-catalogoUCsBR::load_app_data_review()
+catalogoUCsBR::app_prepare()
+```
+
+## **Use the review app locally in RStudio**
+
+We recommend using the application locally.
+
+``` r
+catalogoUCsBR::app_review()
 ```
 
 ## **Consult the [catalogoUCsBR Manual](https://github.com/pablopains/catalogoUCsBR/blob/main/catalogoUCsBR_1.0.0.pdf) for a case study with a complete and replicable workflow**
