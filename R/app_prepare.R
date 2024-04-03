@@ -39,13 +39,14 @@ app_prepare <- function()
    
    #' @details direcionar memória para processamento temporário em disco
    { 
-      if (!dir.exists("c:/R_temp")){dir.create("c:/R_temp")}
-      tempdir <- function() "c:/R_temp"
-      unlockBinding("tempdir", baseenv()) 
-      assignInNamespace("tempdir", tempdir, ns="base", envir=baseenv())
-      assign("tempdir", tempdir, baseenv())
-      lockBinding("tempdir", baseenv())
-      tempdir()
+      # if (!dir.exists("c:/R_temp")){dir.create("c:/R_temp")}
+      # tempdir <- function() "c:/R_temp"
+     tempdir <- tempdir()
+      # unlockBinding("tempdir", baseenv()) 
+      # assignInNamespace("tempdir", tempdir, ns="base", envir=baseenv())
+      # assign("tempdir", tempdir, baseenv())
+      # lockBinding("tempdir", baseenv())
+      # tempdir()
    }
    
    #' @details carregar funcões para mensurar tempos de processamento
