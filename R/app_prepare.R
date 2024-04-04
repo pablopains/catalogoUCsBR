@@ -2914,7 +2914,7 @@ app_prepare <- function()
                                                          {
                                                             withProgress(message = 'Processing...', style = 'notification', value = 0.5, {
                                                                
-                                                               occ[['fb2020']] <<- get_floraFungaBrasil_v2(path_results = "C:/Dados/APP_GBOT/data")#path_data) 
+                                                               occ[['fb2020']] <<- get_floraFungaBrasil_v2(path_results = tempdir)#"C:/Dados/APP_GBOT/data")#path_data) 
                                                                
                                                                
                                                                
