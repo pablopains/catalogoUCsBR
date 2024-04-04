@@ -1787,7 +1787,7 @@ app_prepare <- function()
    # library(CoordinateCleaner)
    
    # if (!"occAssess" %in% installed.packages()) devtools::install_github("https://github.com/robboyd/occAssess")
-   library(occAssess)   
+   # library(occAssess)   
    
    # # install.packages("countrycode")
    library(countrycode)
