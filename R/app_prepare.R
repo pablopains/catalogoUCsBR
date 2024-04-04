@@ -1074,7 +1074,7 @@ app_prepare <- function()
          # source("C:/Dados/APP_GBOT/functions/get_floraFungaBrasil_v2.R", encoding = "UTF-8")
          {
            get_floraFungaBrasil_v2 <- function(url_source = "http://ipt.jbrj.gov.br/jbrj/archive.do?r=lista_especies_flora_brasil",
-                                               path_results = 'C:\\Dados\\APP_GBOT\\data') # if NULL
+                                               path_results = tempdir)#'C:\\Dados\\APP_GBOT\\data') # if NULL
              
            {  
              
@@ -1098,7 +1098,7 @@ app_prepare <- function()
              
              taxon.file <- paste0(path_results,"/taxon.txt")
              
-             taxon.file <- paste0("C:\\Dados\\APP_GBOT\\data\\FloraFungaBrasil\\taxon.txt")
+             # taxon.file <- paste0("C:\\Dados\\APP_GBOT\\data\\FloraFungaBrasil\\taxon.txt")
              
              
              
