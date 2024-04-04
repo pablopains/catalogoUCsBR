@@ -2094,13 +2094,12 @@ app_prepare <- function()
       # mudar aqui path 
       
       # file.name.sp <- './data/collectionCode/Padronizar_collectionCode.csv'
-      file.name.sp <- 'C:\\catalogoUCsBR - github.com\\data\\collectionCode\\Padronizar_collectionCode.csv'
-      
-      collectionCodeDB <<- readr::read_csv(file.name.sp, 
-                                           locale = readr::locale(encoding = "UTF-8"),
-                                           show_col_types = FALSE) %>%
-         data.frame() %>%
-         dplyr::mutate(Ctrl_collectionCode = Ctrl_collectionCode %>% toupper())
+      # file.name.sp <- 'C:\\catalogoUCsBR - github.com\\data\\collectionCode\\Padronizar_collectionCode.csv'
+      # collectionCodeDB <<- readr::read_csv(file.name.sp, 
+      #                                      locale = readr::locale(encoding = "UTF-8"),
+      #                                      show_col_types = FALSE) %>%
+      #    data.frame() %>%
+      #    dplyr::mutate(Ctrl_collectionCode = Ctrl_collectionCode %>% toupper())
       
       
       # file.name.sp <- './data/recordedBy/Padronizar_Coletores_CNCFlora.csv'
