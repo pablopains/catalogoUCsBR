@@ -1062,7 +1062,7 @@ app_prepare <- function()
                         summary = res_in,
                         MainCollectorLastNameDB_new=recordedBy_ajusted_new))
             
-            ptint('Finished!')
+            ptint('Finished2!')
             
           }
         } 
@@ -2103,7 +2103,7 @@ app_prepare <- function()
       
       
       # file.name.sp <- './data/recordedBy/Padronizar_Coletores_CNCFlora.csv'
-      file.name.sp <- 'https://raw.githubusercontent.com/pablopains/parseGBIF/main/collectorDictionary/CollectorsDictionary_parseGBIF.csv'
+      file.name.sp <- 'https://raw.githubusercontent.com/pablopains/catalogoUCsBR/main/collectorDictionary/collectorDictionary.csv'
       coletoresDB <<- readr::read_csv(file.name.sp, 
                                       locale = readr::locale(encoding = "UTF-8"),
                                       show_col_types = FALSE) %>%
@@ -3458,9 +3458,12 @@ app_prepare <- function()
                                                                      source_data <- 'all_mainCollectorLastName'
                                                                      occ[[source_data]] <<- mainCollectorLastName_tmp[['occ']]
                                                                      
+                                                                     print(paste0(NROW(occ[[source_data]]),' all_mainCollectorLastName'))
+                                                                     
                                                                      source_data <- 'mainCollectorLastNameSummary'
                                                                      occ[[source_data]] <<- mainCollectorLastName_tmp[['summary']]
                                                                      
+                                                                     occ[[source_data]]
                                                                      
                                                                      incProgress(100, detail = '100')
                                                                   })
@@ -3472,8 +3475,9 @@ app_prepare <- function()
             
             output$applyMainCollectorLastNameContents <- DT::renderDataTable(options = list(scrollX = TRUE),
                                                                              {
+                                                                               # print('aqui')
                                                                                 applyMainCollectorLastNamePattern()
-                                                                                
+                                                                                # print('aqui2')
                                                                              })
             
             # downloadData_applyCollectionCodesPattern_Summary

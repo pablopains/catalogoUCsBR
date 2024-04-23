@@ -1082,7 +1082,7 @@ app_review <- function()
                                           
                                           helpText("Desenvolvido por: Melo, Pablo Hendrigo Alves de, Bochorny, Thuane & Forzza, Rafaela Campostrini"),
                                           
-                                          helpText("Versão 1.2 de janeiro/2024"),
+                                          helpText("Versão 1.3 de abril/2024"),
                                           
                                         ))
                                       
