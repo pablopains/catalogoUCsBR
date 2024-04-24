@@ -1078,7 +1078,7 @@ app_review <- function()
                                         
                                         column(
                                           width = 12,
-                                          helpText("Administrado pelo Instituto de Pesquisas Jardim Botânico do Rio de Janeiro"),
+                                          helpText("Administrado pelo Instituto de Pesquisas Jardim Botânico do Rio de Janeiro "),
                                           
                                           helpText("Desenvolvido por: Melo, Pablo Hendrigo Alves de, Bochorny, Thuane & Forzza, Rafaela Campostrini"),
                                           
