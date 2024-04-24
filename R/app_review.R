@@ -814,14 +814,14 @@ app_review <- function()
           
           shinydashboard::dashboardBody(
             
-            navbarPage("Verificador de dados de flora do Catálogo de Plantas das Unidades de Conservação do Brasil (Flora data verifier of the Catalog of Plants of Conservation Units in Brazil)",
+            navbarPage("Aplicativo de revisão de dados para as listas do Catálogo de Plantas das Unidades de Conservação do Brasil",
                        
                        #  Tela para verificação da identificação de amostras e duplicatas 
                        tabPanel(icon("check"), 
                                 # navbarPage("Validação de identificação taxonômica e seleção de material testemunho (Validation of taxonomic identification and voucher selection)",
                                 #            tabPanel(icon("sitemap 
                                 
-                                box(title = '1. Informações do pesquisador (Researcher information)',
+                                box(title = '1. Informações do revisor',
                                     status = "primary",
                                     width = 12,
                                     
@@ -830,17 +830,17 @@ app_review <- function()
                                         column(
                                           width = 12,
                                           
-                                          textInput("Ctrl_verificadoPor_Input", "Verificado por (Verified by):", Ctrl_identifiedBy),
+                                          textInput("Ctrl_verificadoPor_Input", "1. Nome completo:", Ctrl_identifiedBy),
                                           
-                                          textInput("Ctrl_emailVerificador_Input", "Email do verificador (Verifier email):", Ctrl_emailVerificador),
-                                          
-                                          dateInput("Ctrl_dataVerificacao_Input", "Data de verificação (Verification date):", value = Ctrl_dateIdentified, ) #language = "ru"
+                                          textInput("Ctrl_emailVerificador_Input", "2. E-mail para contato:", Ctrl_emailVerificador),
+                                          # as.POSIXlt(Sys.time(), "GMT") # the current time in GMT
+                                          dateInput("Ctrl_dataVerificacao_Input", "Data de verificação:", value = Sys.time() ) #language = "ru"
                                         )
                                       )
                                     )
                                 ),
                                 
-                                box(title = '2. Carregar arquivo CSV e informações associadas (Upload CSV file and associated information)',
+                                box(title = '2. Carregar arquivo e validar nomes',
                                     status = "primary",
                                     width = 12,
                                     
@@ -848,7 +848,7 @@ app_review <- function()
                                       fluidRow(
                                         column(width = 12,
                                                
-                                               helpText('2.1. Escolher o arquivo CSV padronizado com registros de ocorrência (Choose standardized CSV file with occurrence records)'),
+                                               helpText('2.1. Carregar arquivo CSV padronizado com registros de ocorrência para revisão'),
                                                
                                                fileInput(inputId = "occResultsFile",
                                                          label = '',#"CSV file",
@@ -859,9 +859,9 @@ app_review <- function()
                                       fluidRow(
                                         column(width = 12,
                                                
-                                               helpText("2.2. Carregar lista de ocorrências para validação (Load data for validation)"),
+                                               helpText("2.2. Carregar lista de ocorrências para validação"),
                                                
-                                               actionButton("getUnvalidatedNamesBtn", "Carregar dados (Load data)", 
+                                               actionButton("getUnvalidatedNamesBtn", "Carregar dados", 
                                                             icon = icon("play")),
                                                br(),
                                                br(),
@@ -871,7 +871,7 @@ app_review <- function()
                                         column(width = 12,
                                                
                                                shiny::tags$a('Flora e Funga do Brasil', href = 'ipt.jbrj.gov.br/jbrj/resource?r=lista_especies_flora_brasil'),
-                                               helpText(paste0('2.3. Carregar dados da Flora e Funga do Brasil no formato Darwin Core (Download Flora and Funga do Brazil in Darwin Core format)')),
+                                               helpText(paste0('2.3. Carregar dados da Flora e Funga do Brasil')),
                                                actionButton("getfb2020Btn", "Carregar Flora e Funga do Brasil", onclick = 'Shiny.onInputChange(\"checkSpeciesNames_FB2020_Btn\",  Math.random())',
                                                             icon = icon("download"))),
                                       )),
@@ -883,13 +883,13 @@ app_review <- function()
                                         #                     icon = icon("play"))),
                                         
                                         column(width = 12,
-                                               actionButton("getResultsBtn", "Carregar dados (Load data)", 
+                                               actionButton("getResultsBtn", "Carregar dados", 
                                                             icon = icon("play"))),
                                         
                                         column(
                                           width = 12,
                                           
-                                          helpText('Amostras/espécies Verificadas (Verified samples/species)'),
+                                          helpText('Amostras verificadas'),
                                           rHandsontableOutput('hot_verified_samples'),
                                         )
                                       )
@@ -901,7 +901,7 @@ app_review <- function()
                                 )
                        ),
                        
-                       box(title = '3. Selecionar família (Select family)',
+                       box(title = '3. Selecionar família',
                            status = "primary",
                            width = 12,
                            
@@ -910,7 +910,7 @@ app_review <- function()
                                column(
                                  width = 12,
                                  
-                                 selectInput("Ctrl_familyList_Input", "Escolha uma família (Choose family) :",
+                                 selectInput("Ctrl_familyList_Input", "Escolha uma família:",
                                              Ctrl_familyList),
                                  
                                )
@@ -925,7 +925,7 @@ app_review <- function()
                                 
                                 
                                 # helpText('Painel de Seleção'),
-                                box(title = "4. Selecionar espécime/amostra por espécie (Select specimen/sample by species)",
+                                box(title = "4. Selecionar espécime",
                                     status = "primary",
                                     width = 12,
                                     
@@ -935,7 +935,7 @@ app_review <- function()
                                       fluidRow(
                                         column(
                                           width = 12,
-                                          helpText('Lista de espécies (Species list)'),
+                                          helpText('Lista de espécies '),
                                           column(width = 12, rHandsontableOutput("hot_specie_key"))
                                         ))),
                                     
@@ -943,7 +943,7 @@ app_review <- function()
                                       fluidRow(
                                         column(
                                           width = 12,
-                                          helpText('Amostras/espécies (Samples/species)'),
+                                          helpText('Duplicatas'),
                                           column(width = 12, rHandsontableOutput('hot_summary_key')),
                                           
                                           # Amostra selecionada (Sample selected)
@@ -962,9 +962,9 @@ app_review <- function()
                                       fluidRow(
                                         column(
                                           width = 12,
-                                          helpText('Duplicatas/amostra (Duplicates/sample)'),
+                                          # helpText('Duplicatas/amostra (Duplicates/sample)'),
                                           
-                                          helpText('Escolha o voucher (choose a voucher)'),
+                                          helpText('Escolha o voucher'),
                                           
                                           htmlOutput("link_key_text"),
                                           
@@ -976,7 +976,7 @@ app_review <- function()
                          column(width = 6,
                                 
                                 
-                                box(title = '5. Confirmar, ou atribuir nova, identificação taxonômica (Confirm, or assign new, taxonomic identification)',
+                                box(title = '5. Confirmar ou atribuir nova identificação',
                                     status = "primary",
                                     width = 12,
                                     
@@ -985,14 +985,14 @@ app_review <- function()
                                         column(
                                           width = 12,
                                           
-                                          selectInput("Ctrl_scientificName_select_Input", "Selecionar nome científico (Choose scientific name):",
+                                          selectInput("Ctrl_scientificName_select_Input", "Selecionar nome científico para confirmar ou atribuir nova identificação:",
                                                       Ctrl_scientificNameList)
                                           
                                         ),
                                         
                                         column(
                                           width = 12,
-                                          helpText('Amostras já selecionadas para esta espécie (Samples already selected for this species)'),
+                                          helpText('Amostras já selecionadas para esta espécie'),
                                           
                                           # rHandsontableOutput('tbl_verified_samples')
                                           verbatimTextOutput("text_verified_samples_sel")
@@ -1006,7 +1006,7 @@ app_review <- function()
                                         column(
                                           width = 12,
                                           
-                                          textInput("Ctrl_family_verified_Input", "Atribuir outra família (Assign another Family) :", Ctrl_family_new_family),
+                                          textInput("Ctrl_family_verified_Input", "Atribuir outra família:", Ctrl_family_new_family),
                                           
                                         )
                                       )
@@ -1018,7 +1018,7 @@ app_review <- function()
                                           width = 12,
                                           
                                           selectInput("Ctrl_observacaoNaoPossivelVerificar_list_Input", 
-                                                      "Informe a razão caso o espécime não possa ser verificado (State reason in case the specimen cannot be verified) :",
+                                                      "Informe a razão caso o espécime não possa ser verificado:",
                                                       Ctrl_observacaoNaoPossivelVerificar_list,
                                                       selected = 'Não se aplica')
                                           
@@ -1048,7 +1048,7 @@ app_review <- function()
                        
                        fluidRow(
                          column(width = 12,
-                                box(title = '6. Baixar resultados (Download results)',
+                                box(title = '6. Baixar resultados',
                                     status = "primary",
                                     width = 12,
                                     
@@ -1057,7 +1057,7 @@ app_review <- function()
                                         
                                         column(
                                           width = 12,
-                                          downloadButton("downloadVerificacaoAmostra", "Baixar resultados (Download results)"),
+                                          downloadButton("downloadVerificacaoAmostra", "Baixar resultados"),
                                           # br()
                                         )
                                       )
@@ -2175,4 +2175,4 @@ app_review <- function()
 
 }
 
-# load_app_data_review()
+# app_review()
