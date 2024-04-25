@@ -867,38 +867,16 @@ app_review <- function()
                                                br(),
                                         )),
                                       
-                                      fluidRow(
-                                        column(width = 12,
-                                               
-                                               shiny::tags$a('Flora e Funga do Brasil', href = 'ipt.jbrj.gov.br/jbrj/resource?r=lista_especies_flora_brasil'),
-                                               helpText(paste0('2.3. Carregar dados da Flora e Funga do Brasil')),
-                                               actionButton("getfb2020Btn", "Carregar Flora e Funga do Brasil", onclick = 'Shiny.onInputChange(\"checkSpeciesNames_FB2020_Btn\",  Math.random())',
-                                                            icon = icon("download"))),
-                                      )),
-                                    
-                                    wellPanel(
-                                      fluidRow(
-                                        # column(width = 12,
-                                        #        actionButton("getResults", "2.3. Carregar Revisões Prévias", onclick = 'Shiny.onInputChange(\"save_verified_namesBtn\",  Math.random())',
-                                        #                     icon = icon("play"))),
-                                        
-                                        column(width = 12,
-                                               actionButton("getResultsBtn", "Carregar dados", 
-                                                            icon = icon("play"))),
-                                        
-                                        column(
-                                          width = 12,
-                                          
-                                          helpText('Amostras verificadas'),
-                                          rHandsontableOutput('hot_verified_samples'),
-                                        )
-                                      )
+                                      # fluidRow(
+                                      #   column(width = 12,
+                                      #          
+                                      #          shiny::tags$a('Flora e Funga do Brasil', href = 'ipt.jbrj.gov.br/jbrj/resource?r=lista_especies_flora_brasil'),
+                                      #          helpText(paste0('2.3. Carregar dados da Flora e Funga do Brasil')),
+                                      #          actionButton("getfb2020Btn", "Carregar Flora e Funga do Brasil", onclick = 'Shiny.onInputChange(\"checkSpeciesNames_FB2020_Btn\",  Math.random())',
+                                      #                       icon = icon("download"))),
+                                      # )
                                       
-                                      
-                                    ),
-                                    
-                                    
-                                )
+                                      ))
                        ),
                        
                        box(title = '3. Selecionar família',
@@ -921,29 +899,33 @@ app_review <- function()
                        
                        fluidRow(
                          
-                         column(width = 6,
+                         fluidRow(
+                         column(width = 12,
                                 
                                 
                                 # helpText('Painel de Seleção'),
-                                box(title = "4. Selecionar espécime",
+                                box(title = "4. Selecionar espécime / Confirmar ou atribuir nova identificação",
                                     status = "primary",
                                     width = 12,
                                     
+                                    fluidRow(
+                                      column(width = 6,
                                     wellPanel(
-                                      
-                                      
                                       fluidRow(
                                         column(
                                           width = 12,
-                                          helpText('Lista de espécies '),
+                                          helpText('4.1. Lista de espécies '),
                                           column(width = 12, rHandsontableOutput("hot_specie_key"))
                                         ))),
+                                
+                                
+                                # column(width = 6,
                                     
                                     wellPanel(
                                       fluidRow(
                                         column(
                                           width = 12,
-                                          helpText('Duplicatas'),
+                                          helpText('4.2. Duplicatas'),
                                           column(width = 12, rHandsontableOutput('hot_summary_key')),
                                           
                                           # Amostra selecionada (Sample selected)
@@ -956,101 +938,190 @@ app_review <- function()
                                           #   verbatimTextOutput("text_verified_samples")
                                           # ),
                                           
-                                        ))),
-                                    
+                                        ))) 
+                                ),
+                                 
+                                column(width = 6,   
+                                       # box(title = '5. Confirmar ou atribuir nova identificação',
+                                       #     status = "primary",
+                                       #     width = 12,
+                                           
                                     wellPanel(
                                       fluidRow(
                                         column(
                                           width = 12,
                                           # helpText('Duplicatas/amostra (Duplicates/sample)'),
                                           
-                                          helpText('Escolha o voucher'),
+                                          helpText('4.3. Escolher o voucher'),
                                           
                                           htmlOutput("link_key_text"),
                                           
                                           rHandsontableOutput('hot_details_key')
                                         ))),
                                     
-                                )),
-                         
-                         column(width = 6,
-                                
-                                
-                                box(title = '5. Confirmar ou atribuir nova identificação',
-                                    status = "primary",
-                                    width = 12,
-                                    
                                     wellPanel(
                                       fluidRow(
                                         column(
                                           width = 12,
                                           
-                                          selectInput("Ctrl_scientificName_select_Input", "Selecionar nome científico para confirmar ou atribuir nova identificação:",
-                                                      Ctrl_scientificNameList)
+                                          helpText('4.4. Selecionar nome científico para confirmar ou atribuir nova identificação'),
+                                          selectInput("Ctrl_scientificName_select_Input", "",
+                                                      Ctrl_scientificNameList),
                                           
-                                        ),
-                                        
-                                        column(
-                                          width = 12,
                                           helpText('Amostras já selecionadas para esta espécie'),
-                                          
-                                          # rHandsontableOutput('tbl_verified_samples')
                                           verbatimTextOutput("text_verified_samples_sel")
                                           
+                                          
+                                        ))),
+                                    
+                                    
+                                    # wellPanel(
+                                    #   fluidRow(
+                                    #     column(width = 12,
+                                    #       helpText('Amostras já selecionadas para esta espécie'),
+                                    #       verbatimTextOutput("text_verified_samples_sel")
+                                    #       
+                                    #     ),
+                                    #     
+                                    #   )),
+                                    
+
+                                    
+                                    wellPanel(
+                                      fluidRow(
+                                        column(
+                                          width = 4,
+                                          
+                                          actionButton("save_verified_namesBtn", "Salvar identificação", icon = icon("save")),
+                                          
                                         ),
                                         
-                                      )),
-                                    
-                                    wellPanel(
-                                      fluidRow(
                                         column(
-                                          width = 12,
+                                          width = 8,
                                           
-                                          textInput("Ctrl_family_verified_Input", "Atribuir outra família:", Ctrl_family_new_family),
+
+                                          verbatimTextOutput("text_getResults"),
                                           
                                         )
-                                      )
-                                    ),
-                                    
-                                    wellPanel(
-                                      fluidRow(
-                                        column(
-                                          width = 12,
-                                          
-                                          selectInput("Ctrl_observacaoNaoPossivelVerificar_list_Input", 
-                                                      "Informe a razão caso o espécime não possa ser verificado:",
-                                                      Ctrl_observacaoNaoPossivelVerificar_list,
-                                                      selected = 'Não se aplica')
-                                          
-                                        )
+                                        
                                       ))
                                     
+                                # )
+                                ),
+                                
                                 ),
                                 
                                 
-                                wellPanel(
-                                  fluidRow(
-                                    column(
-                                      width = 12,
-                                      
-                                      actionButton("save_verified_namesBtn", "Salvar (Save)", icon = icon("save")),
-                                      
-                                      verbatimTextOutput("text_getResults"),
-                                      
-                                    )
-                                  )),
+                                # box(title = 'Ou alterar Família ou Justificar não identificação do espécime',
+                                #     status = "primary",
+                                #     width = 12,
                                 
+                                fluidRow(
+                                  column(width = 12,
+                                         
+                                         helpText('Caso não informe item 4.4.'),
+                                         
+                                         
+                                         wellPanel(
+                                           fluidRow(
+                                             column(
+                                               width = 12,
+                                               
+                                               textInput("Ctrl_family_verified_Input", "Atribuir outra família:", Ctrl_family_new_family),
+                                               
+                                             )
+                                           )
+                                         ),
+                                         
+                                         wellPanel(
+                                           fluidRow(
+                                             column(
+                                               width = 12,
+                                               
+                                               selectInput("Ctrl_observacaoNaoPossivelVerificar_list_Input", 
+                                                           "Informe a razão caso o espécime não possa ser verificado:",
+                                                           Ctrl_observacaoNaoPossivelVerificar_list,
+                                                           selected = 'Não se aplica')
+                                               
+                                             )
+                                           ))
+                                         
+                                  ),
+                                  
+                                  
+                                  # botao salvar aqui tbm
+                                  
+                                )
+                                # )
                                 
-                                
-                         )
+                                    
+                                )),
+                         
+                         # nova fam
+                         
+                                  ),
+                         
+                       #   fluidRow(
+                       #   column(width = 12,
+                       #          
+                       #          box(title = '5. Alterar Família ou Justificar não identificação ',
+                       #              status = "primary",
+                       #              width = 12,
+                       #              
+                       #              
+                       #              wellPanel(
+                       #                fluidRow(
+                       #                  column(
+                       #                    width = 12,
+                       #                    
+                       #                    textInput("Ctrl_family_verified_Input", "Atribuir outra família:", Ctrl_family_new_family),
+                       #                    
+                       #                  )
+                       #                )
+                       #              ),
+                       #              
+                       #              wellPanel(
+                       #                fluidRow(
+                       #                  column(
+                       #                    width = 12,
+                       #                    
+                       #                    selectInput("Ctrl_observacaoNaoPossivelVerificar_list_Input", 
+                       #                                "Informe a razão caso o espécime não possa ser verificado:",
+                       #                                Ctrl_observacaoNaoPossivelVerificar_list,
+                       #                                selected = 'Não se aplica')
+                       #                    
+                       #                  )
+                       #                ))
+                       #              
+                       #          ),
+                       #          
+                       #          
+                       #          # botao salvar aqui tbm
+                       #          
+                       #   )
+                       # )
                          
                        ),
                        
                        fluidRow(
                          column(width = 12,
-                                box(title = '6. Baixar resultados',
+                                box(title = '5. Baixar resultados',
                                     status = "primary",
                                     width = 12,
+                                    
+                                    wellPanel(
+                                      fluidRow(
+                                        # column(width = 12,
+                                        #        actionButton("getResultsBtn", "Atualizar lista de verificados",icon = icon("play"))),
+                                        
+
+                                        column(
+                                          width = 12,
+                                          
+                                          helpText('Amostras verificadas'),
+                                          rHandsontableOutput('hot_verified_samples'),
+                                        ))),
+                                    
                                     
                                     wellPanel(
                                       fluidRow(
@@ -1059,9 +1130,7 @@ app_review <- function()
                                           width = 12,
                                           downloadButton("downloadVerificacaoAmostra", "Baixar resultados"),
                                           # br()
-                                        )
-                                      )
-                                    )
+                                        )))
                                     
                                 ))
                        ),
@@ -1179,7 +1248,7 @@ app_review <- function()
         output$text_getResults <- renderText({
           req(input$save_verified_namesBtn)
           x_tmp <- save_verified_names()
-          print(paste0('Última alteração salva com sucesso em: ', Sys.Date()) )
+          print(paste0('Última alteção (',  Sys.time(), ')!'))
         })
         
         
@@ -1188,12 +1257,17 @@ app_review <- function()
             # 02 02 24
             shiny::validate(
               need(NROW(hot_to_r(input$hot_specie_key))>0,  "..."))
+            
+            # shiny::validate(
+            #   need(NROW(dados())>0,  "..."))
+            
 
               # dt <- save_verified_names()
             
               # dt <- dados()
               
               dt <- occ_full
+            # dt <- getResults()
 
               rr <- hot_to_r(input$hot_details_key)
 
@@ -1363,6 +1437,8 @@ app_review <- function()
                                                          occ_full[index_upd==TRUE,]$Ctrl_dataVerificacao <<- ''
                                                          occ_full[index_upd==TRUE,]$Ctrl_verificadoPor <<- ''
                                                          occ_full[index_upd==TRUE,]$Ctrl_emailVerificador <<- ''
+                                                         
+                                                         print('aqu limpa email')
                                                        }    
                                                        
                                                        # showModal(modalDialog( title = "Alteração realizada com sucesso!",
@@ -1467,6 +1543,10 @@ app_review <- function()
                                                                    choices = Ctrl_familyList)#,
                                                  # selected = Ctrl_familyList[1])
                                                  
+                                                 
+                                                 occ[['fb2020']] <<- get_floraFungaBrasil(path_results = tempdir())#path_data) 
+                                                 
+                                                 
                                                  return(occ_full)
                                                  
                                                })
@@ -1476,7 +1556,8 @@ app_review <- function()
         
         get_current_slice_specie <- reactive(
           {
-            req(input$getfb2020Btn)
+            # req(input$getfb2020Btn)
+            req(input$getUnvalidatedNamesBtn)
             
             key_tmp <- ID_specie(input)
             index <- occ_full$Ctrl_scientificName %in% key_tmp
@@ -1498,7 +1579,9 @@ app_review <- function()
         get_current_slice_key <- reactive(
           {
             # aqui
-            req(input$getfb2020Btn)
+            # req(input$getfb2020Btn)
+            req(input$getUnvalidatedNamesBtn)
+            
             
             key_tmp <- ID_key(input)
             # key_tmp <- "ARALIACEAE_LOPES_528"
@@ -1567,7 +1650,9 @@ app_review <- function()
             #    need(NROW(occ[['all_results']])>0,  "..."))
             
             
-            req(input$getfb2020Btn)
+            # req(input$getfb2020Btn)
+            req(input$getUnvalidatedNamesBtn)
+            
             
             dt <- getUnvalidatedNames()
             
@@ -1607,7 +1692,7 @@ app_review <- function()
             rhandsontable::rhandsontable(dt,
                                          # width = 600, height = 250,
                                          # width = '100%', height = 150,
-                                         width = '100%', height = 100,
+                                         width = '100%', height = 125,
                                          
                                          digits = 0,
                                          
@@ -1624,7 +1709,7 @@ app_review <- function()
               need(NROW(hot_to_r(input$hot_specie_key))>0,  "..."))
             
             {
-              dt <- checkSpeciesNames_FB2020()
+              dt <- occ[['fb2020']]
               dt <- dt %>% dplyr::filter(toupper(family) %in% input$Ctrl_familyList_Input )
               dt <- dt %>%
                 dplyr::select(scientificName,
@@ -1641,7 +1726,7 @@ app_review <- function()
             
             rhandsontable::rhandsontable(dt,
                                          # width = 1300, height = 150,
-                                         width = '100%', height = 100,
+                                         width = '100%', height = 125,
                                          
                                          digits = 0,
                                          
@@ -2064,7 +2149,7 @@ app_review <- function()
             
             family_ID <- paste0('family_ID',id)
             
-            if(!NROW(checkSpeciesNames_FB2020())>0)
+            if(!NROW(occ[['fb2020']])>0)
             {res <- list(
               selectInput(inputId = family_ID,
                           label = 'Family:',
@@ -2074,7 +2159,7 @@ app_review <- function()
                 selectInput(inputId = family_ID,
                             label = 'Family:',
                             choices = as.list(c('Tudo',
-                                                checkSpeciesNames_FB2020()$family %>%
+                                                occ[['fb2020']]$family %>%
                                                   unique() %>% sort()))))
             }
             return(res)
@@ -2082,7 +2167,7 @@ app_review <- function()
           
           data_sel_fb2020 <- reactive({
             
-            occ[['fb2020']] <<- checkSpeciesNames_FB2020()
+            # occ[['fb2020']] <<- checkSpeciesNames_FB2020()
             
             if (input$family_ID1 == 'Tudo'){
               return(occ[['fb2020']] %>% dplyr::filter(
