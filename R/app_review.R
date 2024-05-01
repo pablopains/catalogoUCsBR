@@ -1156,7 +1156,7 @@ app_review <- function()
                                           
                                           helpText("Desenvolvido por: Melo, Pablo Hendrigo Alves de, Bochorny, Thuane & Forzza, Rafaela Campostrini"),
                                           
-                                          helpText("Versão 1.3 de abril/2024"),
+                                          helpText("Versão 1.4 de maio/2024"),
                                           
                                         ))
                                       
@@ -1307,53 +1307,18 @@ app_review <- function()
           {
             # 02 02 24
             shiny::validate(
-              need(NROW(hot_to_r(input$hot_specie_key))>0,  "..."))
-            
-            # shiny::validate(
-            #   need(NROW(dados())>0,  "..."))
-            
-
-              # dt <- save_verified_names()
-            
-              # dt <- dados()
-              
+              # need(NROW( hot_to_r(input$hot_specie_key)) >0 &
+              need(NROW(hot_to_r(input$hot_specie_key)) >0 ,  "..."))
               dt <- occ_full
-            # dt <- getResults()
-
               rr <- hot_to_r(input$hot_details_key)
 
               scientificName_verified_tmp <- unique(rr$scientificName_verified) %>% na.omit()
 
             index_res <- (dt$Ctrl_voucherAmostra == TRUE | dt$Ctrl_naoPossivelVerificar == TRUE) &
               (toupper(dt$Ctrl_emailVerificador) %in% toupper(input$Ctrl_emailVerificador_Input))
-
-            # dt <- dt[index_res==TRUE,] %>%
-            #   dplyr::rename(source = Ctrl_bibliographicCitation,
-            #                 collectionCode_catalogNumber = tombo,
-            #                 family = Ctrl_family,
-            #                 scientificName = Ctrl_scientificName,
-            #                 identifiedBy = Ctrl_identifiedBy,
-            #                 dateIdentified = Ctrl_dateIdentified,
-            #                 recordedBy = Ctrl_recordedBy,
-            #                 recordNumber = Ctrl_recordNumber,
-            #                 country = Ctrl_country,
-            #                 stateProvince = Ctrl_stateProvince,
-            #                 municipality = Ctrl_municipality,
-            #                 locality = Ctrl_locality,
-            #                 Longitude = Ctrl_decimalLongitude,
-            #                 Latitude = Ctrl_decimalLatitude,
-            #                 year = Ctrl_year,
-            #                 month = Ctrl_month,
-            #                 day = Ctrl_day,
-            #                 key = Ctrl_key_family_recordedBy_recordNumber,
-            #                 family_verified = Ctrl_family_verified,
-            #                 scientificName_verified = Ctrl_scientificName_verified,) %>%
-            #   dplyr::select(Ctrl_voucherAmostra,
-            #                 family_verified,
-            #                 scientificName_verified,
-            #                 fb2020_scientificName, fb2020_searchNotes, source, family, scientificName, identifiedBy, dateIdentified, recordedBy, recordNumber, country, stateProvince, municipality, locality, collectionCode_catalogNumber, Longitude, Latitude, year, month, day,
-            #                 Ctrl_Record_ID_Review,
-            #                 key)
+            
+            if(sum(index_res)>0)
+            {
 
             dt <- dt[index_res==TRUE,] 
             
@@ -1384,6 +1349,9 @@ app_review <- function()
                                    `Coletor`	= dt$Ctrl_recordedBy,
                                    `Número da Coleta`	= dt$Ctrl_recordNumber,
                                    `Origem (segundo Flora e Funga do Brasil)` = rep('',NROW(dt)))
+            }else{
+              data_imp <- data.frame(vazio='vazio')
+            }
 
             rhandsontable::rhandsontable(data_imp,#dt,
                                          # width = 600, height = 250,
