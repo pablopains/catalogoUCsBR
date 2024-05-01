@@ -1113,24 +1113,29 @@ app_review <- function()
                                       fluidRow(
                                         # column(width = 12,
                                         #        actionButton("getResultsBtn", "Atualizar lista de verificados",icon = icon("play"))),
-                                        
-
                                         column(
                                           width = 12,
                                           
                                           helpText('Amostras verificadas'),
-                                          rHandsontableOutput('hot_verified_samples'),
-                                        ))),
+                                          rHandsontableOutput('hot_verified_samples')
+                                          
+                                          ))),
                                     
                                     
                                     wellPanel(
                                       fluidRow(
                                         
                                         column(
-                                          width = 12,
-                                          downloadButton("downloadVerificacaoAmostra", "Baixar resultados"),
+                                          width = 6,
+                                          downloadButton("downloadVerificacaoAmostra", "Baixar planilha completa"),
                                           # br()
-                                        )))
+                                        ),
+                                        
+                                        column(
+                                          width = 6,
+                                          downloadButton("download_ModeloCatalogo", "Baixar planilha Modelo Catálogo de Plantas das Unidades de Conservação do Brasil"),
+                                         
+                                        ))),
                                     
                                 ))
                        ),
@@ -1201,10 +1206,55 @@ app_review <- function()
         
         output$downloadVerificacaoAmostra <- downloadHandler(
           filename = function() {
-            paste("Planilha_Verificador_Catalogo_de_Plantas_UCs_Brasil - ",input$Ctrl_verificadoPor_Input, ' - ', Sys.Date(), ".csv", sep="")
+            paste("Planilha_COMPLETA_Catalogo_de_Plantas_UCs_Brasil - ",input$Ctrl_verificadoPor_Input, ' - ', Sys.Date(), ".csv", sep="")
           },
           content = function(file) {
+            # write.csv(occ_full %>% dplyr::select(-colunas_wcvp_sel) %>% data.frame(stringsAsFactors = FALSE), file, row.names = FALSE, fileEncoding = "UTF-8", na = "")
             write.csv(occ_full %>% data.frame(stringsAsFactors = FALSE), file, row.names = FALSE, fileEncoding = "UTF-8", na = "")
+          })
+        
+        
+        output$download_ModeloCatalogo <- downloadHandler(
+          filename = function() {
+            paste("Planilha_MODELO_Catalogo_de_Plantas_UCs_Brasil - ",input$Ctrl_verificadoPor_Input, ' - ', Sys.Date(), ".csv", sep="")
+          },
+          content = function(file) {
+            
+            dt <- occ_full
+            
+            index_res <- (dt$Ctrl_voucherAmostra == TRUE | dt$Ctrl_naoPossivelVerificar == TRUE) &
+              (toupper(dt$Ctrl_emailVerificador) %in% toupper(input$Ctrl_emailVerificador_Input))
+            
+            dt <- dt[index_res==TRUE,] 
+            
+            bancodados <- stringr::str_sub(dt$Ctrl_occurrenceID, 
+                                           1, 
+                                           stringr::str_locate(dt$Ctrl_occurrenceID, '=')[[1]]-1)
+            bancodados <- paste0(toupper(str_sub(bancodados,1,1)),str_sub(bancodados, 2,nchar(bancodados)))
+            
+            barcode <- stringr::str_sub(dt$Ctrl_occurrenceID,
+                                        stringr::str_locate(dt$Ctrl_occurrenceID, '=')[[1]]+1,
+                                        nchar(dt$Ctrl_occurrenceID))
+            
+            autor <- paste0(word(dt$Ctrl_scientificName_verified,1) ,' ',word(dt$Ctrl_scientificName_verified,2))
+            autor <- sub(autor, '', dt$Ctrl_scientificName_verified)
+            autor <- stringr::str_sub(autor, 2,nchar(autor))
+
+            data_imp <- data.frame(UC = rep('',NROW(dt)),
+                                   Grupos = rep('',NROW(dt)),
+                                   `Família`= dt$Ctrl_family_verified,
+                                   `Gênero` =  word(dt$Ctrl_scientificName_verified,1),
+                                   `Espécie` = word(dt$Ctrl_scientificName_verified,2),
+                                   Autor = autor,
+                                   `Táxon completo (segundo Flora & Funga do Brasil)` = dt$Ctrl_scientificName_verified,
+                                   `Barcode`	=  barcode,
+                                   `Banco de dados de origem`	= bancodados,
+                                   `Sigla Herbário` = dt$Ctrl_collectionCode,
+                                   `Coletor`	= dt$Ctrl_recordedBy,
+                                   `Número da Coleta`	= dt$Ctrl_recordNumber,
+                                   `Origem (segundo Flora & Funga do Brasil)` = rep('',NROW(dt)))
+
+            write.csv(data_imp %>% data.frame(stringsAsFactors = FALSE), file, row.names = FALSE, fileEncoding = "UTF-8", na = "")
           })
         
         
@@ -1276,36 +1326,63 @@ app_review <- function()
             index_res <- (dt$Ctrl_voucherAmostra == TRUE | dt$Ctrl_naoPossivelVerificar == TRUE) &
               (toupper(dt$Ctrl_emailVerificador) %in% toupper(input$Ctrl_emailVerificador_Input))
 
-            dt <- dt[index_res==TRUE,] %>%
-              dplyr::rename(source = Ctrl_bibliographicCitation,
-                            collectionCode_catalogNumber = tombo,
-                            family = Ctrl_family,
-                            scientificName = Ctrl_scientificName,
-                            identifiedBy = Ctrl_identifiedBy,
-                            dateIdentified = Ctrl_dateIdentified,
-                            recordedBy = Ctrl_recordedBy,
-                            recordNumber = Ctrl_recordNumber,
-                            country = Ctrl_country,
-                            stateProvince = Ctrl_stateProvince,
-                            municipality = Ctrl_municipality,
-                            locality = Ctrl_locality,
-                            Longitude = Ctrl_decimalLongitude,
-                            Latitude = Ctrl_decimalLatitude,
-                            year = Ctrl_year,
-                            month = Ctrl_month,
-                            day = Ctrl_day,
-                            key = Ctrl_key_family_recordedBy_recordNumber,
-                            family_verified = Ctrl_family_verified,
-                            scientificName_verified = Ctrl_scientificName_verified,) %>%
-              dplyr::select(Ctrl_voucherAmostra,
-                            family_verified,
-                            scientificName_verified,
-                            fb2020_scientificName, fb2020_searchNotes, source, family, scientificName, identifiedBy, dateIdentified, recordedBy, recordNumber, country, stateProvince, municipality, locality, collectionCode_catalogNumber, Longitude, Latitude, year, month, day,
-                            Ctrl_Record_ID_Review,
-                            key)
+            # dt <- dt[index_res==TRUE,] %>%
+            #   dplyr::rename(source = Ctrl_bibliographicCitation,
+            #                 collectionCode_catalogNumber = tombo,
+            #                 family = Ctrl_family,
+            #                 scientificName = Ctrl_scientificName,
+            #                 identifiedBy = Ctrl_identifiedBy,
+            #                 dateIdentified = Ctrl_dateIdentified,
+            #                 recordedBy = Ctrl_recordedBy,
+            #                 recordNumber = Ctrl_recordNumber,
+            #                 country = Ctrl_country,
+            #                 stateProvince = Ctrl_stateProvince,
+            #                 municipality = Ctrl_municipality,
+            #                 locality = Ctrl_locality,
+            #                 Longitude = Ctrl_decimalLongitude,
+            #                 Latitude = Ctrl_decimalLatitude,
+            #                 year = Ctrl_year,
+            #                 month = Ctrl_month,
+            #                 day = Ctrl_day,
+            #                 key = Ctrl_key_family_recordedBy_recordNumber,
+            #                 family_verified = Ctrl_family_verified,
+            #                 scientificName_verified = Ctrl_scientificName_verified,) %>%
+            #   dplyr::select(Ctrl_voucherAmostra,
+            #                 family_verified,
+            #                 scientificName_verified,
+            #                 fb2020_scientificName, fb2020_searchNotes, source, family, scientificName, identifiedBy, dateIdentified, recordedBy, recordNumber, country, stateProvince, municipality, locality, collectionCode_catalogNumber, Longitude, Latitude, year, month, day,
+            #                 Ctrl_Record_ID_Review,
+            #                 key)
 
+            dt <- dt[index_res==TRUE,] 
+            
+            bancodados <- stringr::str_sub(1, 
+                                           stringr::str_locate(dt$Ctrl_occurrenceID, '=')[[1]],
+                                           dt$Ctrl_occurrenceID)
+            bancodados <- paste0(toupper(str_sub(bancodados,1,1)),str_sub(bancodados, 2,nchar(bancodados)))
+            barcode <- stringr::str_sub(dt$Ctrl_occurrenceID,
+                                        stringr::str_locate(dt$Ctrl_occurrenceID, '=')[[1]]+1,
+                                        nchar(dt$Ctrl_occurrenceID))
+            
+            autor <- paste0(word(dt$Ctrl_scientificName_verified,1) ,' ',word(dt$Ctrl_scientificName_verified,2))
+            autor <- sub(autor, '', dt$Ctrl_scientificName_verified)
+            autor <- stringr::str_sub(autor, 2,nchar(autor))
+            
+            data_imp <- data.frame(UC = rep('',NROW(dt)),
+                                   Grupos = rep('',NROW(dt)),
+                                   `Família`= dt$Ctrl_family_verified,
+                                   `Gênero` =  word(dt$Ctrl_scientificName_verified,1),
+                                   `Espécie` = word(dt$Ctrl_scientificName_verified,2),
+                                   Autor = autor,
+                                   `Táxon completo (segundo Flora & Funga do Brasil)` = dt$Ctrl_scientificName_verified,
+                                   `Barcode`	=  barcode,
+                                   `Banco de dados de origem`	= bancodados,
+                                   `Sigla Herbário` = dt$Ctrl_collectionCode,
+                                   `Coletor`	= dt$Ctrl_recordedBy,
+                                   `Número da Coleta`	= dt$Ctrl_recordNumber,
+                                   `Origem (segundo Flora & Funga do Brasil)` =rep('',NROW(dt)))
 
-            rhandsontable::rhandsontable(dt,
+            rhandsontable::rhandsontable(data_imp,#dt,
                                          # width = 600, height = 250,
                                          width = '100%', height = 150,
 
