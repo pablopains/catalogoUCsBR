@@ -1230,6 +1230,7 @@ app_review <- function()
             bancodados <- stringr::str_sub(dt$Ctrl_occurrenceID, 
                                            1, 
                                            stringr::str_locate(dt$Ctrl_occurrenceID, '=')[[1]]-1)
+            
             bancodados <- paste0(toupper(str_sub(bancodados,1,1)),str_sub(bancodados, 2,nchar(bancodados)))
             
             barcode <- stringr::str_sub(dt$Ctrl_occurrenceID,
@@ -1252,7 +1253,7 @@ app_review <- function()
                                    `Sigla Herbário` = dt$Ctrl_collectionCode,
                                    `Coletor`	= dt$Ctrl_recordedBy,
                                    `Número da Coleta`	= dt$Ctrl_recordNumber,
-                                   `Origem (segundo Flora & Funga do Brasil)` = rep('',NROW(dt)))
+                                   `Origem (segundo Flora e Funga do Brasil)` = rep('',NROW(dt)))
 
             write.csv(data_imp %>% data.frame(stringsAsFactors = FALSE), file, row.names = FALSE, fileEncoding = "UTF-8", na = "")
           })
@@ -1356,10 +1357,12 @@ app_review <- function()
 
             dt <- dt[index_res==TRUE,] 
             
-            bancodados <- stringr::str_sub(1, 
-                                           stringr::str_locate(dt$Ctrl_occurrenceID, '=')[[1]],
-                                           dt$Ctrl_occurrenceID)
+            bancodados <- stringr::str_sub(dt$Ctrl_occurrenceID, 
+                                           1, 
+                                           stringr::str_locate(dt$Ctrl_occurrenceID, '=')[[1]]-1)
+            
             bancodados <- paste0(toupper(str_sub(bancodados,1,1)),str_sub(bancodados, 2,nchar(bancodados)))
+            
             barcode <- stringr::str_sub(dt$Ctrl_occurrenceID,
                                         stringr::str_locate(dt$Ctrl_occurrenceID, '=')[[1]]+1,
                                         nchar(dt$Ctrl_occurrenceID))
@@ -1380,7 +1383,7 @@ app_review <- function()
                                    `Sigla Herbário` = dt$Ctrl_collectionCode,
                                    `Coletor`	= dt$Ctrl_recordedBy,
                                    `Número da Coleta`	= dt$Ctrl_recordNumber,
-                                   `Origem (segundo Flora & Funga do Brasil)` =rep('',NROW(dt)))
+                                   `Origem (segundo Flora e Funga do Brasil)` = rep('',NROW(dt)))
 
             rhandsontable::rhandsontable(data_imp,#dt,
                                          # width = 600, height = 250,
