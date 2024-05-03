@@ -1,14 +1,13 @@
 Package: catalogoUCsBR
 Type: Package
-Title: An R package for preparing species listings for the Plant Catalog of Units of Brazilian Conservation.
-Version: 1.0.0
-Date: 2023-06-04
+Title: An R package to prepare species lists for the Catalog of Plants of Conservation Units in Brazil.
+Version: 1.0.4
+Date: 2024-03-05
 Authors@R: c(person("Pablo", "Melo", email = "pablopains@yahoo.com.br", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3004-2984")),
 	    person("Thuane", "Bochorny", email = "tbochorny@gmail.com", role = c("aut"), comment = c(ORCID = "0000-0003-4278-4520")),
 	    person("Rafaela", "Forzza", email = "rafaela@jbrj.gov.br", role = c("aut"), comment = c(ORCID = "0000-0002-7035-9313")))
 Maintainer: Pablo Melo <pablopains@yahoo.com.br>
-Description: The catalogo_ucs_BR package is designed to convert species occurrence data from the Jabot Geral, Jabot RB, Reflora, SpeciesLink and GBIF data portals into a more understandable format for use in preparing species listings for the Plant Catalog of Units of Brazilian Conservation.
-    The package provides tools to verify and standardize scientific names of species, join duplicates and select species records as a voucher to compose lists of plant species in UCs in Brazil, promoting the dissemination of knowledge about biodiversity in protected areas.
+Description: The catalogoUCsBR package is designed to convert herbarium species occurrence data from JABOT, Reflora, speciesLink, and GBIF data portals into a suitable format to prepare plant species lists revised for the Catalog of Plants of Conservation Units in Brazil. The package provides tools to verify and standardize scientific names of species, join duplicates, and select species records as a voucher to compose lists of plant species in UCs in Brazil, helping to understand and protect the biodiversity in protected areas.
 License: GPL (>= 2) | file LICENSE
 Encoding: UTF-8
 LazyData: FALSE
@@ -17,14 +16,12 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
 Imports:
     dplyr,
-    dplyr,
     tidyr,
     readr,
     stringr,
     lubridate,
     jsonlite,
     sqldf,
-    rvest,
     shiny,
     shinydashboard,
     rhandsontable,

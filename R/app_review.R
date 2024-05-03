@@ -15,7 +15,6 @@
 #' @import lubridate
 #' @import jsonlite
 #' @import sqldf
-#' @import rvest
 #' @import shiny
 #' @import shinydashboard
 #' @import rhandsontable
@@ -53,107 +52,107 @@ app_review <- function()
   {
     #  carregar pacotes básicos
     {
-      # 
-      # # install.packages('plyr', dependencies = TRUE)
-      # library(plyr) 
-      # 
-      # # install.packages('readxl', dependencies = TRUE)
-      # library(readxl) 
-      
-      # install.packages('dplyr', dependencies = TRUE)
-      library(dplyr)
-      
-      # install.packages('tidyr', dependencies = TRUE)
-      library(tidyr)
-      
-      # # install.packages('biogeo', dependencies = TRUE)
-      # library(biogeo)
-      
-      # install.packages('readr', dependencies = TRUE)
-      library(readr)
-      
-      # install.packages('stringr', dependencies = TRUE)
-      library(stringr)
-      
-      # # install.packages('devtools', dependencies = TRUE)
-      # library(devtools)
-      # 
-      # # devtools::install_github("ropensci/CoordinateCleaner")
-      # library(CoordinateCleaner)
+      # # 
+      # # # install.packages('plyr', dependencies = TRUE)
+      # # library(plyr) 
+      # # 
+      # # # install.packages('readxl', dependencies = TRUE)
+      # # library(readxl) 
       # 
       # # install.packages('dplyr', dependencies = TRUE)
       # library(dplyr)
       # 
-      # # install.packages('textclean', dependencies = TRUE)
-      # library(textclean)
+      # # install.packages('tidyr', dependencies = TRUE)
+      # library(tidyr)
       # 
-      # # install.packages('googledrive', dependencies = TRUE)
-      # library(googledrive)
+      # # # install.packages('biogeo', dependencies = TRUE)
+      # # library(biogeo)
+      # 
+      # # install.packages('readr', dependencies = TRUE)
+      # library(readr)
+      # 
+      # # install.packages('stringr', dependencies = TRUE)
+      # library(stringr)
+      # 
+      # # # install.packages('devtools', dependencies = TRUE)
+      # # library(devtools)
+      # # 
+      # # # devtools::install_github("ropensci/CoordinateCleaner")
+      # # library(CoordinateCleaner)
+      # # 
+      # # # install.packages('dplyr', dependencies = TRUE)
+      # # library(dplyr)
+      # # 
+      # # # install.packages('textclean', dependencies = TRUE)
+      # # library(textclean)
+      # # 
+      # # # install.packages('googledrive', dependencies = TRUE)
+      # # library(googledrive)
+      # # 
+      # # # install.packages('rvest', dependencies = TRUE)
+      # # library(rvest)
+      # # 
+      # # # # install.packages('flora', dependencies = TRUE)
+      # # # library(flora)
+      # # 
+      # # # install.packages('raster', dependencies = TRUE)
+      # # library(raster)
+      # # 
+      # # # install.packages('sp', dependencies = TRUE)
+      # # library(sp)
+      # 
+      # # install.packages('lubridate', dependencies = TRUE)
+      # library(lubridate)
+      # 
+      # # # install.packages('rnaturalearthdata', dependencies = TRUE)
+      # # library(rnaturalearthdata)
+      # # 
+      # # # # install.packages('geobr', dependencies = TRUE)
+      # # # library(geobr) 
+      # # 
+      # # # # install.packages('monographaR', dependencies = TRUE)
+      # # # library(monographaR) 
+      # 
+      # # install.packages('jsonlite', dependencies = TRUE)
+      # library(jsonlite)
+      # 
+      # # install.packages('sqldf', dependencies = TRUE)
+      # library(sqldf) 
       # 
       # # install.packages('rvest', dependencies = TRUE)
+      # # install.packages("rvest")
       # library(rvest)
       # 
-      # # # install.packages('flora', dependencies = TRUE)
-      # # library(flora)
-      # 
-      # # install.packages('raster', dependencies = TRUE)
-      # library(raster)
-      # 
-      # # install.packages('sp', dependencies = TRUE)
-      # library(sp)
-      
-      # install.packages('lubridate', dependencies = TRUE)
-      library(lubridate)
-      
-      # # install.packages('rnaturalearthdata', dependencies = TRUE)
-      # library(rnaturalearthdata)
-      # 
-      # # # install.packages('geobr', dependencies = TRUE)
-      # # library(geobr) 
-      # 
-      # # # install.packages('monographaR', dependencies = TRUE)
-      # # library(monographaR) 
-      
-      # install.packages('jsonlite', dependencies = TRUE)
-      library(jsonlite)
-      
-      # install.packages('sqldf', dependencies = TRUE)
-      library(sqldf) 
-      
-      # install.packages('rvest', dependencies = TRUE)
-      # install.packages("rvest")
-      library(rvest)
-      
-      # install.packages('shiny', dependencies = TRUE)
-      library(shiny) 
-      
       # # install.packages('shiny', dependencies = TRUE)
-      # library(shinydashboardPlus)
-      
-      # install.packages('shinydashboard', dependencies = TRUE)
-      library(shinydashboard)
-      
-      # install.packages('rhandsontable', dependencies = TRUE)
-      library(rhandsontable)
-      
-      
-      # # install.packages('mapview', dependencies = TRUE)
-      # library(mapview)
-      
-      # install.packages('DT', dependencies = TRUE)
-      library(DT)
-      
-      # install.packages('rhandsontable', dependencies = TRUE)
-      library(rhandsontable) # tabela editavel
-      
-      # install.packages('shinyWidgets', dependencies = TRUE)
-      library(shinyWidgets) # botoes
-      
-      # install.packages('measurements', dependencies = TRUE)
-      library(measurements)
-      
-      # install.packages('downloader', dependencies = TRUE)
-      library(downloader)
+      # library(shiny) 
+      # 
+      # # # install.packages('shiny', dependencies = TRUE)
+      # # library(shinydashboardPlus)
+      # 
+      # # install.packages('shinydashboard', dependencies = TRUE)
+      # library(shinydashboard)
+      # 
+      # # install.packages('rhandsontable', dependencies = TRUE)
+      # library(rhandsontable)
+      # 
+      # 
+      # # # install.packages('mapview', dependencies = TRUE)
+      # # library(mapview)
+      # 
+      # # install.packages('DT', dependencies = TRUE)
+      # library(DT)
+      # 
+      # # install.packages('rhandsontable', dependencies = TRUE)
+      # library(rhandsontable) # tabela editavel
+      # 
+      # # install.packages('shinyWidgets', dependencies = TRUE)
+      # library(shinyWidgets) # botoes
+      # 
+      # # install.packages('measurements', dependencies = TRUE)
+      # library(measurements)
+      # 
+      # # install.packages('downloader', dependencies = TRUE)
+      # library(downloader)
       
       
       

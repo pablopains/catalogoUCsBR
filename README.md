@@ -12,11 +12,15 @@ coverage](https://codecov.io/gh/pablopains/catalogoUCsBR/branch/main/graph/badge
 
 <!-- badges: end -->
 
-The **catalogoUCsBR** package is designed to convert species occurrence
-data from the Jabot Geral, Jabot RB, Reflora, SpeciesLink and GBIF data
-portals into a more understandable format for use in preparing species
-listings for the [Plant Catalog of Units of Brazilian
-Conservation](https://catalogo-ucs-brasil.jbrj.gov.br/).
+The **catalogoUCsBR** package is designed to convert herbarium species
+occurrence data from JABOT, Reflora, speciesLink, and GBIF data portals
+into a suitable format to prepare plant species lists revised for the
+[Catalog of Plants of Conservation Units in
+Brazil](https://catalogo-ucs-brasil.jbrj.gov.br/). The package provides
+tools to verify and standardize scientific names of species, join
+duplicates, and select species records as a voucher to compose lists of
+plant species in UCs in Brazil, helping to understand and protect the
+biodiversity in protected areas.
 
 ## Installation
 
@@ -25,16 +29,12 @@ You can install the development version of catalogoUCsBR from
 catalogoUCsBR, run
 
 ``` r
-devtools::install_github("pablopains/catalogoUCsBR")
+devtools::install_github("pablopains/catalogoUCsBR", dependencies = TRUE)
 ```
 
 # **Botanical experts**
 
-## **Use the online review app at ** [pablopains.shinyapps.io/catalogoUCsBR/](https://pablopains.shinyapps.io/catalogoUCsBR/)\*\*
-
 ## **Use the prepare app locally in RStudio**
-
-We recommend using the application locally.
 
 ``` r
 catalogoUCsBR::app_prepare()
@@ -42,13 +42,11 @@ catalogoUCsBR::app_prepare()
 
 ## **Use the review app locally in RStudio**
 
-We recommend using the application locally.
-
 ``` r
 catalogoUCsBR::app_review()
 ```
 
-## **Consult the [catalogoUCsBR Manual](https://github.com/pablopains/catalogoUCsBR/blob/main/catalogoUCsBR_1.0.0.pdf) for a case study with a complete and replicable workflow**
+## **Consult the [catalogoUCsBR Manual](https://github.com/pablopains/catalogoUCsBR/blob/main/catalogoUCsBR_1.0.4.pdf) for a case study with a complete and replicable workflow**
 
 Please site catalogoUCsBR as:
 
