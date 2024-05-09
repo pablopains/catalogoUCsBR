@@ -17,7 +17,6 @@
 #' @import sqldf
 #' @import shiny
 #' @import shinydashboard
-#' @import rhandsontable
 #' @import DT
 #' @import rhandsontable
 #' @import shinyWidgets
@@ -243,6 +242,12 @@ app_review <- function()
           
         }
         
+        
+        occurrenceID = 'splink=MO:3234022'
+        bibliographicCitation = 'splink'
+        scientificNameReference = 'Rudgea interrupta'
+        i=1
+        
         get_link_source_record <- function(occurrenceID,
                                            bibliographicCitation,
                                            scientificNameReference)
@@ -312,23 +317,20 @@ app_review <- function()
               
               if (!is.na(str_locate(occurrenceID[i],':')[[1]]))
               {
-                
-                # occurrenceID_tmp <- gsub(paste0(tolower(bibliographicCitation),"=" ), '',occurrenceID )
-                # occurrenceID_tmp <- str_split(occurrenceID_tmp,':')
-                # 
-                # col <- occurrenceID_tmp[[1]][1]
-                # cat <- occurrenceID_tmp[[1]][2]
-                
-                # base_url <- "https://specieslink.net/search/records/col/%s"
-                # url <- sprintf(base_url,col %>% tolower(), cat)
-                url <- 'https://specieslink.net/search/'
-                
+                 
+                occurrenceID_tmp <- gsub(paste0(tolower(bibliographicCitation[i]),"=" ), '',occurrenceID[i] )
+                occurrenceID_tmp <- str_split(occurrenceID_tmp,':')
+                col <- occurrenceID_tmp[[1]][1]
+                cat <- occurrenceID_tmp[[1]][2]
+                # url <- 'https://specieslink.net/search/'
+                url <- paste0('https://specieslink.net/search/records/catalognumber/',cat,'/collectionCode/',col)
                 x$link[i] <- paste0("<a href='", url, "'target='_blank'>", occurrenceID[i],"</a>")
                 
               }else  
               {
                 barcode <- gsub(paste0(tolower(bibliographicCitation[i]),"=" ), '',occurrenceID[i] )
                 
+                # https://specieslink.net/search/records/barcode/MO0101458866
                 base_url <- "https://specieslink.net/search/records/barcode/%s"
                 url <- sprintf(base_url, barcode)
                 
@@ -667,17 +669,20 @@ app_review <- function()
       # atualizar_tabela_identificacao <<- FALSE
       atualizar_tabela_identificacao <<- TRUE
       
+      spp_sel <<- ''
+      
     }
     
     #   Preparaçao
     {
       
       Ctrl_observacaoNaoPossivelVerificar_list <- c('Não se aplica',
-                                                    'Espécime danificado e/ou em condições não adequadas para verificação (Specimen damaged and/or in conditions not suitable for verification)',
-                                                    'Espécime não possui imagem digitalizada (Specimen does not have a scanned image)',
-                                                    'Espécime não descrito (Specimen not described)',
-                                                    'Material estéril sem possibilidade de identificação (sterile material no possibility of identification)',
-                                                    'Outros motivos (Other reasons)')
+                                                    'Espécimes estão danificados e/ou em condições não adequadas para verificação',
+                                                    'Espécimes não possuem imagens digitalizadas',
+                                                    'Espécime não descrito',
+                                                    'Material estéril sem possibilidade de identificação',
+                                                    'Outra Família',
+                                                    'Outros motivos')
       
       
       occ_full_tmp <- {}
@@ -745,9 +750,10 @@ app_review <- function()
           colSearch_fb2020[['taxonRank']] <- as.list(taxonRank_fb2020)
           
           # fb2020_taxon$taxonomicStatus %>% unique() %>% sort()
-          taxonomicStatus_fb2020 <- c("NOME_ACEITO",
+          taxonomicStatus_fb2020_ <- c("NOME_ACEITO",
                                       "SINONIMO")
-          colSearch_fb2020[['taxonomicStatus']] <- as.list(taxonomicStatus_fb2020)
+          
+          colSearch_fb2020[['taxonomicStatus']] <- as.list(taxonomicStatus_fb2020_)
           
           # nomenclaturalStatus_fb2020 <<-c("NOME_APLICACAO_INCERTA",
           #                                 "NOME_CORRETO",
@@ -798,18 +804,14 @@ app_review <- function()
     ui <- 
       {
         shinydashboard::dashboardPage(
-          shinydashboard::dashboardHeader(title = "Flora UCs BR"),
-          shinydashboard::dashboardSidebar(width = 350,
+          shinydashboard::dashboardHeader(title = "Catálogo de Plantas das UCs do Brasil"),
+          shinydashboard::dashboardSidebar(width = 700,
                                            collapsed = TRUE,
-                                           
+
                                            box(status = "primary", width = 12,
-                                               title = '', background = 'navy', # red, yellow, aqua, blue, light-blue, green, navy, teal, olive, lime, orange, fuchsia, purple, maroon, black.
-                                               
-                                               # selectInput("sp", label = 'Selecione uma espécie:',choices = spp$FB2020_AcceptedNameUsage),
-                                               
-                                               # actionButton("selectBtn", "Selecionar espécie", icon = icon("play")),
+                                               title = '', background = 'navy'
                                            )
-          ),
+         ),
           
           shinydashboard::dashboardBody(
             
@@ -864,18 +866,7 @@ app_review <- function()
                                                             icon = icon("play")),
                                                br(),
                                                br(),
-                                        )),
-                                      
-                                      # fluidRow(
-                                      #   column(width = 12,
-                                      #          
-                                      #          shiny::tags$a('Flora e Funga do Brasil', href = 'ipt.jbrj.gov.br/jbrj/resource?r=lista_especies_flora_brasil'),
-                                      #          helpText(paste0('2.3. Carregar dados da Flora e Funga do Brasil')),
-                                      #          actionButton("getfb2020Btn", "Carregar Flora e Funga do Brasil", onclick = 'Shiny.onInputChange(\"checkSpeciesNames_FB2020_Btn\",  Math.random())',
-                                      #                       icon = icon("download"))),
-                                      # )
-                                      
-                                      ))
+                                        ))))
                        ),
                        
                        box(title = '3. Selecionar família',
@@ -915,48 +906,70 @@ app_review <- function()
                                           width = 12,
                                           helpText('4.1. Lista de espécies '),
                                           column(width = 12, rHandsontableOutput("hot_specie_key"))
-                                        ))),
+                                        )),
+                                      
+                                      fluidRow(
+                                        column(width = 12,
+                                               br(),
+                                               verbatimTextOutput("text_getResults")
+                                        )),
+                                      
+                                      ),
                                 
                                 
-                                # column(width = 6,
-                                    
                                     wellPanel(
                                       fluidRow(
                                         column(
                                           width = 12,
-                                          helpText('4.2. Duplicatas'),
+                                          helpText('4.2. Amostras da espécie'),
                                           column(width = 12, rHandsontableOutput('hot_summary_key')),
                                           
-                                          # Amostra selecionada (Sample selected)
-                                          # column(
-                                          #   width = 12,
-                                          #   helpText('Amostra selecionada (Sample selected)'),
-                                          #   
-                                          #   verbatimTextOutput("text_verified_names"),
-                                          #   
-                                          #   verbatimTextOutput("text_verified_samples")
-                                          # ),
-                                          
-                                        ))) 
+                                        )),
+                                      
+                                      fluidRow(
+                                        column(width = 12,
+                                               
+                                               helpText('Justifique, caso nenuhum voucher possa ser verificado para a espécie'),
+
+                                               wellPanel(
+                                                 fluidRow(
+                                                   column(
+                                                     width = 12,
+                                                     
+                                                     selectInput("Ctrl_observacaoNaoPossivelVerificar_list_Input", 
+                                                                 "Informe a razão, para cada amostra, caso nenuhum voucher possa ser verificado para a espécie:",
+                                                                 Ctrl_observacaoNaoPossivelVerificar_list,
+                                                                 selected = 'Não se aplica'),
+
+                                                     textInput("Ctrl_family_verified_Input", "Atribuir outra família:", Ctrl_family_new_family)
+
+                                                   )))
+                                               
+                                        ),
+                                        
+                                        
+                                        # botao salvar aqui tbm
+                                        
+                                      )
+
+                                      ) 
                                 ),
                                  
                                 column(width = 6,   
-                                       # box(title = '5. Confirmar ou atribuir nova identificação',
-                                       #     status = "primary",
-                                       #     width = 12,
-                                           
+                                       
                                     wellPanel(
                                       fluidRow(
-                                        column(
-                                          width = 12,
+                                        column(width = 12,
                                           # helpText('Duplicatas/amostra (Duplicates/sample)'),
                                           
-                                          helpText('4.3. Escolher o voucher'),
+                                          helpText('4.3. Escolher um voucher, por espécie, entre as duplicatas da amostra'),
                                           
                                           htmlOutput("link_key_text"),
                                           
                                           rHandsontableOutput('hot_details_key')
-                                        ))),
+                                          
+                                        )),
+                                      ),
                                     
                                     wellPanel(
                                       fluidRow(
@@ -967,139 +980,40 @@ app_review <- function()
                                           selectInput("Ctrl_scientificName_select_Input", "",
                                                       Ctrl_scientificNameList),
                                           
-                                          helpText('Amostras já selecionadas para esta espécie'),
+                                          helpText('Amostra(s) já selecionada(s) para esta espécie:'),
                                           verbatimTextOutput("text_verified_samples_sel")
                                           
                                           
                                         ))),
-                                    
-                                    
-                                    # wellPanel(
-                                    #   fluidRow(
-                                    #     column(width = 12,
-                                    #       helpText('Amostras já selecionadas para esta espécie'),
-                                    #       verbatimTextOutput("text_verified_samples_sel")
-                                    #       
-                                    #     ),
-                                    #     
-                                    #   )),
-                                    
 
-                                    
                                     wellPanel(
                                       fluidRow(
                                         column(
                                           width = 4,
-                                          
-                                          actionButton("save_verified_namesBtn", "Salvar identificação", icon = icon("save")),
-                                          
-                                        ),
-                                        
-                                        column(
-                                          width = 8,
-                                          
 
-                                          verbatimTextOutput("text_getResults"),
-                                          
-                                        )
-                                        
-                                      ))
-                                    
-                                # )
-                                ),
-                                
-                                ),
-                                
-                                
-                                # box(title = 'Ou alterar Família ou Justificar não identificação do espécime',
-                                #     status = "primary",
-                                #     width = 12,
+                                          actionButton("save_verified_namesBtn", "Salvar alteração", icon = icon("save")),
+
+                                        )))
+                                )),
                                 
                                 fluidRow(
                                   column(width = 12,
-                                         
-                                         helpText('Caso não informe item 4.4.'),
-                                         
-                                         
-                                         wellPanel(
-                                           fluidRow(
-                                             column(
-                                               width = 12,
-                                               
-                                               textInput("Ctrl_family_verified_Input", "Atribuir outra família:", Ctrl_family_new_family),
-                                               
-                                             )
-                                           )
-                                         ),
-                                         
-                                         wellPanel(
-                                           fluidRow(
-                                             column(
-                                               width = 12,
-                                               
-                                               selectInput("Ctrl_observacaoNaoPossivelVerificar_list_Input", 
-                                                           "Informe a razão caso o espécime não possa ser verificado:",
-                                                           Ctrl_observacaoNaoPossivelVerificar_list,
-                                                           selected = 'Não se aplica')
-                                               
-                                             )
-                                           ))
-                                         
-                                  ),
-                                  
-                                  
-                                  # botao salvar aqui tbm
-                                  
-                                )
-                                # )
+                                selectInput(inputId = 'taxonomicStatus_FB2020',
+                                            label = 'Status taxonômico para listar nomes científicos:',
+                                            choices = colSearch_fb2020[['taxonomicStatus']],
+                                            multiple = TRUE,
+                                            selected = c('NOME_ACEITO'))
+                                ))
                                 
+                                # antiga justficatifa
+
                                     
                                 )),
                          
                          # nova fam
                          
                                   ),
-                         
-                       #   fluidRow(
-                       #   column(width = 12,
-                       #          
-                       #          box(title = '5. Alterar Família ou Justificar não identificação ',
-                       #              status = "primary",
-                       #              width = 12,
-                       #              
-                       #              
-                       #              wellPanel(
-                       #                fluidRow(
-                       #                  column(
-                       #                    width = 12,
-                       #                    
-                       #                    textInput("Ctrl_family_verified_Input", "Atribuir outra família:", Ctrl_family_new_family),
-                       #                    
-                       #                  )
-                       #                )
-                       #              ),
-                       #              
-                       #              wellPanel(
-                       #                fluidRow(
-                       #                  column(
-                       #                    width = 12,
-                       #                    
-                       #                    selectInput("Ctrl_observacaoNaoPossivelVerificar_list_Input", 
-                       #                                "Informe a razão caso o espécime não possa ser verificado:",
-                       #                                Ctrl_observacaoNaoPossivelVerificar_list,
-                       #                                selected = 'Não se aplica')
-                       #                    
-                       #                  )
-                       #                ))
-                       #              
-                       #          ),
-                       #          
-                       #          
-                       #          # botao salvar aqui tbm
-                       #          
-                       #   )
-                       # )
-                         
+
                        ),
                        
                        fluidRow(
@@ -1110,30 +1024,29 @@ app_review <- function()
                                     
                                     wellPanel(
                                       fluidRow(
-                                        # column(width = 12,
-                                        #        actionButton("getResultsBtn", "Atualizar lista de verificados",icon = icon("play"))),
                                         column(
                                           width = 12,
-                                          
                                           helpText('Amostras verificadas'),
-                                          rHandsontableOutput('hot_verified_samples')
-                                          
-                                          ))),
+                                          rHandsontableOutput('hot_verified_samples'),
+                                          downloadButton("download_ModeloCatalogo", "Baixar planilha Modelo Catálogo de Plantas das Unidades de Conservação do Brasil"),
+                                          )),
+                                      
+                                      fluidRow(
+                                        column(
+                                          width = 12,
+                                          helpText('Amostras não verificadas'),
+                                          rHandsontableOutput('hot_no_verified_samples')
+                                        ))
+                                      
+                                      
+                                      ),
                                     
                                     
                                     wellPanel(
                                       fluidRow(
-                                        
                                         column(
-                                          width = 6,
+                                          width = 12,
                                           downloadButton("downloadVerificacaoAmostra", "Baixar planilha completa"),
-                                          # br()
-                                        ),
-                                        
-                                        column(
-                                          width = 6,
-                                          downloadButton("download_ModeloCatalogo", "Baixar planilha Modelo Catálogo de Plantas das Unidades de Conservação do Brasil"),
-                                         
                                         ))),
                                     
                                 ))
@@ -1155,7 +1068,7 @@ app_review <- function()
                                           
                                           helpText("Desenvolvido por: Melo, Pablo Hendrigo Alves de, Bochorny, Thuane & Forzza, Rafaela Campostrini"),
                                           
-                                          helpText("Versão 1.4 de maio/2024"),
+                                          helpText("Versão 1.0.0 de maio/2024"),
                                           
                                         ))
                                       
@@ -1168,10 +1081,10 @@ app_review <- function()
     
     #  Server
     server <- function(input, output, session)
-    {
+{
       Ctrl_observacaoNaoPossivelVerificar <<- ''
       
-      Ctrl_family_new_family <<- ''
+      # Ctrl_family_new_family <<- ''
       
       Ctrl_scientificName_new_family  <<- ''
       
@@ -1184,7 +1097,7 @@ app_review <- function()
       })
       
       #  selecao especies por uc
-      {
+  {
         
         output$link_key_text <- renderPrint({ 
           req(NROW(hot_to_r(input$hot_specie_key))>0)
@@ -1221,25 +1134,32 @@ app_review <- function()
             
             dt <- occ_full
             
-            index_res <- (dt$Ctrl_voucherAmostra == TRUE | dt$Ctrl_naoPossivelVerificar == TRUE) &
+            index_res <- (dt$Ctrl_voucherAmostra == TRUE) & # | dt$Ctrl_naoPossivelVerificar == TRUE) &
               (toupper(dt$Ctrl_emailVerificador) %in% toupper(input$Ctrl_emailVerificador_Input))
             
             dt <- dt[index_res==TRUE,] 
             
             bancodados <- stringr::str_sub(dt$Ctrl_occurrenceID, 
                                            1, 
-                                           stringr::str_locate(dt$Ctrl_occurrenceID, '=')[[1]]-1)
+                                           stringr::str_locate(dt$Ctrl_occurrenceID, '=')[,1]-1)
             
             bancodados <- paste0(toupper(str_sub(bancodados,1,1)),str_sub(bancodados, 2,nchar(bancodados)))
             
             barcode <- stringr::str_sub(dt$Ctrl_occurrenceID,
-                                        stringr::str_locate(dt$Ctrl_occurrenceID, '=')[[1]]+1,
+                                        stringr::str_locate(dt$Ctrl_occurrenceID, '=')[,1]+1,
                                         nchar(dt$Ctrl_occurrenceID))
             
-            autor <- paste0(word(dt$Ctrl_scientificName_verified,1) ,' ',word(dt$Ctrl_scientificName_verified,2))
-            autor <- sub(autor, '', dt$Ctrl_scientificName_verified)
-            autor <- stringr::str_sub(autor, 2,nchar(autor))
-
+            x <- dt$Ctrl_scientificName_verified
+            sp_tmp <- paste0(word(x,1) ,' ',word(x,2), ' ')
+            autor <- rep('',NROW(x))
+            for(i in 1:NROW(x))
+            {
+              autor[i] <- sub(sp_tmp[i], '', x[i])  
+            }  
+            
+            dt <- dt %>% 
+              dplyr::arrange_at(., c('Ctrl_family_verified','Ctrl_scientificName_verified','Ctrl_recordedBy','Ctrl_recordNumber'))
+            
             data_imp <- data.frame(UC = rep('',NROW(dt)),
                                    Grupos = rep('',NROW(dt)),
                                    `Família`= dt$Ctrl_family_verified,
@@ -1261,59 +1181,33 @@ app_review <- function()
         output$text_verified_samples_sel <- renderText({
           index_res <- occ_full$Ctrl_scientificName_verified %in% input$Ctrl_scientificName_select_Input
           x_res <- occ_full[index_res==TRUE,]$Ctrl_key_family_recordedBy_recordNumber %>% unique() %>% na.omit() %>% as.character() 
+          # print(input$Ctrl_scientificName_select_Input)
           paste(x_res ,sep = ',')
         })
         
-        
-        output$text_verified_samples <- renderText({
-          
-          # key_tmp <- ID_specie(input)
-          # index <- occ_full$Ctrl_scientificName %in% key_tmp
-          # 
-          # key_tmp <- unique(occ_full[index==TRUE,]$Ctrl_key_family_recordedBy_recordNumber)
-          
-          # rr <- hot_to_r(input$hot_summary_key)
-          # key_tmp <- rr[,1]
-          shiny::validate(
-            need(NROW(hot_to_r(input$hot_specie_key))>0,  "..."))
-          
-          rr <- get_current_slice_specie() 
-          
-          index <- occ_full$Ctrl_key_family_recordedBy_recordNumber %in% rr[,1] & ! occ_full$Ctrl_scientificName_verified == ''
-          
-          x_res <- occ_full[index==TRUE,]$Ctrl_key_family_recordedBy_recordNumber %>% unique() %>% na.omit() %>% as.character()
-          
-          paste(x_res ,sep = ',')
-          
-          # rr <- hot_to_r(input$hot_details_key)
-          # scientificName_verified_tmp <- unique(rr$scientificName_verified)
-          # scientificName_verified_tmp <- ifelse(is.na(scientificName_verified_tmp),'x', scientificName_verified_tmp)
-          # index_res <- occ_full$Ctrl_scientificName_verified %in% scientificName_verified_tmp
-          # x_res <- occ_full[index_res==TRUE,]$Ctrl_key_family_recordedBy_recordNumber %>% unique() %>% as.character()
-          # 
-          # paste(x_res ,sep = ',')
-        })
-  
 
-        output$text_getResults <- renderText({
+output$text_getResults <- renderText(
+  {
           req(input$save_verified_namesBtn)
           x_tmp <- save_verified_names()
-          print(paste0('Última alteção (',  Sys.time(), ')!'))
+          print(paste0('Última alteção: ', '( ', spp_sel, ' ) ', format(Sys.time(),"%H:%M:%S") ))
         })
         
         
-        output$hot_verified_samples <- renderRHandsontable(
-          {
+output$hot_verified_samples <- renderRHandsontable(
+  {
             # 02 02 24
             shiny::validate(
               # need(NROW( hot_to_r(input$hot_specie_key)) >0 &
               need(NROW(hot_to_r(input$hot_specie_key)) >0 ,  "..."))
+            
+              tmp <- input$Ctrl_scientificName_select_Input
+            
               dt <- occ_full
-              rr <- hot_to_r(input$hot_details_key)
+              # rr <- hot_to_r(input$hot_details_key)
+              # scientificName_verified_tmp <- unique(rr$scientificName_verified) %>% na.omit()
 
-              scientificName_verified_tmp <- unique(rr$scientificName_verified) %>% na.omit()
-
-            index_res <- (dt$Ctrl_voucherAmostra == TRUE | dt$Ctrl_naoPossivelVerificar == TRUE) &
+              index_res <- (dt$Ctrl_voucherAmostra == TRUE) & # | dt$Ctrl_naoPossivelVerificar == TRUE) &
               (toupper(dt$Ctrl_emailVerificador) %in% toupper(input$Ctrl_emailVerificador_Input))
             
             if(sum(index_res)>0)
@@ -1323,17 +1217,25 @@ app_review <- function()
             
             bancodados <- stringr::str_sub(dt$Ctrl_occurrenceID, 
                                            1, 
-                                           stringr::str_locate(dt$Ctrl_occurrenceID, '=')[[1]]-1)
+                                           stringr::str_locate(dt$Ctrl_occurrenceID, '=')[,1]-1)
+            
             
             bancodados <- paste0(toupper(str_sub(bancodados,1,1)),str_sub(bancodados, 2,nchar(bancodados)))
             
             barcode <- stringr::str_sub(dt$Ctrl_occurrenceID,
-                                        stringr::str_locate(dt$Ctrl_occurrenceID, '=')[[1]]+1,
+                                        stringr::str_locate(dt$Ctrl_occurrenceID, '=')[,1]+1,
                                         nchar(dt$Ctrl_occurrenceID))
             
-            autor <- paste0(word(dt$Ctrl_scientificName_verified,1) ,' ',word(dt$Ctrl_scientificName_verified,2))
-            autor <- sub(autor, '', dt$Ctrl_scientificName_verified)
-            autor <- stringr::str_sub(autor, 2,nchar(autor))
+            x <- dt$Ctrl_scientificName_verified
+            sp_tmp <- paste0(word(x,1) ,' ',word(x,2), ' ')
+            autor <- rep('',NROW(x))
+            for(i in 1:NROW(x))
+            {
+              autor[i] <- sub(sp_tmp[i], '', x[i])  
+            }  
+            
+            dt <- dt %>% 
+              dplyr::arrange_at(.,c('Ctrl_family_verified','Ctrl_scientificName_verified','Ctrl_recordedBy','Ctrl_recordNumber'))
             
             data_imp <- data.frame(UC = rep('',NROW(dt)),
                                    Grupos = rep('',NROW(dt)),
@@ -1341,7 +1243,7 @@ app_review <- function()
                                    `Gênero` =  word(dt$Ctrl_scientificName_verified,1),
                                    `Espécie` = word(dt$Ctrl_scientificName_verified,2),
                                    Autor = autor,
-                                   `Táxon completo (segundo Flora & Funga do Brasil)` = dt$Ctrl_scientificName_verified,
+                                   `Táxon completo (segundo Flora & Funga do Brasil)` = dt$Ctrl_scientificName_verified, #paste0(dt$Ctrl_family_verified, ' - ', dt$Ctrl_scientificName_verified),
                                    `Barcode`	=  barcode,
                                    `Banco de dados de origem`	= bancodados,
                                    `Sigla Herbário` = dt$Ctrl_collectionCode,
@@ -1364,160 +1266,431 @@ app_review <- function()
 
           })
         
+
+output$hot_no_verified_samples <- renderRHandsontable(
+  {
+    # 02 02 24
+    shiny::validate(
+      # need(NROW( hot_to_r(input$hot_specie_key)) >0 &
+      need(NROW(hot_to_r(input$hot_specie_key)) >0 ,  "..."))
+    
+    tmp <- input$Ctrl_scientificName_select_Input
+    
+    dt <- occ_full
+    
+    index_res <- (dt$Ctrl_naoPossivelVerificar == TRUE) & 
+      (toupper(dt$Ctrl_emailVerificador) %in% toupper(input$Ctrl_emailVerificador_Input))
+    
+    if(sum(index_res)>0)
+    {
+      data_imp <- dt[index_res==TRUE,] %>%
+        dplyr::arrange_at(.,c('Ctrl_key_family_recordedBy_recordNumber')) %>%
+        dplyr::rename(`Observação` = Ctrl_observacaoNaoPossivelVerificar,
+                      `Família Original`= Ctrl_family,
+                      `Táxon Original` =  Ctrl_scientificName,
+                      `Sigla Herbário` = Ctrl_collectionCode,
+                      `Coletor`	= Ctrl_recordedBy,
+                      `Número da Coleta`	= Ctrl_recordNumber,
+                      `Outra Família` = Ctrl_family_verified,
+                      ID = Ctrl_occurrenceID,
+                      Amostra = Ctrl_key_family_recordedBy_recordNumber) %>%
+        dplyr::select(Amostra,
+                      `Coletor`,
+                      `Número da Coleta`,
+                      `Observação`,
+                      `Outra Família`,
+                      `Família Original`,
+                      `Táxon Original`,
+                      `Sigla Herbário`,
+                      ID)
         
-        save_verified_names <- eventReactive(input$save_verified_namesBtn,
-                                             {
-                                               if (atualizar_tabela_identificacao == TRUE)
-                                               {
-                                                 
-                                                 msg_tmp <- TRUE
-                                                 
-                                                 df <- hot_to_r(input$hot_details_key)
-                                                 
-                                                 # df_sample <- hot_to_r(input$hot_summary_key)
-                                                 
-                                                 if(input$Ctrl_emailVerificador_Input=='' | input$Ctrl_verificadoPor_Input=='')
-                                                 { 
-                                                   showModal(modalDialog( title = "Por gentileza, informe nome e email do veficador.",
-                                                                          '', easyClose = TRUE, footer = NULL ))
-                                                   msg_tmp <- FALSE
-                                                 }
-                                                 
-                                                 
-                                                 if(input$Ctrl_observacaoNaoPossivelVerificar_list_Input!='Não se aplica')
-                                                 {
-                                                   
-                                                   for(i_upd in 1:NROW(df))
-                                                   {
-                                                     index_upd <- occ_full$Ctrl_Record_ID_Review %in% df$Ctrl_Record_ID_Review[i_upd] # %>% round(.,0) %>% as.character()
-                                                     
-                                                     occ_full[index_upd==TRUE,]$Ctrl_voucherAmostra <<- FALSE
-                                                     
-                                                     occ_full[index_upd==TRUE,]$Ctrl_amostraVerificada <<- FALSE
-                                                     occ_full[index_upd==TRUE,]$Ctrl_naoPossivelVerificar <<- TRUE
-                                                     
-                                                     occ_full[index_upd==TRUE,]$Ctrl_observacaoNaoPossivelVerificar <<- input$Ctrl_observacaoNaoPossivelVerificar_list_Input
-                                                     
-                                                     occ_full[index_upd==TRUE,]$Ctrl_scientificName_verified <<- ''
-                                                     
-                                                     occ_full[index_upd==TRUE,]$Ctrl_family_verified <<- ''
-                                                     
-                                                     occ_full[index_upd==TRUE,]$Ctrl_dataVerificacao <<- input$Ctrl_dataVerificacao_Input %>% as.character()
-                                                     occ_full[index_upd==TRUE,]$Ctrl_verificadoPor <<- input$Ctrl_verificadoPor_Input
-                                                     occ_full[index_upd==TRUE,]$Ctrl_emailVerificador <<- input$Ctrl_emailVerificador_Input
-                                                   }
-                                                   
-                                                 }else
-                                                 {
-                                                   if(sum(df$Ctrl_voucherAmostra==TRUE)>1)
-                                                   {
-                                                     showModal(modalDialog( title = "Selecione somente uma amostra.",
-                                                                            '', easyClose = TRUE, footer = NULL ))
-                                                     msg_tmp <- FALSE
-                                                   }
-                                                   
-                                                   if(input$Ctrl_scientificName_select_Input=='' &
-                                                      (sum(df$Ctrl_voucherAmostra)>0))
-                                                   { 
-                                                     showModal(modalDialog( title = "Selecione um nome científico para a amostra.",
-                                                                            '', easyClose = TRUE, footer = NULL ))
-                                                     msg_tmp <- FALSE
-                                                   }
-                                                   
-                                                   spp_sel_tmp <- ""
-                                                   
-                                                   spp_sel_tmp <- input$Ctrl_scientificName_select_Input
-                                                   
-                                                   if(msg_tmp == TRUE)
-                                                   {
-                                                     for(i_upd in 1:NROW(df))
-                                                     {
-                                                       
-                                                       if (sum(df$Ctrl_voucherAmostra)>0)
-                                                       {  
-                                                         #
-                                                         index_upd <- occ_full$Ctrl_Record_ID_Review %in% df$Ctrl_Record_ID_Review[i_upd] # %>% round(.,0) %>% as.character()
-                                                         
-                                                         occ_full[index_upd==TRUE,]$Ctrl_voucherAmostra <<- df$Ctrl_voucherAmostra[i_upd]
-                                                         
-                                                         occ_full[index_upd==TRUE,]$Ctrl_amostraVerificada <<- TRUE
-                                                         occ_full[index_upd==TRUE,]$Ctrl_naoPossivelVerificar <<- FALSE
-                                                         
-                                                         occ_full[index_upd==TRUE,]$Ctrl_observacaoNaoPossivelVerificar <<- ''
-                                                         
-                                                         # if(input$Ctrl_scientificName_Input!='')
-                                                         # {
-                                                         #   occ_full[index_upd==TRUE,]$Ctrl_scientificName_verified <<- input$Ctrl_scientificName_Input
-                                                         # }else
-                                                         # {
-                                                         occ_full[index_upd==TRUE,]$Ctrl_scientificName_verified <<- input$Ctrl_scientificName_select_Input
-                                                         # }
-                                                         
-                                                         # Ctrl_familyList_Input
-                                                         if(input$Ctrl_family_verified_Input!='')
-                                                         {
-                                                           occ_full[index_upd==TRUE,]$Ctrl_family_verified <<- input$Ctrl_family_verified_Input
-                                                         }else
-                                                         {
-                                                           occ_full[index_upd==TRUE,]$Ctrl_family_verified <<- input$Ctrl_familyList_Input
-                                                         }
-                                                         
-                                                         occ_full[index_upd==TRUE,]$Ctrl_dataVerificacao <<- input$Ctrl_dataVerificacao_Input %>% as.character()
-                                                         occ_full[index_upd==TRUE,]$Ctrl_verificadoPor <<- input$Ctrl_verificadoPor_Input
-                                                         occ_full[index_upd==TRUE,]$Ctrl_emailVerificador <<- input$Ctrl_emailVerificador_Input
-                                                       }else
-                                                       {  
-                                                         #
-                                                         index_upd <- occ_full$Ctrl_Record_ID_Review %in% df$Ctrl_Record_ID_Review[i_upd] # %>% round(.,0) %>% as.character()
-                                                         
-                                                         occ_full[index_upd==TRUE,]$Ctrl_voucherAmostra <<- FALSE
-                                                         
-                                                         occ_full[index_upd==TRUE,]$Ctrl_amostraVerificada <<- FALSE
-                                                         occ_full[index_upd==TRUE,]$Ctrl_naoPossivelVerificar <<- FALSE
-                                                         
-                                                         occ_full[index_upd==TRUE,]$Ctrl_observacaoNaoPossivelVerificar <<- ''
-                                                         
-                                                         occ_full[index_upd==TRUE,]$Ctrl_scientificName_verified <<- ''
-                                                         
-                                                         occ_full[index_upd==TRUE,]$Ctrl_family_verified <<- ''
-                                                         
-                                                         occ_full[index_upd==TRUE,]$Ctrl_dataVerificacao <<- ''
-                                                         occ_full[index_upd==TRUE,]$Ctrl_verificadoPor <<- ''
-                                                         occ_full[index_upd==TRUE,]$Ctrl_emailVerificador <<- ''
-                                                         
-                                                         print('aqu limpa email')
-                                                       }    
-                                                       
-                                                       # showModal(modalDialog( title = "Alteração realizada com sucesso!",
-                                                       #                        '', easyClose = TRUE, footer = NULL ))
-                                                       
-                                                     }
-                                                     
-                                                   }
-                                                   
-                                                 }
-                                                 
-                                               }
-                                               
-                                               return(dados())
-                                               
-                                             })
+    }else{
+      data_imp <- data.frame(vazio='vazio')
+    }
+    
+    rhandsontable::rhandsontable(data_imp,#dt,
+                                 # width = 600, height = 250,
+                                 width = '100%', height = 150,
+                                 
+                                 digits = 0,
+                                 
+                                 selectionMode = 'single',
+                                 selectCallback = TRUE) %>%
+      hot_table(highlightCol = TRUE, highlightRow = TRUE, readOnly = TRUE)
+    
+  })
+
+save_verified_names <- 
+  eventReactive(input$save_verified_namesBtn,
+  {
+  if (atualizar_tabela_identificacao == TRUE)
+  {
+                    
+                    msg_tmp <- TRUE
+                    
+                    df <- hot_to_r(input$hot_details_key)
+                    
+                    # df_sample <- hot_to_r(input$hot_summary_key)
+                    
+                    if(input$Ctrl_verificadoPor_Input=='')
+                    { 
+                      showModal(modalDialog( title = "Informe o nome do veficador.",
+                                             '', easyClose = TRUE, footer = NULL ))
+                      msg_tmp <- FALSE
+                    }
+                    
+                    if(input$Ctrl_emailVerificador_Input=='')
+                    { 
+                      showModal(modalDialog( title = "Informe o email do veficador.",
+                                             '', easyClose = TRUE, footer = NULL ))
+                      msg_tmp <- FALSE
+                    }
+                    
+                    spp_sel_tmp <- input$Ctrl_scientificName_select_Input
+                    
+                    if(input$Ctrl_observacaoNaoPossivelVerificar_list_Input!='Não se aplica')
+                    {
+                      
+                      for(i_upd in 1:NROW(df))
+                      {
+                        index_upd <- occ_full$Ctrl_Record_ID_Review %in% df$Ctrl_Record_ID_Review[i_upd] # %>% round(.,0) %>% as.character()
+                        
+                        occ_full[index_upd==TRUE,]$Ctrl_voucherAmostra <<- FALSE
+                        
+                        occ_full[index_upd==TRUE,]$Ctrl_amostraVerificada <<- FALSE
+                        occ_full[index_upd==TRUE,]$Ctrl_naoPossivelVerificar <<- TRUE
+                        
+                        occ_full[index_upd==TRUE,]$Ctrl_observacaoNaoPossivelVerificar <<- input$Ctrl_observacaoNaoPossivelVerificar_list_Input
+                        
+                        occ_full[index_upd==TRUE,]$Ctrl_scientificName_verified <<- ''
+                        
+                        occ_full[index_upd==TRUE,]$Ctrl_family_verified <<- input$Ctrl_family_verified_Input
+                        # occ_full[index_upd==TRUE,]$Ctrl_family_verified <<- ''
+                        
+                        occ_full[index_upd==TRUE,]$Ctrl_dataVerificacao <<- input$Ctrl_dataVerificacao_Input %>% as.character()
+                        occ_full[index_upd==TRUE,]$Ctrl_verificadoPor <<- input$Ctrl_verificadoPor_Input
+                        occ_full[index_upd==TRUE,]$Ctrl_emailVerificador <<- input$Ctrl_emailVerificador_Input
+                      }
+                      
+                    }else
+                    {
+                      
+                      index_t <- occ_full$Ctrl_scientificName_verified %in% spp_sel_tmp
+                      
+                      if(sum(index_t)>0 & sum(df$Ctrl_voucherAmostra==TRUE)>0)
+                      {
+                        showModal(modalDialog( title =  "Outra amostra já foi selecioanda para esta espécie. Mantenha somente UMA amostra selecionada por espécie!",
+                                               '', easyClose = TRUE, footer = NULL ))
+                        msg_tmp <- TRUE
+                      }
+                      
+                      
+                      if(sum(df$Ctrl_voucherAmostra==TRUE)>1)
+                      {
+                        showModal(modalDialog( title = "Selecione somente uma amostra!",
+                                               '', easyClose = TRUE, footer = NULL ))
+                        msg_tmp <- FALSE
+                      }
+                      
+                      if(input$Ctrl_scientificName_select_Input=='' &
+                         (sum(df$Ctrl_voucherAmostra)>0))
+                      { 
+                        showModal(modalDialog( title = "Selecione um nome científico para a amostra.",
+                                               '', easyClose = TRUE, footer = NULL ))
+                        msg_tmp <- FALSE
+                      }
+                      
+                      # spp_sel <<- spp_sel_tmp
+                      
+                      if(msg_tmp == TRUE)
+                      {
+                        for(i_upd in 1:NROW(df))
+                        {
+                          
+                          if (sum(df$Ctrl_voucherAmostra)>0)
+                          {  
+                            #
+                            index_upd <- occ_full$Ctrl_Record_ID_Review %in% df$Ctrl_Record_ID_Review[i_upd] # %>% round(.,0) %>% as.character()
+                            
+                            occ_full[index_upd==TRUE,]$Ctrl_voucherAmostra <<- df$Ctrl_voucherAmostra[i_upd]
+                            
+                            occ_full[index_upd==TRUE,]$Ctrl_amostraVerificada <<- TRUE
+                            occ_full[index_upd==TRUE,]$Ctrl_naoPossivelVerificar <<- FALSE
+                            
+                            occ_full[index_upd==TRUE,]$Ctrl_observacaoNaoPossivelVerificar <<- ''
+                            
+                            # if(input$Ctrl_scientificName_Input!='')
+                            # {
+                            #   occ_full[index_upd==TRUE,]$Ctrl_scientificName_verified <<- input$Ctrl_scientificName_Input
+                            # }else
+                            # {
+                            occ_full[index_upd==TRUE,]$Ctrl_scientificName_verified <<- input$Ctrl_scientificName_select_Input
+                            # }
+                            
+                            occ_full[index_upd==TRUE,]$Ctrl_family_verified <<- input$Ctrl_familyList_Input
+
+                            # # Ctrl_familyList_Input
+                            # if(input$Ctrl_family_verified_Input!='')
+                            # {
+                            #   occ_full[index_upd==TRUE,]$Ctrl_family_verified <<- input$Ctrl_family_verified_Input
+                            # }else
+                            # {
+                            #   occ_full[index_upd==TRUE,]$Ctrl_family_verified <<- input$Ctrl_familyList_Input
+                            # }
+                            
+                            occ_full[index_upd==TRUE,]$Ctrl_dataVerificacao <<- input$Ctrl_dataVerificacao_Input %>% as.character()
+                            occ_full[index_upd==TRUE,]$Ctrl_verificadoPor <<- input$Ctrl_verificadoPor_Input
+                            occ_full[index_upd==TRUE,]$Ctrl_emailVerificador <<- input$Ctrl_emailVerificador_Input
+                          }else
+                          {  
+                            #
+                            index_upd <- occ_full$Ctrl_Record_ID_Review %in% df$Ctrl_Record_ID_Review[i_upd] # %>% round(.,0) %>% as.character()
+                            
+                            occ_full[index_upd==TRUE,]$Ctrl_voucherAmostra <<- FALSE
+                            
+                            occ_full[index_upd==TRUE,]$Ctrl_amostraVerificada <<- FALSE
+                            occ_full[index_upd==TRUE,]$Ctrl_naoPossivelVerificar <<- FALSE
+                            
+                            occ_full[index_upd==TRUE,]$Ctrl_observacaoNaoPossivelVerificar <<- ''
+                            
+                            occ_full[index_upd==TRUE,]$Ctrl_scientificName_verified <<- ''
+                            
+                            occ_full[index_upd==TRUE,]$Ctrl_family_verified <<- ''
+                            
+                            occ_full[index_upd==TRUE,]$Ctrl_dataVerificacao <<- ''
+                            occ_full[index_upd==TRUE,]$Ctrl_verificadoPor <<- ''
+                            occ_full[index_upd==TRUE,]$Ctrl_emailVerificador <<- ''
+                            
+                            print('aqu limpa email')
+                          }    
+                          
+                          # showModal(modalDialog( title = "Alteração realizada com sucesso!",
+                          #                        '', easyClose = TRUE, footer = NULL ))
+                          
+                        }
+                      }
+                      
+                      # spp_sel <<- spp_sel_tmp
+
+                    }
+                    
+                    spp_sel <<- spp_sel_tmp
+                    
+                    
+                  }
+                  
+  {
+    updateSelectInput(session, "Ctrl_scientificName_select_Input",
+                      choices = Ctrl_scientificNameList$scientificName,
+                      selected = '')
+    
+    updateSelectInput(session, "Ctrl_scientificName_select_Input",
+                      choices = Ctrl_scientificNameList$scientificName,
+                      selected = spp_sel_tmp)
+    
+    updateSelectInput(session, "Ctrl_observacaoNaoPossivelVerificar_list_Input",
+                      choices = Ctrl_observacaoNaoPossivelVerificar_list,
+                      selected = 'Não se aplica')
+    
+    updateSelectInput(session, "Ctrl_observacaoNaoPossivelVerificar_list_Input",
+                      choices = Ctrl_observacaoNaoPossivelVerificar_list,
+                      selected = 'Não se aplica')
+    
+    Ctrl_family_new_family <<- ''
+    
+    updateTextInput(session, "Ctrl_family_verified_Input",
+                    value = Ctrl_family_new_family)
+  
+    
         
-        
-        getResults <- eventReactive(input$getResultsBtn,
-                                    {
-                                      atualizar_tabela_identificacao <<- FALSE
-                                      
-                                      save_verified_names()
-                                      
-                                      atualizar_tabela_identificacao <<- TRUE
-                                      
-                                      
-                                    })
-        
-        
-        loadoccResults <- reactive(
-          {
+    
+    }
+                  
+  return(dados())
+                  
+  })
+
+# save_verified_names <- 
+#   eventReactive(input$save_verified_namesBtn,
+#   {
+#   if (atualizar_tabela_identificacao == TRUE)
+#   {
+#                     
+#                     msg_tmp <- TRUE
+#                     
+#                     df <- hot_to_r(input$hot_details_key)
+#                     
+#                     # df_sample <- hot_to_r(input$hot_summary_key)
+#                     
+#                     if(input$Ctrl_verificadoPor_Input=='')
+#                     { 
+#                       showModal(modalDialog( title = "Informe o nome do veficador.",
+#                                              '', easyClose = TRUE, footer = NULL ))
+#                       msg_tmp <- FALSE
+#                     }
+#                     
+#                     if(input$Ctrl_emailVerificador_Input=='')
+#                     { 
+#                       showModal(modalDialog( title = "Informe o email do veficador.",
+#                                              '', easyClose = TRUE, footer = NULL ))
+#                       msg_tmp <- FALSE
+#                     }
+#                     
+#                     spp_sel_tmp <- input$Ctrl_scientificName_select_Input
+#                     
+#                     if(input$Ctrl_observacaoNaoPossivelVerificar_list_Input!='Não se aplica')
+#                     {
+#                       
+#                       for(i_upd in 1:NROW(df))
+#                       {
+#                         index_upd <- occ_full$Ctrl_Record_ID_Review %in% df$Ctrl_Record_ID_Review[i_upd] # %>% round(.,0) %>% as.character()
+#                         
+#                         occ_full[index_upd==TRUE,]$Ctrl_voucherAmostra <<- FALSE
+#                         
+#                         occ_full[index_upd==TRUE,]$Ctrl_amostraVerificada <<- FALSE
+#                         occ_full[index_upd==TRUE,]$Ctrl_naoPossivelVerificar <<- TRUE
+#                         
+#                         occ_full[index_upd==TRUE,]$Ctrl_observacaoNaoPossivelVerificar <<- input$Ctrl_observacaoNaoPossivelVerificar_list_Input
+#                         
+#                         occ_full[index_upd==TRUE,]$Ctrl_scientificName_verified <<- ''
+#                         
+#                         occ_full[index_upd==TRUE,]$Ctrl_family_verified <<- input$Ctrl_family_verified_Input
+#                         # occ_full[index_upd==TRUE,]$Ctrl_family_verified <<- ''
+#                         
+#                         occ_full[index_upd==TRUE,]$Ctrl_dataVerificacao <<- input$Ctrl_dataVerificacao_Input %>% as.character()
+#                         occ_full[index_upd==TRUE,]$Ctrl_verificadoPor <<- input$Ctrl_verificadoPor_Input
+#                         occ_full[index_upd==TRUE,]$Ctrl_emailVerificador <<- input$Ctrl_emailVerificador_Input
+#                       }
+#                       
+#                     }else
+#                     {
+#                       
+#                       index_t <- occ_full$Ctrl_scientificName_verified %in% spp_sel_tmp
+#                       
+#                       if(sum(index_t)>0 & sum(df$Ctrl_voucherAmostra==TRUE)>0)
+#                       {
+#                         showModal(modalDialog( title =  "Outra amostra já foi selecioanda para esta espécie. Mantenha somente UMA amostra selecionada por espécie!",
+#                                                '', easyClose = TRUE, footer = NULL ))
+#                         msg_tmp <- TRUE
+#                       }
+#                       
+#                       
+#                       if(sum(df$Ctrl_voucherAmostra==TRUE)>1)
+#                       {
+#                         showModal(modalDialog( title = "Selecione somente uma amostra!",
+#                                                '', easyClose = TRUE, footer = NULL ))
+#                         msg_tmp <- FALSE
+#                       }
+#                       
+#                       if(input$Ctrl_scientificName_select_Input=='' &
+#                          (sum(df$Ctrl_voucherAmostra)>0))
+#                       { 
+#                         showModal(modalDialog( title = "Selecione um nome científico para a amostra.",
+#                                                '', easyClose = TRUE, footer = NULL ))
+#                         msg_tmp <- FALSE
+#                       }
+#                       
+#                       # spp_sel <<- spp_sel_tmp
+#                       
+#                       if(msg_tmp == TRUE)
+#                       {
+#                         for(i_upd in 1:NROW(df))
+#                         {
+#                           
+#                           if (sum(df$Ctrl_voucherAmostra)>0)
+#                           {  
+#                             #
+#                             index_upd <- occ_full$Ctrl_Record_ID_Review %in% df$Ctrl_Record_ID_Review[i_upd] # %>% round(.,0) %>% as.character()
+#                             
+#                             occ_full[index_upd==TRUE,]$Ctrl_voucherAmostra <<- df$Ctrl_voucherAmostra[i_upd]
+#                             
+#                             occ_full[index_upd==TRUE,]$Ctrl_amostraVerificada <<- TRUE
+#                             occ_full[index_upd==TRUE,]$Ctrl_naoPossivelVerificar <<- FALSE
+#                             
+#                             occ_full[index_upd==TRUE,]$Ctrl_observacaoNaoPossivelVerificar <<- ''
+#                             
+#                             # if(input$Ctrl_scientificName_Input!='')
+#                             # {
+#                             #   occ_full[index_upd==TRUE,]$Ctrl_scientificName_verified <<- input$Ctrl_scientificName_Input
+#                             # }else
+#                             # {
+#                             occ_full[index_upd==TRUE,]$Ctrl_scientificName_verified <<- input$Ctrl_scientificName_select_Input
+#                             # }
+#                             
+#                             occ_full[index_upd==TRUE,]$Ctrl_family_verified <<- input$Ctrl_familyList_Input
+# 
+#                             # # Ctrl_familyList_Input
+#                             # if(input$Ctrl_family_verified_Input!='')
+#                             # {
+#                             #   occ_full[index_upd==TRUE,]$Ctrl_family_verified <<- input$Ctrl_family_verified_Input
+#                             # }else
+#                             # {
+#                             #   occ_full[index_upd==TRUE,]$Ctrl_family_verified <<- input$Ctrl_familyList_Input
+#                             # }
+#                             
+#                             occ_full[index_upd==TRUE,]$Ctrl_dataVerificacao <<- input$Ctrl_dataVerificacao_Input %>% as.character()
+#                             occ_full[index_upd==TRUE,]$Ctrl_verificadoPor <<- input$Ctrl_verificadoPor_Input
+#                             occ_full[index_upd==TRUE,]$Ctrl_emailVerificador <<- input$Ctrl_emailVerificador_Input
+#                           }else
+#                           {  
+#                             #
+#                             index_upd <- occ_full$Ctrl_Record_ID_Review %in% df$Ctrl_Record_ID_Review[i_upd] # %>% round(.,0) %>% as.character()
+#                             
+#                             occ_full[index_upd==TRUE,]$Ctrl_voucherAmostra <<- FALSE
+#                             
+#                             occ_full[index_upd==TRUE,]$Ctrl_amostraVerificada <<- FALSE
+#                             occ_full[index_upd==TRUE,]$Ctrl_naoPossivelVerificar <<- FALSE
+#                             
+#                             occ_full[index_upd==TRUE,]$Ctrl_observacaoNaoPossivelVerificar <<- ''
+#                             
+#                             occ_full[index_upd==TRUE,]$Ctrl_scientificName_verified <<- ''
+#                             
+#                             occ_full[index_upd==TRUE,]$Ctrl_family_verified <<- ''
+#                             
+#                             occ_full[index_upd==TRUE,]$Ctrl_dataVerificacao <<- ''
+#                             occ_full[index_upd==TRUE,]$Ctrl_verificadoPor <<- ''
+#                             occ_full[index_upd==TRUE,]$Ctrl_emailVerificador <<- ''
+#                             
+#                             print('aqu limpa email')
+#                           }    
+#                           
+#                           # showModal(modalDialog( title = "Alteração realizada com sucesso!",
+#                           #                        '', easyClose = TRUE, footer = NULL ))
+#                           
+#                         }
+#                       }
+#                       
+#                       # spp_sel <<- spp_sel_tmp
+# 
+#                     }
+#                     
+#                     spp_sel <<- spp_sel_tmp
+#                     
+#                     
+#                   }
+#                   
+#   {
+#                     # key_tmp <- ID_key(input)
+#                     # index <- occ_full$Ctrl_key_family_recordedBy_recordNumber %in% key_tmp
+#                     # selected_dup <- occ_full[index==TRUE,]$fb2020_scientificName[1]
+#                     # index_tmp <- Ctrl_scientificNameList$scientificName %in% selected_dup
+#                     
+#                     updateSelectInput(session, "Ctrl_scientificName_select_Input",
+#                                       choices = Ctrl_scientificNameList$scientificName,
+#                                       selected = '')
+#                     
+#                     updateSelectInput(session, "Ctrl_scientificName_select_Input",
+#                                       choices = Ctrl_scientificNameList$scientificName,
+#                                       selected = spp_sel_tmp)
+#                   }
+#                   
+#   return(dados())
+#                   
+#   })
+
+
+loadoccResults <- reactive(
+  {
             req(input$occResultsFile)
             tryCatch(
               {
@@ -1554,10 +1727,9 @@ app_review <- function()
               }
             )
           })
-        
-        
-        getUnvalidatedNames <- eventReactive(input$getUnvalidatedNamesBtn,
-                                             {
+
+getUnvalidatedNames <- eventReactive(input$getUnvalidatedNamesBtn,
+  {
                                                req(input$occResultsFile)
                                                
                                                withProgress(message = 'Processing...', style = 'notification', value = 0.5, {
@@ -1600,9 +1772,8 @@ app_review <- function()
                                                
                                              })
         
-        
-        get_current_slice_specie <- reactive(
-          {
+get_current_slice_specie <- reactive(
+  {
             # req(input$getfb2020Btn)
             req(input$getUnvalidatedNamesBtn)
             
@@ -1622,9 +1793,8 @@ app_review <- function()
                                                ORDER BY typeStatus DESC")
           })
         
-        
-        get_current_slice_key <- reactive(
-          {
+get_current_slice_key <- reactive(
+  {
             # aqui
             # req(input$getfb2020Btn)
             req(input$getUnvalidatedNamesBtn)
@@ -1690,9 +1860,8 @@ app_review <- function()
                             key)
           })
         
-        
-        output$hot_specie_key <- renderRHandsontable(
-          {
+output$hot_specie_key <- renderRHandsontable(
+  {
             # shiny::validate(
             #    need(NROW(occ[['all_results']])>0,  "..."))
             
@@ -1728,9 +1897,8 @@ app_review <- function()
               hot_table(highlightCol = TRUE, highlightRow = TRUE, readOnly = TRUE) 
           })
         
-        
-        output$hot_summary_key <- renderRHandsontable(
-          {
+output$hot_summary_key <- renderRHandsontable(
+  {
             shiny::validate(
               need(NROW(hot_to_r(input$hot_specie_key))>0,  "..."))
             
@@ -1749,9 +1917,8 @@ app_review <- function()
             
           })
         
-        
-        output$hot_details_key <- renderRHandsontable(
-          {
+output$hot_details_key <- renderRHandsontable(
+  {
             shiny::validate(
               need(NROW(hot_to_r(input$hot_specie_key))>0,  "..."))
             
@@ -1764,6 +1931,7 @@ app_review <- function()
                               nomenclaturalStatus)
               
               Ctrl_scientificNameList <<- dt %>%
+                dplyr::filter(taxonomicStatus %in% input$taxonomicStatus_FB2020) %>%
                 dplyr::arrange(scientificName) %>%
                 dplyr::select(scientificName)
               
@@ -1786,94 +1954,94 @@ app_review <- function()
             
           })
         
-        
-        # funcoes internas
-        {
-          ID_specie <- function(input)
-          {
-            linha <- input$hot_specie_key_select$select$r
-            rr <- hot_to_r(input$hot_specie_key)
-            
-            if ( is.null(linha))
-            {
-              return(rr[1,2])
-            }
-            
-            if ( linha>NROW(rr))
-            {
-              return(rr[1,2])
-            }else
-            {
-              return(rr[linha,2])
-            }
-          }
-          
-          ID_key <- function(input)
-          {
-            linha <- input$hot_summary_key_select$select$r
-            rr <- hot_to_r(input$hot_summary_key)
-            
-            if ( is.null(linha))
-            {
-              return(rr[1,1])
-            }
-            
-            if ( linha>NROW(rr))
-            {
-              return(rr[1,1])
-            }else
-            {
-              return(rr[linha,1])
-            }
-          }
-          
-          ID_dup_name <- function(input)
-          {
-            linha <- input$hot_details_key_select$select$r
-            rr <- hot_to_r(input$hot_details_key)
-            
-            if ( is.null(linha))
-            {
-              return(rr[1,1])
-            }
-            
-            if ( linha>NROW(rr))
-            {
-              return(rr[1,1])
-            }else
-            {
-              return(rr[linha,1])
-            }
-          }
-          
-          ID_list_name <- function(input)
-          {
-            linha <- input$hot_scientificName_identification_select$select$r
-            rr <- hot_to_r(input$hot_scientificName_identification)
-            
-            if ( is.null(linha))
-            {
-              return(rr[1,1])
-            }
-            
-            if ( linha>NROW(rr))
-            {
-              return(rr[1,1])
-            }else
-            {
-              return(rr[linha,1])
-            }
-          }
-          
-          
-        }
+# funcoes internas
+{
+  ID_specie <- function(input)
+  {
+    linha <- input$hot_specie_key_select$select$r
+    rr <- hot_to_r(input$hot_specie_key)
+    
+    if ( is.null(linha))
+    {
+      return(rr[1,2])
+    }
+    
+    if ( linha>NROW(rr))
+    {
+      return(rr[1,2])
+    }else
+    {
+      return(rr[linha,2])
+    }
+  }
+  
+  ID_key <- function(input)
+  {
+    linha <- input$hot_summary_key_select$select$r
+    rr <- hot_to_r(input$hot_summary_key)
+    
+    if ( is.null(linha))
+    {
+      return(rr[1,1])
+    }
+    
+    if ( linha>NROW(rr))
+    {
+      return(rr[1,1])
+    }else
+    {
+      return(rr[linha,1])
+    }
+  }
+  
+  ID_dup_name <- function(input)
+  {
+    linha <- input$hot_details_key_select$select$r
+    rr <- hot_to_r(input$hot_details_key)
+    
+    if ( is.null(linha))
+    {
+      return(rr[1,1])
+    }
+    
+    if ( linha>NROW(rr))
+    {
+      return(rr[1,1])
+    }else
+    {
+      return(rr[linha,1])
+    }
+  }
+  
+  ID_list_name <- function(input)
+  {
+    linha <- input$hot_scientificName_identification_select$select$r
+    rr <- hot_to_r(input$hot_scientificName_identification)
+    
+    if ( is.null(linha))
+    {
+      return(rr[1,1])
+    }
+    
+    if ( linha>NROW(rr))
+    {
+      return(rr[1,1])
+    }else
+    {
+      return(rr[linha,1])
+    }
+  }
+  
+  
+}
+
         
       }
       
       
       # applyTaxonomicAlignment_Contents
       # backbone
-      {
+  {
         
         # save taxonomic
         {
@@ -2301,10 +2469,29 @@ app_review <- function()
     }
     
     #  Run the application 
-    shinyApp(ui = ui, server = server)
+    # shinyApp(ui = ui, server = server)
+    
+    shinyApp(ui = ui, server = server, options = list(launch.browser = TRUE))
     
   }
 
 }
 
 # app_review()
+# 
+# library(tidyr)
+# library(readr)
+# library(stringr)
+# library(lubridate)
+# library(jsonlite)
+# library(sqldf)
+# library(shiny)
+# library(shinydashboard)
+# library(rhandsontable)
+# library(DT)
+# library(shinyWidgets)
+# library(measurements)
+# library(downloader)
+# library(dplyr)
+
+

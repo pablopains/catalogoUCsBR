@@ -1,8 +1,8 @@
 Package: catalogoUCsBR
 Type: Package
 Title: An R package to prepare species lists for the Catalog of Plants of Conservation Units in Brazil.
-Version: 1.0.4
-Date: 2024-03-05
+Version: 1.0.0
+Date: 2024-05-09
 Authors@R: c(person("Pablo", "Melo", email = "pablopains@yahoo.com.br", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3004-2984")),
 	    person("Thuane", "Bochorny", email = "tbochorny@gmail.com", role = c("aut"), comment = c(ORCID = "0000-0003-4278-4520")),
 	    person("Rafaela", "Forzza", email = "rafaela@jbrj.gov.br", role = c("aut"), comment = c(ORCID = "0000-0002-7035-9313")))
