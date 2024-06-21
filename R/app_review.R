@@ -2693,7 +2693,7 @@ output$hot_details_key <- renderRHandsontable(
    # shinyApp(ui = ui, server = server)
    
    # shinyApp(ui = ui, server = server, options = list(launch.browser = TRUE))
-   shinyApp(ui = ui, server = server, options = list(launch.browser = FALSE))
+   shinyApp(ui = ui, server = server, options = list(launch.browser = TRUE))
    
 }
 
