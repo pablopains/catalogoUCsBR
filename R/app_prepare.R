@@ -1106,10 +1106,19 @@ app_prepare <- function()
              fb2020_taxon  <- readr::read_delim(taxon.file, delim = "\t", quote = "") %>% 
                dplyr::select(-id)
              
+             ### familia
+             # index = fb2020_taxon$taxonRank %in% c("ESPECIE",
+             #                                       "SUB_ESPECIE",
+             #                                       "VARIEDADE",
+             #                                       "FORMA")
+                                                   
              index = fb2020_taxon$taxonRank %in% c("ESPECIE",
                                                    "SUB_ESPECIE",
                                                    "VARIEDADE",
-                                                   "FORMA")
+                                                   "FORMA",
+                                                   "FAMILIA",
+                                                   "GENERO")
+             ###
              
              fb2020_taxon  <- fb2020_taxon[index==TRUE,] 
              
@@ -1139,6 +1148,14 @@ app_prepare <- function()
              fb2020_taxon$scientificNamewithoutAuthorship_U <- toupper(scientificName)
              
              fb2020_taxon$scientificNameAuthorship_U <- toupper(fb2020_taxon$scientificNameAuthorship)
+             
+             ### reconhecer genero e familia
+             
+             fb2020_taxon$genus_U <- toupper(fb2020_taxon$genus)
+             
+             fb2020_taxon$family_U <- toupper(fb2020_taxon$family)
+             
+             ###
              
              return(fb2020_taxon)
              
@@ -1279,6 +1296,8 @@ app_prepare <- function()
                taxon_authors_last <- ''  
              }
              
+             if(is.na(taxon_authors)){taxon_authors <- ''}
+             
              
              return(list(searchedName = searchedName_raw,
                          standardizeName = searchedName,
@@ -1295,6 +1314,7 @@ app_prepare <- function()
                                                   fb2020=NA,
                                                   if_author_fails_try_without_combinations=TRUE)
            {
+              print(searchedName)
              # https://powo.science.kew.org/about-wcvp#unplacednames
              
              x <- {}  
@@ -1332,9 +1352,7 @@ app_prepare <- function()
                ntaxa <- NROW(fb2020[index==TRUE,])
              }
              
-             
-             #' @details Not found
-             if(ntaxa == 0)
+             if(ntaxa == 0 | sp_fb$standardizeName=="")
              {
                x <- fb2020[index==TRUE,] %>%
                  dplyr::add_row()  %>%
@@ -1345,8 +1363,6 @@ app_prepare <- function()
                                verified_author = index_author,
                                verified_speciesName = 0,
                                searchNotes='Not found')
-               
-               
              }
              
              if(ntaxa == 1)
@@ -1400,7 +1416,7 @@ app_prepare <- function()
                                  taxon_authors_of_searchedName = NA,
                                  verified_author = index_author,
                                  verified_speciesName = verified_speciesName,
-                                 searchNotes=taxonomicStatus)
+                                 searchNotes=ifelse(is.na(taxonomicStatus),'',taxonomicStatus))
                }
                
              }
@@ -1451,6 +1467,136 @@ app_prepare <- function()
                  
                }
                
+             }
+             
+             # 'Homonyms' ajustar família
+             
+             if(x$searchNotes == 'Not found' )
+             {
+                ### reconhecer genero e familia
+                # x <-{}
+                w1 <- toupper(word(sp_fb$standardizeName))
+                
+                index <- fb2020$genus_U %in% toupper(w1) & fb2020$taxonRank == 'GENERO' & !is.na(fb2020$acceptedNameUsageID)
+                ntaxa <- NROW(fb2020[index==TRUE,])
+                
+                g_f <- 'g'
+                
+                if(ntaxa == 0 )
+                {
+                   index <- fb2020$family_U %in% toupper(w1) & fb2020$taxonRank == 'FAMILIA' & !is.na(fb2020$acceptedNameUsageID)
+                   ntaxa <- NROW(fb2020[index==TRUE,])
+                   g_f <- 'f'
+                }    
+                
+                if(ntaxa == 1)
+                {
+                   verified_speciesName <- 100
+                   
+                   id_accept <- ifelse(is.na(fb2020$acceptedNameUsageID[index==TRUE]),'', fb2020$acceptedNameUsageID[index==TRUE])
+                   
+                   if((!is.na(fb2020$acceptedNameUsageID[index==TRUE])) &
+                      (fb2020$taxonID[index==TRUE] != id_accept ))
+                   {
+                      
+                      x <- fb2020[index==TRUE,]
+                      
+                      taxon_status_of_searchedName <- fb2020[index==TRUE,]$taxonomicStatus
+                      plant_name_id_of_searchedName <- fb2020[index==TRUE,]$taxonID
+                      taxon_authors_of_searchedName <- fb2020[index==TRUE,]$scientificNamewithoutAuthorship
+                      
+                      index_synonym <- fb2020$taxonID %in% x$acceptedNameUsageID 
+                      
+                      if(sum(index_synonym==TRUE)==1)
+                      {
+                         x <- fb2020[index_synonym==TRUE,] %>%
+                            dplyr::mutate(searchedName=searchedName,
+                                          taxon_status_of_searchedName = taxon_status_of_searchedName,
+                                          plant_name_id_of_searchedName = plant_name_id_of_searchedName,
+                                          taxon_authors_of_searchedName = taxon_authors_of_searchedName,
+                                          verified_author = index_author,
+                                          verified_speciesName = verified_speciesName,
+                                          searchNotes=  ifelse(g_f=='g', 'Updated_genus', 'Updated_family') )
+                         
+                      }else
+                      {
+                         x <- fb2020[index==TRUE,] %>%
+                            dplyr::mutate(searchedName=searchedName,
+                                          taxon_status_of_searchedName = taxon_status_of_searchedName,
+                                          plant_name_id_of_searchedName = plant_name_id_of_searchedName,
+                                          taxon_authors_of_searchedName = taxon_authors_of_searchedName,
+                                          verified_author = index_author,
+                                          verified_speciesName = verified_speciesName,
+                                          searchNotes= 'Does not occur in Brazil')
+                      }
+                      
+                   }else
+                   {
+                      x <- fb2020[index==TRUE,] %>%
+                         # dplyr::add_row()  %>%
+                         dplyr::mutate(searchedName=searchedName,
+                                       taxon_status_of_searchedName = NA,
+                                       plant_name_id_of_searchedName = NA,
+                                       taxon_authors_of_searchedName = NA,
+                                       verified_author = index_author,
+                                       verified_speciesName = verified_speciesName,
+                                       searchNotes=taxonomicStatus)
+                   }
+                   
+                }
+                
+                
+                if(ntaxa >1)
+                {
+                   
+                   x <- fb2020[index==TRUE,][1,] %>%
+                      # dplyr::add_row()  %>%
+                      dplyr::mutate(taxonID = '',                           
+                                    acceptedNameUsageID = '',
+                                    parentNameUsageID = '',         
+                                    originalNameUsageID = '',          
+                                    
+                                    # scientificName = ifelse(g_f=='g', genus, family),                    
+                                    scientificName = '', 
+                                    
+                                    acceptedNameUsage  = '',                
+                                    parentNameUsage = '',                   
+                                    namePublishedIn = '',                  
+                                    namePublishedInYear = '',               
+                                    higherClassification = '',             
+                                    # kingdom                           
+                                    # phylum                           
+                                    # class                             
+                                    # order                            
+                                    # family                            
+                                    # genus                            
+                                    specificEpithet = '',                   
+                                    infraspecificEpithet = '',             
+                                    
+                                    # taxonRank = ifelse(g_f=='g',"GENERO", "FAMILIA"),   
+                                    taxonRank = '',
+                                       
+                                    scientificNameAuthorship = '',
+                                    taxonomicStatus = '',                   
+                                    nomenclaturalStatus = '',              
+                                    modified = '',                          
+                                    bibliographicCitation = '',            
+                                    references = '',                        
+                                    scientificNamewithoutAuthorship = ifelse(g_f=='g', genus, family),
+                                    scientificNamewithoutAuthorship_U = ifelse(g_f=='g', genus_U, family_U),
+                                    scientificNameAuthorship_U = '',       
+                                    genus_U,                           
+                                    family_U) %>%
+                      dplyr::mutate(searchedName=searchedName,
+                                    taxon_status_of_searchedName = NA,
+                                    plant_name_id_of_searchedName = NA,
+                                    taxon_authors_of_searchedName = NA,
+                                    verified_author = NA,
+                                    verified_speciesName = NA,
+                                    searchNotes=taxonRank)
+                }
+                ###
+                
              }
              
              colnames(x) <- str_c('fb2020_',colnames(x))
@@ -2174,24 +2320,24 @@ app_prepare <- function()
                                                                      DT::dataTableOutput('refloraContents')))
                                                        )),
                                               
-                                              tabPanel(icon("table"), 
-                                                       shinydashboard::box(title = "Jabot RB - Apenas os dados do Herbário do Jardim Botânico do Rio de Janeiro",
-                                                           status = "primary",
-                                                           width = 12,
-                                                           
-                                                           fluidRow(
-                                                              column(width = 12,
-                                                                     shiny::tags$a('Jabot RB', href = 'http://rb.jbrj.gov.br/v2/consulta.php'),
-                                                                     fileInput(inputId = "jabotBRFile", 
-                                                                               label = "Carregar arquivo(s) CSV JABOT RB",
-                                                                               multiple = TRUE))),
-                                                           
-                                                           br(),
-                                                           
-                                                           fluidRow(
-                                                              column(width = 12,
-                                                                     DT::dataTableOutput('jabotRBContents')))
-                                                       )),
+                                              # tabPanel(icon("table"), 
+                                              #          shinydashboard::box(title = "Jabot RB - Apenas os dados do Herbário do Jardim Botânico do Rio de Janeiro",
+                                              #              status = "primary",
+                                              #              width = 12,
+                                              #              
+                                              #              fluidRow(
+                                              #                 column(width = 12,
+                                              #                        shiny::tags$a('Jabot RB', href = 'http://rb.jbrj.gov.br/v2/consulta.php'),
+                                              #                        fileInput(inputId = "jabotBRFile", 
+                                              #                                  label = "Carregar arquivo(s) CSV JABOT RB",
+                                              #                                  multiple = TRUE))),
+                                              #              
+                                              #              br(),
+                                              #              
+                                              #              fluidRow(
+                                              #                 column(width = 12,
+                                              #                        DT::dataTableOutput('jabotRBContents')))
+                                              #          )),
                                               
                                               tabPanel(icon("table"), 
                                                        shinydashboard::box(title = "Jabot Geral - Dados de todos os herbários que utilizam o sistema Jabot",
@@ -2683,15 +2829,30 @@ app_prepare <- function()
                                    # occ[['all']] <- occ_tmp
                                    
                                    {
+                                      ### familia
+                                      # index <- occ[['all']]$Ctrl_taxonRank %>% toupper() %in%
+                                      #    toupper(c('SPECIES',
+                                      #              'VARIETY',
+                                      #              'SUBSPECIES',
+                                      #              'FORM'))
+                                      
                                       index <- occ[['all']]$Ctrl_taxonRank %>% toupper() %in%
                                          toupper(c('SPECIES',
                                                    'VARIETY',
                                                    'SUBSPECIES',
-                                                   'FORM'))
+                                                   'FORM',
+                                                   'GENUS',
+                                                   'FAMILY'))
+                                      
+                                      ###
                                       
                                       occ_all <- occ[['all']] %>%
                                          dplyr::mutate(.submittedToWCVP =  ifelse(index==TRUE, TRUE, FALSE))
                                       
+                                      
+                                      occ_all[index==TRUE,]$Ctrl_scientificName <- ifelse(is.na(occ_all[index==TRUE,]$Ctrl_scientificName),
+                                                                                          ifelse(is.na(occ_all[index==TRUE,]$Ctrl_family),'indet.',occ_all[index==TRUE,]$Ctrl_family),
+                                                                                          occ_all[index==TRUE,]$Ctrl_scientificName)
                                       
                                       name_search_wcvp <- occ_all[index==TRUE,]$Ctrl_scientificName %>% unique() %>% as.character()
                                       # NROW(name_search_wcvp)
@@ -4777,3 +4938,5 @@ app_prepare <- function()
    
    }
 }
+
+# app_prepare()
