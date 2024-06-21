@@ -22,6 +22,7 @@
 #' @import shinyWidgets
 #' @import measurements
 #' @import downloader
+#' @import writexl
 #' 
 #' @examples
 #' \donttest{
