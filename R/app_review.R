@@ -247,10 +247,10 @@ app_review <- function()
             }
             
             
-            occurrenceID = 'splink=MO:3234022'
-            bibliographicCitation = 'splink'
-            scientificNameReference = 'Rudgea interrupta'
-            i=1
+            # occurrenceID = 'splink=MO:3234022'
+            # bibliographicCitation = 'splink'
+            # scientificNameReference = 'Rudgea interrupta'
+            # i=1
             
             get_link_source_record <- function(occurrenceID,
                                                bibliographicCitation,
@@ -1048,7 +1048,7 @@ app_review <- function()
                                                                     label = 'Status taxonômico para listar nomes científicos:',
                                                                     choices = colSearch_fb2020[['taxonomicStatus']],
                                                                     multiple = TRUE,
-                                                                    selected = c('NOME_ACEITO'))
+                                                                    selected = c('NOME_ACEITO', 'SINONIMO'))
                                                  ))
                                               
                                               # antiga justficatifa
@@ -1122,7 +1122,7 @@ app_review <- function()
                                                     
                                                     helpText("Desenvolvido por: Melo, Pablo Hendrigo Alves de, Bochorny, Thuane & Forzza, Rafaela Campostrini"),
                                                     
-                                                    helpText("Versão 1.0.0 de junho/2024"),
+                                                    helpText("Versão 1.0.0 de agosto/2024"),
                                                     
                                                  ))
                                               
@@ -1228,7 +1228,10 @@ app_review <- function()
                                    `Origem (segundo Flora e Funga do Brasil)` = rep('',NROW(dt)))
             
             # write.csv(data_imp %>% data.frame(stringsAsFactors = FALSE), file, row.names = FALSE, fileEncoding = "UTF-8", na = "")
-            write_excel_csv(data_imp %>% data.frame(stringsAsFactors = FALSE), file, na = "")
+            # write_excel_csv(data_imp %>% data.frame(stringsAsFactors = FALSE), file, na = "")
+            writexl::write_xlsx(data_imp, 
+                                file)
+            
             
                })
 
@@ -1246,7 +1249,7 @@ output$text_getResults <- renderText(
    {
       req(input$save_verified_namesBtn)
       x_tmp <- save_verified_names()
-      print(paste0('Última alteção: ', '( ', spp_sel, ' ) ', format(Sys.time(),"%H:%M:%S") ))
+      print(paste0('Última alteração : ', '( ', spp_sel, ' ) ', format(Sys.time(),"%H:%M:%S") ))
    })
 
 
@@ -2018,7 +2021,9 @@ get_current_slice_key <- reactive(
                        country = Ctrl_country,
                        stateProvince = Ctrl_stateProvince,
                        municipality = Ctrl_municipality,
+                       
                        locality = Ctrl_locality,
+                       
                        Longitude = Ctrl_decimalLongitude,
                        Latitude = Ctrl_decimalLatitude,
                        year = Ctrl_year,                                        
@@ -2033,13 +2038,20 @@ get_current_slice_key <- reactive(
                        
          ) %>% 
          dplyr::select(Ctrl_voucherAmostra, 
-                       family_verified,
+                       
+                       scientificName,
+                       fb2020_scientificName,
                        scientificName_verified,
                        
+                       family_verified,
+
                        naoPossivelVerificar,
                        observacaoNaoPossivelVerificar,
                        
-                       fb2020_scientificName, fb2020_searchNotes, source, family, scientificName, identifiedBy, dateIdentified, recordedBy, recordNumber, country, stateProvince, municipality, locality, collectionCode_catalogNumber, Longitude, Latitude, year, month, day,
+                       locality,
+                       
+                       fb2020_searchNotes, source, family, identifiedBy, dateIdentified, recordedBy, recordNumber, country, stateProvince, municipality, #locality, 
+                       collectionCode_catalogNumber, Longitude, Latitude, year, month, day,
                        Ctrl_Record_ID_Review,
                        key)
    })
@@ -2697,3 +2709,4 @@ output$hot_details_key <- renderRHandsontable(
    
 }
 
+# app_review()

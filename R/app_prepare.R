@@ -32,2062 +32,2067 @@
 #' @export
 app_prepare <- function()
 {
-#' @section 0 - Preparar ambiente R
-{
-   #' @details limpar memória
-   rm(list = ls())
-   
-   #' @details direcionar memória para processamento temporário em disco
-   { 
-      # if (!dir.exists("c:/R_temp")){dir.create("c:/R_temp")}
-      # tempdir <- function() "c:/R_temp"
-     tempdir <- tempdir()
-      # unlockBinding("tempdir", baseenv()) 
-      # assignInNamespace("tempdir", tempdir, ns="base", envir=baseenv())
-      # assign("tempdir", tempdir, baseenv())
-      # lockBinding("tempdir", baseenv())
-      # tempdir()
-   }
-   
-   #' @details carregar funcões para mensurar tempos de processamento
-   {
-      tempo_processo <- data.frame(nome_processo=NA,
-                                   tempo_processamento=NA)[-1,]
-      
-      inicia_tempo_processamento <- function(nome_processo='',
-                                             tempo_processo=NA)
-      {
-         return(list(ini.time = Sys.time(),
-                     nome_processo=nome_processo,
-                     tempo_processo=tempo_processo))
-      }  
-      
-      get_tempo_processamento <- function(tempo_processo_tmp)
-      {
-         
-         tempo_processamento <- difftime(Sys.time(), tempo_processo_tmp$ini.time , units = 'min')
-         tempo_processo <- rbind(tempo_processo_tmp$tempo_processo,
-                                 data.frame(nome_processo=tempo_processo_tmp$nome_processo,
-                                            tempo_processamento=tempo_processamento))
-         print(tempo_processo)
-         return(tempo_processo)
-      }  
-   }
-   
-   #' @details inicar tempo de processamento
-   tempo_processo_tmp <- inicia_tempo_processamento('Preparação do ambiente de trabalho em R',
-                                                    tempo_processo)
-   #' @details carregar pacotes básicos
-   {
-      # install.packages('plyr', dependencies = TRUE)
-      library(plyr) 
-      
-      # install.packages('readxl', dependencies = TRUE)
-      library(readxl) 
-      
-      # install.packages('dplyr', dependencies = TRUE)
-      library(dplyr)
-      
-      # install.packages('tidyr', dependencies = TRUE)
-      library(tidyr)
-      
-      # install.packages('biogeo', dependencies = TRUE)
-      # library(biogeo)
-      
-      # install.packages('readr', dependencies = TRUE)
-      library(readr)
-      
-      # install.packages('stringr', dependencies = TRUE)
-      library(stringr)
-      
-      # install.packages('devtools', dependencies = TRUE)
-      library(devtools)
-      
-      # devtools::install_github("ropensci/CoordinateCleaner")
-      library(CoordinateCleaner)
-      
-      # install.packages('dplyr', dependencies = TRUE)
-      library(dplyr)
-      
-      # install.packages('textclean', dependencies = TRUE)
-      library(textclean)
-      
-      # install.packages('googledrive', dependencies = TRUE)
-      library(googledrive)
-      
-      # install.packages('rvest', dependencies = TRUE)
-      library(rvest)
-      
-      # install.packages('flora', dependencies = TRUE)
-      library(flora)
-      
-      # install.packages('raster', dependencies = TRUE)
-      library(raster)
-      
-      # install.packages('sp', dependencies = TRUE)
-      library(sp)
-      
-      # install.packages('lubridate', dependencies = TRUE)
-      library(lubridate)
-      
-      # install.packages('rnaturalearthdata', dependencies = TRUE)
-      library(rnaturalearthdata)
-      
-      # install.packages('geobr', dependencies = TRUE)
-      library(geobr) 
-      
-      # install.packages('monographaR', dependencies = TRUE)
-      library(monographaR) 
-      
-      # install.packages('jsonlite', dependencies = TRUE)
-      library(jsonlite)
-      
-      # install.packages('sqldf', dependencies = TRUE)
-      library(sqldf) 
-      
-      # install.packages('rvest', dependencies = TRUE)
-      # install.packages("rvest")
-      library(rvest)
-      
-      # install.packages('shiny', dependencies = TRUE)
-      library(shiny) 
-
-      library(shinydashboardPlus)
-      
-      library(shinydashboard)
-      
-      # install.packages('shinydashboard', dependencies = TRUE)
-      library(shinydashboard)
-      
-      # install.packages('mapview', dependencies = TRUE)
-      library(mapview)
-      
-      # install.packages('DT', dependencies = TRUE)
-      library(DT)
-      
-      # install.packages('rhandsontable', dependencies = TRUE)
-      library(rhandsontable) # tabela editavel
-      
-      # install.packages('shinyWidgets', dependencies = TRUE)
-      library(shinyWidgets) # botoes
-      
-      # install.packages('measurements', dependencies = TRUE)
-      library(measurements)
-      
-      # install.packages('downloader', dependencies = TRUE)
-      library(downloader)
-      
-      options(shiny.maxRequestSize=10000*1024^2) 
-
-   }
-   
-   #' @details cerregar funções desenvolvidas pelo CNCFLora
-   {
-      #' @details baixar e tabela FB2020 IPT 
-      #' Rodar somente em atualizações do IPT, aproximadamente 6 horas de processamento.
-      # source('./functions/FB2020_IPT_Get.R', encoding = "UTF-8")
-      
-      #' @details carregar tabela FB2020 IPT e funções de acesso
-      #' conferência taxonômica 
-      #' carregar informações da espécie
-      #' somente aqui encontramos dados de tipo de vegetação conforme FB2020
-      
-      # source('./functions/FB2020_IPT_Use.R', encoding = "UTF-8")  # colnames(FloraBrasil2020) <- paste0(colnames(FloraBrasil2020),'_FB2020')
-      # colnames(FloraBrasil2020) <- paste0(colnames(FloraBrasil2020),'_FB2020')
-      
-      #' @details carregar funções para acesso APIs FB2020 v1 e v2
-      #' conferência taxonômica 
-      #' carregar informações da espécie
-      
-      # source("./functions/FB2020_get_taxon_scientificname_from_API.R", encoding = "UTF-8") 
-      # source("C:/ENB_fluxo_processamento/functions/FB2020_get_taxon_scientificname_from_API.R", encoding = "UTF-8") 
-      
-      # txt_search <- occ[[source_data]]$scientificname
-      
-      check_identificationQualifier <- function(txt_search='',
-                                                keyword = c(' aff.', ' cf.'))
-      {
-         df <- data.frame(txt_search=txt_search, stringsAsFactors = FALSE)
-         df$identificationQualifier <- '' 
-         
-         for(kw in keyword)
-         {
-            index <- grepl(kw, txt_search, 
-                           ignore.case = TRUE,
-                           fixed = TRUE)
-            
-            if (any(index)==TRUE) 
-               # { df$identificationQualifier[index==TRUE] <- rep(gsub('\\\\<|\\\\>','',kw),count(index==TRUE)[2,2]) }
-            { df$identificationQualifier[index==TRUE] <- rep(gsub('\\\\<|\\\\>','',kw),sum(index==TRUE)) }
-            
-            df$txt_search[index==TRUE]
-         }
-         return(df$identificationQualifier)
-      }  
-      
-      #' @details carregar pacotes R e funções
-      {
-        # source("C:/Dados/CNCFlora/shiny/cncflora/functions/verbatimCleaning_v3.R", encoding = "UTF-8")
-        {
-          substituir_siglas <- function(x)
-          {
-            
-            sigla_estados <- data.frame(nome='',
-                                        sigla='',
-                                        Ctrl_standardized_stateProvince='')[-1,]
-            
-            sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Bahia', sigla='ba', Ctrl_standardized_stateProvince='bahia')
-            sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Pará' , sigla='pa', Ctrl_standardized_stateProvince='para')
-            sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Rio de Janeiro', sigla='rj', Ctrl_standardized_stateProvince='rio de janeiro')
-            sigla_estados <- sigla_estados %>% dplyr::add_row(nome='São Paulo', sigla='sp', Ctrl_standardized_stateProvince='sao paulo')
-            sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Espírito Santo', sigla='es', Ctrl_standardized_stateProvince='espirito santo')
-            sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Paraíba', sigla='pb', Ctrl_standardized_stateProvince='paraiba')
-            sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Pernambuco', sigla='pe', Ctrl_standardized_stateProvince='alagoas')
-            sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Alagoas', sigla='al', Ctrl_standardized_stateProvince='alagoas')
-            sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Sergipe', sigla='se', Ctrl_standardized_stateProvince='sergipe')
-            sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Piauí', sigla='pi', Ctrl_standardized_stateProvince='piaui')
-            sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Maranhão', sigla='ma', Ctrl_standardized_stateProvince='maranhao')
-            sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Minas Gerais', sigla='mg', Ctrl_standardized_stateProvince='minas gerais')
-            sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Santa Catarina', sigla='sc', Ctrl_standardized_stateProvince='santa catarina')
-            sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Paraná', sigla='pr', Ctrl_standardized_stateProvince='parana')
-            sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Goiás', sigla='go', Ctrl_standardized_stateProvince='goias')
-            sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Mato Grosso', sigla='mt', Ctrl_standardized_stateProvince='mato grosso')
-            sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Mato Grosso do Sul', sigla='ms', Ctrl_standardized_stateProvince='mato grosso do sul')
-            sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Distrito Federal', sigla='df', Ctrl_standardized_stateProvince='distrito federal')
-            sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Rio Grande do Norte', sigla='rn', Ctrl_standardized_stateProvince='rio grande do norte')
-            sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Roraima', sigla='rr', Ctrl_standardized_stateProvince='roraima')
-            sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Ceará', sigla='ce', Ctrl_standardized_stateProvince='ceara')
-            sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Tocantins', sigla='to', Ctrl_standardized_stateProvince='tocantins')
-            sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Amapá', sigla='ap', Ctrl_standardized_stateProvince='amapa')
-            sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Amazonas', sigla='am', Ctrl_standardized_stateProvince='amazonas')
-            sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Rio Grande do Sul', sigla='rs', Ctrl_standardized_stateProvince='rio grande do sul')
-            sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Acre', sigla='ac', Ctrl_standardized_stateProvince='acre')
-            sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Rondônia', sigla='ro', Ctrl_standardized_stateProvince='rondonia')
-            
-            x1 <- textclean::replace_non_ascii(tolower(x))
-            if (any(sigla_estados$sigla %in% x1)) {
-              return(as.character(sigla_estados$nome[which(sigla_estados$sigla == x1)]))
-              
-            } else {
-              as.character(x)
-            }
-          }
-          
-          # occ_tmp <- occ_j$all
-          verbatimCleaning_v2 <- function(occ_tmp,
-                                          view_summary=FALSE)
-          {
-            
-            #' @section Limpeza
-            #' @description Remover registros não informativos, sem coletor, numero de coleta, ano e informações de localidade
-            
-            
-            frase_saida_verbatim <- c('ano', 
-                                      'código de instituição',
-                                      'número de catálogo',
-                                      'coletor',
-                                      'número de coleta',
-                                      'país',
-                                      'estado',
-                                      'município',
-                                      'localidade',
-                                      'identificador',
-                                      'data identificação')
-            
-            frase_saida_verbatim <- c('year', 
-                                      'institutionCode', #Ctrl_institutionCode
-                                      'catalogNumber', #Ctrl_catalogNumber
-                                      'recordedBy', #Ctrl_recordedBy
-                                      'recordNumber', #Ctrl_recordNumber
-                                      'country', #Ctrl_country
-                                      'stateProvince', #Ctrl_stateProvince_standardized
-                                      'municipality', #Ctrl_municipality_standardized
-                                      'locality', #Ctrl_locality_standardized
-                                      'identifiedBy', #Ctrl_identifiedBy
-                                      'dateIdentified') #Ctrl_dateIdentified
-            
-            # substituir_siglas(occ_tmp$Ctrl_stateProvince[1])
-            # purrr::map(occ_tmp$Ctrl_stateProvince[1], .f = substituir_siglas) %>% simplify2array() %>% replace_non_ascii() %>% toupper()
-            
-            occ_tmp <- occ_tmp %>%
-              # dplyr::filter(Ctrl_deletedRecord==TRUE) %>%
-              dplyr::mutate(verbatimNotes = '', 
-                            temAnoColeta = FALSE,
-                            temCodigoInstituicao = FALSE,
-                            temNumeroCatalogo = FALSE,
-                            temColetor = FALSE,
-                            temNumeroColeta = FALSE,
-                            temPais = FALSE,
-                            temUF = FALSE,
-                            temMunicipio = FALSE,
-                            temLocalidade = FALSE,
-                            temIdentificador = FALSE,
-                            temDataIdentificacao = FALSE) %>%
-              
-              dplyr::mutate(Ctrl_country_standardized = '',
-                            Ctrl_municipality_standardized = textclean::replace_non_ascii(Ctrl_municipality) %>% toupper(),
-                            Ctrl_stateProvince_standardized = purrr::map(Ctrl_stateProvince, .f = substituir_siglas) %>% simplify2array() %>% replace_non_ascii() %>% toupper(),
-                            Ctrl_locality_standardized = textclean::replace_non_ascii(Ctrl_locality) %>% toupper(),
-                            Ctrl_lastParsed = NA) %>%
-              
-              dplyr::mutate(temAnoColeta =  ifelse( is.na(Ctrl_year) | Ctrl_year == ""  | Ctrl_year == 0 | Ctrl_year <= 10,
-                                                    FALSE, TRUE) %>%
-                              ifelse(is.na(.), FALSE,.),
-                            
-                            
-                            temCodigoInstituicao = ifelse( is.na(Ctrl_institutionCode) | Ctrl_institutionCode=="",
-                                                           FALSE, TRUE) %>%
-                              ifelse(is.na(.), FALSE,.),
-                            
-                            
-                            temNumeroCatalogo = ifelse( is.na(Ctrl_catalogNumber) | Ctrl_catalogNumber=="",
-                                                        FALSE, TRUE) %>%
-                              ifelse(is.na(.), FALSE,.),
-                            
-                            
-                            temColetor = ifelse( is.na(Ctrl_recordedBy) | Ctrl_recordedBy=="",
-                                                 FALSE, TRUE) %>%
-                              ifelse(is.na(.), FALSE,.),
-                            
-                            
-                            temNumeroColeta = ifelse( is.na(Ctrl_recordNumber) | Ctrl_recordNumber=="",
-                                                      FALSE, TRUE) %>%
-                              ifelse(is.na(.), FALSE,.),
-                            
-                            
-                            temPais = ifelse( is.na(Ctrl_country) | 
-                                                (! toupper(Ctrl_country) %in% c("BRAZIL", "BRASIL", "BRESIL", "BRÉSIL","BRA","BR")),
-                                              FALSE, TRUE) %>%
-                              ifelse(is.na(.), FALSE,.),
-                            
-                            
-                            temUF = ifelse( is.na(Ctrl_stateProvince_standardized) | Ctrl_stateProvince_standardized=="",
-                                            FALSE, TRUE) %>%
-                              ifelse(is.na(.), FALSE,.),
-                            
-                            
-                            temMunicipio = ifelse( is.na(Ctrl_municipality_standardized) | Ctrl_municipality_standardized=="",
-                                                   FALSE, TRUE) %>%
-                              ifelse(is.na(.), FALSE,.),
-                            
-                            
-                            temLocalidade = ifelse( is.na(Ctrl_locality_standardized) | Ctrl_locality_standardized=="",
-                                                    FALSE, TRUE) %>%
-                              ifelse(is.na(.), FALSE,.),
-                            
-                            
-                            temIdentificador = ifelse( is.na(Ctrl_identifiedBy) | Ctrl_identifiedBy=="",
-                                                       FALSE, TRUE) %>%
-                              ifelse(is.na(.), FALSE,.),
-                            
-                            
-                            temDataIdentificacao = ifelse( is.na(Ctrl_dateIdentified) | Ctrl_dateIdentified=="",
-                                                           FALSE, TRUE) %>%
-                              ifelse(is.na(.), FALSE,.)) %>%
-              
-              dplyr::mutate(Ctrl_country_standardized = ifelse(temPais==TRUE,
-                                                               'BRA' ,'')) %>%
-              
-              dplyr::mutate(verbatimNotes = ifelse(temAnoColeta==FALSE,
-                                                   paste(verbatimNotes, frase_saida_verbatim[1] , sep = ' - '), #'ano de coleta'
-                                                   verbatimNotes)) %>%
-              
-              dplyr::mutate(verbatimNotes = ifelse(temCodigoInstituicao==FALSE,
-                                                   paste(verbatimNotes, frase_saida_verbatim[2], sep = ' - '), #'código de instituição'
-                                                   verbatimNotes)) %>%
-              
-              dplyr::mutate(verbatimNotes = ifelse(temNumeroCatalogo==FALSE,
-                                                   paste(verbatimNotes, frase_saida_verbatim[3] , sep = ' - '), #'número de catálogo'
-                                                   verbatimNotes)) %>%
-              
-              dplyr::mutate(verbatimNotes = ifelse(temColetor==FALSE,
-                                                   paste(verbatimNotes, frase_saida_verbatim[4], sep = ' - '), #'coletor'
-                                                   verbatimNotes)) %>%
-              
-              dplyr::mutate(verbatimNotes = ifelse(temNumeroColeta==FALSE,
-                                                   paste(verbatimNotes, frase_saida_verbatim[5], sep = ' - '), #'número de coleta'
-                                                   verbatimNotes)) %>%
-              
-              dplyr::mutate(verbatimNotes = ifelse(temPais==FALSE,
-                                                   paste(verbatimNotes, frase_saida_verbatim[6], sep = ' - '),
-                                                   verbatimNotes)) %>%
-              
-              dplyr::mutate(verbatimNotes = ifelse(temUF==FALSE,
-                                                   paste(verbatimNotes, frase_saida_verbatim[7], sep = ' - '),
-                                                   verbatimNotes)) %>%
-              
-              dplyr::mutate(verbatimNotes = ifelse(temMunicipio==FALSE,
-                                                   paste(verbatimNotes, frase_saida_verbatim[8], sep = ' - '),
-                                                   verbatimNotes)) %>%
-              
-              dplyr::mutate(verbatimNotes = ifelse(temLocalidade==FALSE,
-                                                   paste(verbatimNotes, frase_saida_verbatim[9], sep = ' - '),
-                                                   verbatimNotes)) %>%
-              
-              dplyr::mutate(verbatimNotes = ifelse(temIdentificador==FALSE,
-                                                   paste(verbatimNotes, frase_saida_verbatim[10], sep = ' - '),
-                                                   verbatimNotes)) %>%
-              
-              dplyr::mutate(verbatimNotes = ifelse(temDataIdentificacao==FALSE,
-                                                   paste(verbatimNotes, frase_saida_verbatim[11], sep = ' - '),
-                                                   verbatimNotes)) %>%
-              
-              dplyr::mutate(Ctrl_lastParsed = format(Sys.time(), "%Y %m %d %X"))
-            
-            if (view_summary==TRUE)
-            {
-              occ_tmp %>%
-                # dplyr::filter(Ctrl_deletedRecord==TRUE) %>%
-                dplyr::select(verbatimNotes, 
-                              temAnoColeta,
-                              temCodigoInstituicao,
-                              temNumeroCatalogo,
-                              temColetor,
-                              temNumeroColeta,
-                              temPais,
-                              temUF,
-                              temMunicipio,
-                              temLocalidade,
-                              temIdentificador,
-                              temDataIdentificacao,
-                              Ctrl_country,
-                              Ctrl_municipality, Ctrl_locality,
-                              Ctrl_recordedBy, Ctrl_recordNumber,
-                              Ctrl_institutionCode,  
-                              Ctrl_catalogNumber,
-                              Ctrl_year, 
-                              Ctrl_identifiedBy,
-                              Ctrl_dateIdentified,
-                              Ctrl_decimalLatitude, 
-                              Ctrl_decimalLongitude) %>%
-                View()
-            }   
-            
-            print(NROW(occ_tmp))
-            return(occ_tmp)
-            
-          }
-          
-         }
-        
-        # source("C:/Dados/CNCFlora/shiny/cncflora/functions/duplicata_digital_v2.R", encoding = "UTF-8")
-        {
-          selectMoreInformativeRecord_v2 <- function(occ_tmp, 
-                                                     onlyLatLon = TRUE,
-                                                     include_unmatched = TRUE,
-                                                     view_summary = FALSE,
-                                                     unmatched = c("__"))
-          {  
-            {
-              
-              occ_tmp <- occ_tmp %>%
-                dplyr::mutate(verbatim_quality = (temAnoColeta +
-                                                    temCodigoInstituicao +
-                                                    temNumeroCatalogo+
-                                                    temLocalidade+
-                                                    temMunicipio+
-                                                    temUF))
-              
-              occ_tmp <- occ_tmp %>%
-                dplyr::mutate(key_quality = (temColetor + temNumeroColeta))
-              
-              occ_tmp$key_quality
-              occ_tmp$autoGeoStatus
-              occ_tmp$coordenadasIncidemMunicipio %>% is.na() %>% any()
-              occ_tmp$encontrouLocalidade %>% is.na() %>% any()
-              
-              occ_tmp <- occ_tmp %>%
-                dplyr::mutate(geo_quality = (autoGeoStatus+coordenadasCentroideMunicipio+(encontrouLocalidade*2)+(coordenadasIncidemMunicipio*3)))
-              
-              occ_tmp$geo_quality
-              
-              occ_tmp <- occ_tmp %>%
-                dplyr::mutate(Ctrl_moreInformativeRecord  = (key_quality + geo_quality + verbatim_quality))
-              # dplyr::mutate(Ctrl_moreInformativeRecord  = (verbatim_quality))
-              
-              occ_tmp$Ctrl_moreInformativeRecord
-              
-            }
-            
-            {
-              
-              print("let's go...")
-              recordedBy_unique <- occ_tmp$Ctrl_key_family_recordedBy_recordNumber %>% unique() %>%  as.factor()
-              print(NROW(recordedBy_unique))
-              
-              occ_tmp$Ctrl_selectedMoreInformativeRecord <- FALSE
-              occ_tmp$Ctrl_thereAreDuplicates <- FALSE
-              occ_tmp$Ctrl_unmatched <- TRUE
-              
-              # r=recordedBy_unique[1]
-              # r='Chrysobalanaceae_RODRIGUES_9408'
-              # r='Chrysobalanaceae_GUEDES_13405'
-              # r='Polygalaceae_GARDNER_3582'
-              # r='Polygalaceae_HAENKE_Haenke s.n.'
-              # r='Chrysobalanaceae__NA'
-              # r='Myrtaceae_BARBOSA_217'
-              # r='Apocynaceae_RIZZO_9413'
-              # r='Polygalaceae_HASSLER_9468'
-              
-              for (r in recordedBy_unique)
-              {
-                print(r)
-                
-                index_occ <- (occ_tmp$Ctrl_key_family_recordedBy_recordNumber %in% r) %>% ifelse(is.na(.), FALSE,.)
-                num_records <- NROW(occ_tmp[index_occ==TRUE,])
-                
-                # flaq que inidica que há duplicatas
-                occ_tmp[index_occ==TRUE, ]$Ctrl_thereAreDuplicates <- num_records > 1 
-                
-                if (num_records == 0) 
-                {
-                  print(r)
-                  print('table')
-                  break
-                }
-                
-                n_inc <- lapply(unmatched, grepl, x=r) %>%
-                  simplify2array(., higher = TRUE) %>% sum()
-                
-                # if (r %in% unmatched) 
-                if (n_inc>0)
-                {
-                  
-                  # incluir filtro espacial
-                  
-                  index_end <- occ_tmp[index_occ==TRUE, ]$autoGeoStatus == TRUE
-                  
-                  occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[index_end==TRUE] <- include_unmatched
-                  
-                  occ_tmp[index_occ==TRUE, ]$Ctrl_unmatched[index_end==TRUE] <- FALSE
-                  
-                  next
-                }
-                
-                occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord <- 
-                  (occ_tmp[index_occ==TRUE, ]$Ctrl_moreInformativeRecord == 
-                     max(occ_tmp[index_occ==TRUE, ]$Ctrl_moreInformativeRecord) ) 
-                
-                occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord
-                occ_tmp[index_occ==TRUE, ]$Ctrl_bibliographicCitation
-                
-                if (sum(occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord)>1)
-                {
-                  
-                  index_end <- occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord == TRUE &
-                    # occ_tmp[index_occ==TRUE, ]$autoGeoStatus == TRUE &
-                    occ_tmp[index_occ==TRUE, ]$Ctrl_bibliographicCitation == "REFLORA"
-                  
-                  
-                  if (sum(index_end)>0)
-                  {
-                    n_tmp <- NROW(occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[index_end==TRUE])
-                    if (n_tmp==1)
-                    {
-                      occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[index_end==FALSE] <- FALSE
-                    } else
-                    {
-                      occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[index_end==FALSE] <- FALSE
-                      occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[index_end==TRUE][2:n_tmp] <- FALSE
-                    }   
-                  } else
-                  {
-                    index_end <- occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord == TRUE &
-                      # occ_tmp[index_occ==TRUE, ]$autoGeoStatus == TRUE &
-                      occ_tmp[index_occ==TRUE, ]$Ctrl_bibliographicCitation == "SPLINK"
-                    
-                    if (sum(index_end)>0)
-                    {
-                      n_tmp <- NROW(occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[index_end==TRUE])
-                      if (n_tmp==1)
-                      {
-                        occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[index_end==FALSE] <- FALSE
-                      } else
-                      {
-                        occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[index_end==FALSE] <- FALSE
-                        occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[index_end==TRUE][2:n_tmp] <- FALSE
-                      }   
-                      
-                    } else
-                    {
-                      index_end <- occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord == TRUE 
-                      # &
-                      #    occ_tmp[index_occ==TRUE, ]$autoGeoStatus == TRUE
-                      
-                      
-                      if (sum(index_end)>0)
-                      {
-                        n_tmp <- NROW(occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[index_end==TRUE])
-                        if (n_tmp==1)
-                        {
-                          occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[index_end==FALSE] <- FALSE
-                        } else
-                        {
-                          occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[index_end==FALSE] <- FALSE
-                          occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[index_end==TRUE][2:n_tmp] <- FALSE
-                        }   
-                      } else
-                      {
-                        if (onlyLatLon==TRUE)
-                        {
-                          # todos
-                          occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[1:num_records] <- FALSE
-                        } else
-                        {
-                          # exceto o primeiro
-                          occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[2:num_records] <- FALSE 
-                        }   
-                      }
-                      
-                      # }   
-                    }   
-                  }   
-                } else 
-                {
-                  
-                  index_end <- occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord == TRUE 
-                  
-                  # &
-                  #    # is.na(occ_tmp[index_occ==TRUE, ]$new_Lat) == FALSE 
-                  #    occ_tmp[index_occ==TRUE, ]$temCoordenadas == TRUE
-                  
-                  if (sum(index_end)>0)
-                  {
-                    n_tmp <- NROW(occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[index_end==TRUE])
-                    if (n_tmp==1)
-                    {
-                      occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[index_end==FALSE] <- FALSE
-                    } else
-                    {
-                      occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[index_end==FALSE] <- FALSE
-                      occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[index_end==TRUE][2:n_tmp] <- FALSE
-                    }   
-                  } else
-                  {
-                    if (onlyLatLon==TRUE)
-                    {
-                      # todos
-                      occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[1:num_records] <- FALSE
-                    }   
-                  }
-                }   
-              }
-              
-              # }   
-            }
-            
-            
-            res_in <- occ_tmp %>%
-              dplyr::select(Ctrl_key_family_recordedBy_recordNumber,
-                            Ctrl_numberRecordsOfSample,
-                            Ctrl_bibliographicCitation,
-                            Ctrl_moreInformativeRecord,
-                            Ctrl_autoGeoLongitude,
-                            Ctrl_autoGeoLatitude,
-                            Ctrl_selectedMoreInformativeRecord,
-                            autoGeoStatus,
-                            autoGeoNotes,
-                            verbatimNotes,
-                            Ctrl_occurrenceID)
-            
-            if (view_summary==TRUE)
-            {
-              res_in %>%
-                View()
-            }
-            
-            
-            print('...finished!')
-            # return(occ_tmp)
-            return(list(occ = occ_tmp,
-                        summary_MIR = res_in))
-          }
-          
-         }
-         
-        # source("C:/Dados/CNCFlora/shiny/cncflora/functions/prepere_lastNameRecordedBy_v3.R", encoding = "UTF-8")
-        {
-          prepere_lastNameRecordedBy_v3 <- function(occ_tmp, 
-                                                    coletoresDB=coletoresDB)
-          {  
-            
-            coletoresDB <- coletoresDB %>%
-              dplyr::rename(Ctrl_nameRecordedBy_Standard_CNCFlora = Ctrl_nameRecordedBy_Standard)
-            
-            
-            Ctrl_lastNameRecordedBy <- lapply(occ_tmp$Ctrl_recordedBy %>% 
-                                                toupper() %>%
-                                                unique(), 
-                                              get_lastNameRecordedBy) %>% 
-              do.call(rbind.data.frame, .)
-            
-            recordedBy_Standart <- data.frame(
-              Ctrl_nameRecordedBy_Standard =  textclean::replace_non_ascii(toupper(Ctrl_lastNameRecordedBy[,1])),
-              Ctrl_recordedBy = occ_tmp$Ctrl_recordedBy %>% toupper() %>% unique(),
-              stringsAsFactors = FALSE) 
-            
-            recordedBy_Standart <- left_join(recordedBy_Standart,
-                                             coletoresDB,
-                                             by = c('Ctrl_recordedBy')) %>%
-              # dplyr::mutate(coletoresDB='') %>% 
-              dplyr::mutate(coletoresDB=ifelse(!is.na(Ctrl_nameRecordedBy_Standard_CNCFlora),
-                                               'Banco de Coletores OK',
-                                               '')) %>%
-              dplyr::mutate(Ctrl_nameRecordedBy_Standard = ifelse(coletoresDB=='Banco de Coletores OK',
-                                                                  Ctrl_nameRecordedBy_Standard_CNCFlora,
-                                                                  Ctrl_nameRecordedBy_Standard)) %>% 
-              dplyr::arrange(coletoresDB, Ctrl_nameRecordedBy_Standard, Ctrl_recordedBy) %>%
-              dplyr::mutate(Ctrl_notes = Ctrl_notes %>% as.character(),
-                            Ctrl_update = Ctrl_update %>% as.character(),
-                            Ctrl_nameRecordedBy_Standard = Ctrl_nameRecordedBy_Standard %>% as.character(),
-                            Ctrl_recordedBy = Ctrl_recordedBy %>% as.character(),
-                            collectorName = collectorName %>% as.character(),
-                            Ctrl_fullName = Ctrl_fullName %>% as.character(),
-                            Ctrl_fullNameII = Ctrl_fullNameII %>% as.character(),
-                            CVStarrVirtualHerbarium_PersonDetails = CVStarrVirtualHerbarium_PersonDetails %>% as.character()) %>%
-              # dplyr::select(Ctrl_notes,
-              #               Ctrl_update,
-              #               Ctrl_nameRecordedBy_Standard,
-              #               Ctrl_recordedBy,
-              #               collectorName,
-              #               Ctrl_fullName,
-              #               Ctrl_fullNameII,
-              #               CVStarrVirtualHerbarium_PersonDetails)
-              dplyr::select(Ctrl_nameRecordedBy_Standard,
-                            Ctrl_recordedBy,
-                            Ctrl_notes,
-                            coletoresDB,
-                            Ctrl_update,
-                            collectorName,
-                            Ctrl_fullName,
-                            Ctrl_fullNameII,
-                            CVStarrVirtualHerbarium_PersonDetails)
-            
-            
-            # colnames(recordedBy_Standart)
-            xn <- nrow((recordedBy_Standart))
-            recordedBy_Standart <- recordedBy_Standart %>%
-              dplyr::distinct_('Ctrl_recordedBy', .keep_all =TRUE)
-            
-            print( paste0(' Ctrl_recordedBy repetidos na base: ',xn-nrow(recordedBy_Standart)))
-            
-            return(recordedBy_Standart)
-          }
-          
-         }
-        
-        # source("C:/Dados/CNCFlora/shiny/cncflora/functions/get_lastNameRecordedBy.R", encoding = "UTF-8")
-        {
-          get_lastNameRecordedBy <- function(x) 
-          {
-            
-            #aqui
-            # x = gsub("et al.","",x, fixed=TRUE) # teste pablo 10-02-2020
-            # x = gsub("et. al.","",x, fixed=TRUE) # teste pablo 10-02-2020
-            # x = gsub("et al","",x, fixed=TRUE) # teste pablo 10-02-2020
-            # x = gsub("s.c.","",x, fixed=TRUE) # teste pablo 10-02-2020
-            # x = gsub("s/c","",x, fixed=TRUE) # teste pablo 10-02-2020
-            # x = gsub("sc","",x, fixed=TRUE) # teste pablo 10-02-2020
-            
-            
-            x = gsub("[?]","",x) # teste pablo 10-02-2020
-            
-            x = gsub("[.]"," ",x) # teste pablo 10-02-2020
-            
-            if (length(grep("\\|",x))>0)
-            {
-              x = strsplit(x,"\\|")[[1]][1]
-            }
-            
-            x = gsub("[á|à|â|ã|ä]","a",x)
-            x = gsub("[Á|À|Â|Ã|Ä]","A",x)
-            
-            x = gsub("[ó|ò|ô|õ|ö]","o",x)
-            x = gsub("[Ó|Ò|Ô|Õ|Ö]","O",x)
-            
-            x = gsub("[í|ì|î|ï]","i",x)
-            x = gsub("[Í|Ì|Î|Ï]","I",x)
-            
-            x = gsub("[ú|ù|û|ü]","u",x)
-            x = gsub("[Ú|Ù|Û|Ü]","U",x)
-            
-            x = gsub("[é|è|ê|ë]","e",x)
-            x = gsub("[É|È|Ê|Ë]","E",x)
-            
-            x = gsub("ñ","n",x)
-            x = gsub("Ñ","N",x)
-            
-            x = gsub("ç","c",x)
-            x = gsub("Ç","C",x)
-            
-            x = gsub("\\(|\\)"," ",x) # teste pablo 10-02-2020
-            x = gsub("\\[|\\]"," ",x) # teste pablo 10-02-2020
-            x = gsub("[\"]"," ",x) # teste pablo 10-02-2020
-            
-            #pega o primeiro nome de uma lista de coletores separados por & se houver
-            if (length(grep("&",x))>0)
-            {
-              x = strsplit(x,"&")[[1]][1]
-            }
-            
-            #pega o primeiro nome de uma lista de coletores separados por ";" se houver
-            if (length(grep(";",x))>0)
-            {
-              x_t <- strsplit(x,";")[[1]][1]
-              
-              # para capturar padrão iniciado por ;
-              if (nchar(x_t)==0)
-              {
-                x_t <- strsplit(x,";")[[1]][2]
-                if (is.na(x_t )) { x_t <- ""}
-              }
-              
-              if (nchar(x_t)>0)
-              {
-                x <- x_t 
-              } else
-              {
-                x <- ''
-              }  
-              
-            }
-            #se houver v?rgula pode ser dois casos:
-            #1. ou o valor antes da v?rgula ? o sobrenome (padr?o INPA)
-            #2. ou a v?rgula esta separando diferentes coletores (e neste caso as palavras do primeiro elemento n?o s?o apenas abrevia??es)
-            
-            # aqui
-            # vl = grep(",|.",x) 
-            
-            vl = grep(",| ",x) 
-            
-            #se tem v?rgula
-            if (length(vl)>0) {
-              
-              # aqui 2 se der pau voltar
-              # x = gsub("[.]"," ",x) # teste pablo 10-02-2020
-              
-              #separa pela v?rgula e pega o primeiro elemento
-              xx = strsplit(x,",")[[1]][1]
-              
-              #separa o primeiro elemento antes da v?rgula por espa?os
-              xx = strsplit(xx," ")[[1]]
-              
-              #apaga elementos vazios
-              xx = xx[xx!=""]
-              
-              #se o numero de caracteres da maior palavra for maior do que 2, ent?o o primeiro elemento era todo o nome do coletor, pega apenas o sobrenome
-              if (max(nchar(xx))>2) {
-                #1 pegue esta palavra como sobrenome se houver apenas 1 palavra
-                vll = which(nchar(xx)==max(nchar(xx)))
-                #ou 2, se houver mais de uma palavra com o mesmo tamanho, pega a ?ltima delas
-                if (length(vll)>1) {
-                  vll = vll[length(vll)]
-                } 
-                sobren = xx[vll]
-                # ##############
-                #       # teste para pegar o ultimo nome
-                #       #1 pegue esta palavra como sobrenome se houver apenas 1 palavra
-                #       sobren = xx[[length(nchar(xx))]]
-                # ##############
-                #       
-              } else {
-                #caso contrario h? apenas abrevia??es em xx, ent?o, virgula separa apenas sobrenome de abreviacoes ou prenome 
-                sb = strsplit(x,",")[[1]]
-                sb = str_trim(sb)
-                nsb = nchar(sb)
-                sbvl = which(nsb==max(nsb))
-                if (length(sbvl)>1) {
-                  sbvl = sbvl[length(sbvl)]
-                }
-                sobren = sb[sbvl]
-              }
-            } else {
-              #neste caso n?o h? virgula, ent?o o ultimo nome ? o sobrenome
-              xx = strsplit(x," ")[[1]]
-              sobren = xx[length(xx)]
-            }
-            sobren = str_trim(sobren)
-            sobren = gsub("?","", sobren)
-            sobren = paste(sobren,sep="-")
-            if (length(sobren)>0){
-              x = strsplit(sobren,"\\|")[[1]]
-              sobren = x[1]
-              #print(sobren)
-              return(sobren)
-            } else {
-              return(NA)
-            }
-          }
-          
-        } 
-        
-        # source('C:/Dados/CNCFlora/shiny/cncflora/functions/update_lastNameRecordedBy_v5.R')
-        {
-          update_lastNameRecordedBy_v5 <- function(occ_tmp, 
-                                                   recordedBy_ajusted,
-                                                   coletoresDB)
-          {  
-            colunas <- colnames(coletoresDB)
-            
-            coletoresDB <- coletoresDB %>% 
-              dplyr::rename(Ctrl_nameRecordedBy_Standard_CNCFlora = Ctrl_nameRecordedBy_Standard) %>%
-              dplyr::select(Ctrl_recordedBy, Ctrl_nameRecordedBy_Standard_CNCFlora)
-            
-            recordedBy_ajusted$Ctrl_recordedBy <- recordedBy_ajusted$Ctrl_recordedBy %>% 
-              toupper() %>% as.character()
-            
-            coletoresDB$Ctrl_recordedBy <- coletoresDB$Ctrl_recordedBy %>% 
-              toupper() %>% as.character()
-            
-            recordedBy_ajusted_new <- anti_join(recordedBy_ajusted,
-                                                coletoresDB,
-                                                by = c('Ctrl_recordedBy')) %>%
-              dplyr::select(colunas)
-            
-            ####
-            
-            occ_tmp <- occ_tmp %>%
-              dplyr::mutate(Ctrl_nameRecordedBy_Standard='')
-            
-            recordedBy_unique <- occ_tmp$Ctrl_recordedBy %>% unique() %>%  as.factor()
-            recordedBy_unique <- recordedBy_unique %>% toupper()
-            # NROW(recordedBy_unique)
-            
-            print("let's go...")
-            print(NROW(recordedBy_unique))
-            
-            # atualizando tabela de occorencias
-            
-            rt <- NROW(recordedBy_unique)
-            ri <- 0
-            
-            r=recordedBy_unique[1] 
-            for (r in recordedBy_unique)
-            {
-              ri <- ri + 1
-              
-              if (is.na(r)) {next}
-              index_occ <- (occ_tmp$Ctrl_recordedBy %>% toupper() %in% r) %>% ifelse(is.na(.), FALSE,.)
-              num_records <- NROW(occ_tmp[index_occ==TRUE,])
-              index_ajusted <- (recordedBy_ajusted$Ctrl_recordedBy == r) %>% ifelse(is.na(.), FALSE,.)
-              
-              # sum(index_ajusted)
-              # any(index_ajusted)
-              
-              # group_by_(campo) %>% summarise(frecuencia = n() ))
-              # recordedBy_ajusted[index_ajusted==TRUE,] %>% dplyr::select(Ctrl_recordedBy)
-              
-              print(paste0(ri, ' de ', rt, ' - ', r,' : ',num_records, ' registros' ))
-              
-              if (NROW(recordedBy_ajusted[index_ajusted==TRUE,]) == 0)
-              {
-                # occ_tmp[index_occ==TRUE, c('Ctrl_nameRecordedBy_Standard')] =
-                #    data.frame(Ctrl_nameRecordedBy_Standard  = 'undefined collector')
-                print(r)
-                print('in ajusted')
-                next
-              }
-              
-              if (num_records == 0)
-              {
-                print(r)
-                print('table')
-                break
-              }
-              
-              recordedBy_ajusted_tmp <- recordedBy_ajusted %>%
-                dplyr::filter(index_ajusted) %>%
-                dplyr::select(Ctrl_nameRecordedBy_Standard)
-              
-              # 09-09-2022
-              recordedBy_ajusted_tmp <- recordedBy_ajusted_tmp[1,]
-              
-              # 18-10-21
-              #pode-se ajustar aqui as duplicações
-              
-              occ_tmp[index_occ==TRUE, c('Ctrl_nameRecordedBy_Standard')] =
-                data.frame(Ctrl_nameRecordedBy_Standard  = recordedBy_ajusted_tmp)
-              
-              # # 08-02-2022 - desliguei essa conferencia desnecessária e que exige grande processamento
-              # index_ck <- occ_tmp$Ctrl_nameRecordedBy_Standard %in% recordedBy_ajusted_tmp &
-              #    index_occ
-              # 
-              # num_records_ck <- NROW(occ_tmp[index_ck==TRUE,])
-              # 
-              # # print(num_records)
-              # if ((num_records-num_records_ck)>0){print(num_records-num_records_ck)}
-              
-            }
-            
-            print('...finished!')
-            
-            # teste antigo removido
-            
-            occ_tmp$Ctrl_recordNumber_Standard <- str_replace_all(occ_tmp$Ctrl_recordNumber, "[^0-9]", "")
-            
-            occ_tmp$Ctrl_recordNumber_Standard <- ifelse(is.na(occ_tmp$Ctrl_recordNumber_Standard) |
-                                                           occ_tmp$Ctrl_recordNumber_Standard=='',"",occ_tmp$Ctrl_recordNumber_Standard  %>% strtoi())
-            # occ_tmp$Ctrl_recordNumber_Standard <- ifelse(is.na(occ_tmp$Ctrl_recordNumber_Standard),"",occ_tmp$Ctrl_recordNumber_Standard)
-            
-            occ_tmp$Ctrl_recordNumber_Standard
-            
-            occ_tmp$Ctrl_key_family_recordedBy_recordNumber <- ""
-            occ_tmp <- occ_tmp %>%
-              dplyr::mutate(Ctrl_key_family_recordedBy_recordNumber =
-                              paste(Ctrl_family %>% toupper() %>% glue::trim(),
-                                    Ctrl_nameRecordedBy_Standard,
-                                    Ctrl_recordNumber_Standard,
-                                    # Ctrl_recordNumber,
-                                    
-                                    # Ctrl_year,
-                                    # Ctrl_standardized_stateProvince,
-                                    sep='_'))
-            
-            occ_tmp$Ctrl_key_year_recordedBy_recordNumber <- ""
-            occ_tmp <- occ_tmp %>%
-              dplyr::mutate(Ctrl_key_year_recordedBy_recordNumber =
-                              paste(ifelse(Ctrl_year %>% is.na() == TRUE, 'noYear',Ctrl_year)  %>% glue::trim(),
-                                    Ctrl_nameRecordedBy_Standard,
-                                    Ctrl_recordNumber_Standard,
-                                    sep='_'))
-            
-            # # numero de registros por frase saída in
-            res_in <- occ_tmp %>% dplyr::count(paste0(Ctrl_key_family_recordedBy_recordNumber))
-            colnames(res_in) <- c('Key',
-                                  'numberOfRecords')
-            res_in <- res_in %>% dplyr::arrange_at(c('numberOfRecords'), desc )
-            
-            print(occ_tmp$Ctrl_key_family_recordedBy_recordNumber %>% unique())
-            return(list(occ = occ_tmp,
-                        summary = res_in,
-                        MainCollectorLastNameDB_new=recordedBy_ajusted_new))
-            
-            ptint('Finished2!')
-            
-          }
-        } 
-        
-         # no app
-         # source("C:/Dados/APP_GBOT/functions/get_wcvp.R", encoding = "UTF-8")
-         update_wcvp <<- FALSE
-         
-         # source("C:/Dados/APP_GBOT/functions/get_floraFungaBrasil_v2.R", encoding = "UTF-8")
-         {
-           get_floraFungaBrasil_v2 <- function(url_source = "http://ipt.jbrj.gov.br/jbrj/archive.do?r=lista_especies_flora_brasil",
-                                               path_results = tempdir)#'C:\\Dados\\APP_GBOT\\data') # if NULL
-             
-           {  
-             
-             require(dplyr)
-             require(downloader)
-             require(stringr)
-             require(plyr)
-             
-             #' @details criar pasta para salvar raultados do dataset
-             path_results <- paste0(path_results,'/FloraFungaBrasil')
-             if (!dir.exists(path_results)){dir.create(path_results)}
-             
-             destfile <- paste0(path_results,"/IPT_FloraFungaBrasil_.zip")
-             
-             
-             #' @details ultima versao
-             # destfile <- paste0(path_results,"/",Sys.Date(),'.zip')
-             downloader::download(url = url_source, destfile = destfile, mode = "wb") 
-             utils::unzip(destfile, exdir = path_results) # descompactar e salvar dentro subpasta "ipt" na pasta principal
-             
-             
-             taxon.file <- paste0(path_results,"/taxon.txt")
-             
-             # taxon.file <- paste0("C:\\Dados\\APP_GBOT\\data\\FloraFungaBrasil\\taxon.txt")
-             
-             
-             
-             #' @details taxon
-             fb2020_taxon  <- readr::read_delim(taxon.file, delim = "\t", quote = "") %>% 
-               dplyr::select(-id)
-             
-             ### familia
-             # index = fb2020_taxon$taxonRank %in% c("ESPECIE",
-             #                                       "SUB_ESPECIE",
-             #                                       "VARIEDADE",
-             #                                       "FORMA")
-                                                   
-             index = fb2020_taxon$taxonRank %in% c("ESPECIE",
-                                                   "SUB_ESPECIE",
-                                                   "VARIEDADE",
-                                                   "FORMA",
-                                                   "FAMILIA",
-                                                   "GENERO")
-             ###
-             
-             fb2020_taxon  <- fb2020_taxon[index==TRUE,] 
-             
-             
-             scientificName_tmp <- fb2020_taxon$scientificName %>% stringr::str_split(.,pattern = ' ', simplify = TRUE)
-             
-             
-             # carregando especie sem autor
-             scientificName <- rep('',nrow(fb2020_taxon))
-             
-             # scientificName[index==TRUE] <- scientificName_tmp[index==TRUE,1] %>% trimws(.,'right')
-             
-             index = fb2020_taxon$taxonRank %in% c("ESPECIE")
-             
-             scientificName[index==TRUE] <-  paste0(scientificName_tmp[index==TRUE,1], ' ', scientificName_tmp[index==TRUE,2]) #%>% trimws(.,'right')
-             
-             index = fb2020_taxon$taxonRank %in% c("VARIEDADE")
-             scientificName[index==TRUE] <-  paste0(fb2020_taxon$genus[index==TRUE], ' ', fb2020_taxon$specificEpithet[index==TRUE], ' var. ', fb2020_taxon$infraspecificEpithet[index==TRUE])# %>% trimws(.,'right')
-             
-             index = fb2020_taxon$taxonRank %in% c("SUB_ESPECIE")
-             scientificName[index==TRUE] <-  paste0(fb2020_taxon$genus[index==TRUE], ' ', fb2020_taxon$specificEpithet[index==TRUE], ' subsp. ', fb2020_taxon$infraspecificEpithet[index==TRUE])# %>% trimws(.,'right')
-             
-             index = fb2020_taxon$taxonRank %in% c("FORMA")
-             scientificName[index==TRUE] <-  paste0(fb2020_taxon$genus[index==TRUE], ' ', fb2020_taxon$specificEpithet[index==TRUE], ' form. ', fb2020_taxon$infraspecificEpithet[index==TRUE])# %>% trimws(.,'right')
-             
-             fb2020_taxon$scientificNamewithoutAuthorship <- scientificName
-             fb2020_taxon$scientificNamewithoutAuthorship_U <- toupper(scientificName)
-             
-             fb2020_taxon$scientificNameAuthorship_U <- toupper(fb2020_taxon$scientificNameAuthorship)
-             
-             ### reconhecer genero e familia
-             
-             fb2020_taxon$genus_U <- toupper(fb2020_taxon$genus)
-             
-             fb2020_taxon$family_U <- toupper(fb2020_taxon$family)
-             
-             ###
-             
-             return(fb2020_taxon)
-             
-           }
-           
-         }
-         
-         # source("C:/Dados/APP_GBOT/functions/checkName_WCVP.R", encoding = "UTF-8")
-         
-         # source("C:/Dados/APP_GBOT/functions/checkName_FloraFungaBrasil.R", encoding = "UTF-8")
-         {
-           standardize_scientificName <- function(searchedName = 'Alomia angustata (Gardner) Benth. ex Baker')
-           {
-             
-             x <- {}
-             
-             infrataxa = ''
-             # str_squish(x)
-             # setdiff(vec1, vec2)
-             
-             #' @details Transformação padrão GBIF de híbrido para wcvp 
-             searchedName_raw <- searchedName
-             # searchedName <- gsub('×','x ',searchedName)
-             searchedName <- gsub('×','× ',searchedName)
-             searchedName_ori <- searchedName
-             
-             # if(!is.na(taxonRank))
-             # {
-             #   
-             #   searchedName_clear <- ifelse(taxonRank %in% c('GENUS','FAMILY'),word(searchedName,1),
-             #                                ifelse(taxonRank=='SPECIES',paste0(word(searchedName,1),' ',word(searchedName,2)),
-             #                                       ifelse(taxonRank=='VARIETY',paste0(word(searchedName,1),' ', word(searchedName,2), ' var. ', word(searchedName,4)),
-             #                                              ifelse(taxonRank=='SUBSPECIES',paste0(word(searchedName,1),' ', word(searchedName,2), ' subsp. ', word(searchedName,4)),
-             #                                                     ifelse(taxonRank=='FORM',paste0(word(searchedName,1),' ', word(searchedName,2), ' f. ', word(searchedName,4)), 
-             #                                                            '')))))
-             #   
-             #   return(list(searchedName = searchedName_raw,
-             #               standardizeName = searchedName,
-             #               taxonAuthors= taxon_authors))
-             #   
-             # }
-             
-             
-             
-             sp <- str_split(searchedName, ' ', simplify = T)
-             padrao <- c('var.', 'subsp.', ' f. ')
-             padrao_s <- c('var.', 'subsp.', 'f.')
-             
-             # Urtica gracilis Aiton subsp. gracilis
-             
-             if(length(sp)>1)
-             {
-               # if(any(str_detect(searchedName, padrao))==T)
-               if(grepl(padrao[1],searchedName, fixed = T)|grepl(padrao[2],searchedName, fixed = T)|grepl(padrao[3],searchedName, fixed = T) ) 
-               {
-                 ip <- 1
-                 for(ip in 1:length(padrao))
-                 {
-                   # grepl(padrao[ip],'teste var. teste', fixed = T)
-                   # grepl(padrao[ip],'"Elatostema variabile C.B.Rob."', fixed = T)
-                   
-                   # if(str_detect(searchedName, padrao[ip])==TRUE)
-                   if(grepl(padrao[ip],searchedName, fixed = T)==TRUE)
-                   {
-                     indx <- sp == padrao_s[ip]
-                     
-                     if(length(sp)>3){if(indx[3]==T){infrataxa <- sp[4]}}
-                     if(length(sp)>4){if(indx[4]==T){infrataxa <- sp[5]}}
-                     if(length(sp)>5){if(indx[5]==T){infrataxa <- sp[6]}}
-                     if(length(sp)>6){if(indx[6]==T){infrataxa <- sp[7]}}
-                     if(length(sp)>7){if(indx[7]==T){infrataxa <- sp[8]}}
-                     if(length(sp)>8){if(indx[8]==T){infrataxa <- sp[9]}}
-                     if(length(sp)>9){if(indx[9]==T){infrataxa <- sp[10]}}
-                     if(length(sp)>10){if(indx[10]==T){infrataxa <- sp[11]}}
-                     if(length(sp)>11){if(indx[11]==T){infrataxa <- sp[12]}}
-                     if(length(sp)>12){if(indx[12]==T){infrataxa <- sp[13]}}
-                     
-                     if(str_detect(searchedName_raw, '×')==TRUE)
-                     {
-                       searchedName <- paste0(sp[1], ' × ', sp[3], ifelse(infrataxa=='','',paste0(' ', padrao_s[ip], ' ', infrataxa)))  
-                     }else
-                     {
-                       searchedName <- paste0(sp[1], ' ', sp[2], ' ', padrao_s[ip], ' ', infrataxa)   
-                     }
-                     
-                     
-                     
-                     break
-                     
-                   }
-                 }
-               }else
-               {
-                 
-                 if(str_detect(searchedName_raw, '×')==TRUE)
-                 {
-                   
-                   searchedName <- paste0(sp[1], ' × ', sp[3])  
-                   
-                 }else
-                 {
-                   if((str_sub(sp[2],1,1)==toupper(str_sub(sp[2],1,1)) |
-                       str_sub(sp[2],1,1)=="(") )
-                   {
-                     searchedName <- sp[1]
-                   }else
-                   {
-                     searchedName <- paste0(sp[1], ' ', sp[2])
-                   } 
-                 }
-               }
-             }else
-             {
-               searchedName <- sp[1]
-             }
-             
-             sp2 <- str_split(searchedName, ' ', simplify = T)
-             
-             taxon_authors <- str_sub(searchedName_ori, str_locate(searchedName_ori, sp2[length(sp2)])[2]+2, nchar(searchedName_ori))
-             # if(length(sp2)>=4){if( paste0(sp2[3], ' ',sp2[4])==taxon_authors){taxon_authors <- ''}}
-             
-             if(length(sp2)==4 &!is.na(taxon_authors)){if(paste0(sp2[3], ' ',sp2[4])==taxon_authors){taxon_authors <- ''}}
-             
-             # if( (str_sub(sp[3],1,1)==toupper(str_sub(sp[3],1,1)) | str_sub(sp[3],1,1)=="(") & any(str_detect(searchedName, padrao))==TRUE ){taxon_authors <- ''}
-             
-             xi <- str_locate(taxon_authors,'\\(')
-             xf <- str_locate(taxon_authors,'\\)')
-             
-             
-             if(!is.na(xi)[1] & nchar(taxon_authors) > 0)
-             {    
-               if(xi[1]==1)
-               {
-                 taxon_authors_last <- str_sub(taxon_authors,xf[2]+ifelse(str_sub(taxon_authors,xf[2]+1,xf[2]+1)==' ',2,1),nchar(taxon_authors))
-               }
-             }else
-             {
-               taxon_authors_last <- ''  
-             }
-             
-             if(is.na(taxon_authors)){taxon_authors <- ''}
-             
-             
-             return(list(searchedName = searchedName_raw,
-                         standardizeName = searchedName,
-                         taxonAuthors= taxon_authors,
-                         taxonAuthors_last= taxon_authors_last))
-           }
-           
-           # searchedName = "Acacia plumosa"
-           # searchedName = "Furnarius rufus"
-           
-           # searchedName = "Oncidium cebolleta"
-           
-           checkName_FloraFungaBrasil <- function(searchedName = 'Alomia angustata',
-                                                  fb2020=NA,
-                                                  if_author_fails_try_without_combinations=TRUE)
-           {
-              print(searchedName)
-             # https://powo.science.kew.org/about-wcvp#unplacednames
-             
-             x <- {}  
-             sp_fb <- standardize_scientificName(searchedName)
-             
-             if(sp_fb$taxonAuthors != "")
-             {
-               
-               index_author <- 100
-               
-               index <- fb2020$scientificNamewithoutAuthorship_U %in% toupper(sp_fb$standardizeName) & 
-                 fb2020$scientificNameAuthorship_U %in% toupper(gsub ("\\s+", "", sp_fb$taxonAuthors ))
-               ntaxa <- NROW(fb2020[index==TRUE,])
-               
-               if(ntaxa == 0 & if_author_fails_try_without_combinations == TRUE)
-               {
-                 index_author <- 50
-                 index <- fb2020$scientificNamewithoutAuthorship_U %in% toupper(sp_fb$standardizeName) & 
-                   fb2020$scientificNameAuthorship_U %in% toupper(gsub ("\\s+", "", sp_fb$taxonAuthors_last ))
-                 ntaxa <- NROW(fb2020[index==TRUE,])
-               }
-               
-               
-               if(ntaxa == 0)
-               {
-                 index_author <- 0
-                 index <- fb2020$scientificNamewithoutAuthorship_U %in% toupper(sp_fb$standardizeName)
-                 ntaxa <- NROW(fb2020[index==TRUE,])
-               }
-               
-             }else
-             {
-               index_author <- 0
-               index <- fb2020$scientificNamewithoutAuthorship_U %in% toupper(sp_fb$standardizeName)
-               ntaxa <- NROW(fb2020[index==TRUE,])
-             }
-             
-             if(ntaxa == 0 | sp_fb$standardizeName=="")
-             {
-               x <- fb2020[index==TRUE,] %>%
-                 dplyr::add_row()  %>%
-                 dplyr::mutate(searchedName=searchedName,
-                               taxon_status_of_searchedName = NA,
-                               plant_name_id_of_searchedName = NA,
-                               taxon_authors_of_searchedName = NA,
-                               verified_author = index_author,
-                               verified_speciesName = 0,
-                               searchNotes='Not found')
-             }
-             
-             if(ntaxa == 1)
-             {
-               verified_speciesName <- 100
-               
-               id_accept <- ifelse(is.na(fb2020$acceptedNameUsageID[index==TRUE]),'', fb2020$acceptedNameUsageID[index==TRUE])
-               
-               if((!is.na(fb2020$acceptedNameUsageID[index==TRUE])) &
-                  (fb2020$taxonID[index==TRUE] != id_accept ))
-               {
-                 
-                 x <- fb2020[index==TRUE,]
-                 
-                 taxon_status_of_searchedName <- fb2020[index==TRUE,]$taxonomicStatus
-                 plant_name_id_of_searchedName <- fb2020[index==TRUE,]$taxonID
-                 taxon_authors_of_searchedName <- fb2020[index==TRUE,]$scientificNamewithoutAuthorship
-                 
-                 index_synonym <- fb2020$taxonID %in% x$acceptedNameUsageID 
-                 
-                 if(sum(index_synonym==TRUE)==1)
-                 {
-                   x <- fb2020[index_synonym==TRUE,] %>%
-                     dplyr::mutate(searchedName=searchedName,
-                                   taxon_status_of_searchedName = taxon_status_of_searchedName,
-                                   plant_name_id_of_searchedName = plant_name_id_of_searchedName,
-                                   taxon_authors_of_searchedName = taxon_authors_of_searchedName,
-                                   verified_author = index_author,
-                                   verified_speciesName = verified_speciesName,
-                                   searchNotes= 'Updated')
-                   
-                 }else
-                 {
-                   x <- fb2020[index==TRUE,] %>%
-                     dplyr::mutate(searchedName=searchedName,
-                                   taxon_status_of_searchedName = taxon_status_of_searchedName,
-                                   plant_name_id_of_searchedName = plant_name_id_of_searchedName,
-                                   taxon_authors_of_searchedName = taxon_authors_of_searchedName,
-                                   verified_author = index_author,
-                                   verified_speciesName = verified_speciesName,
-                                   searchNotes= 'Does not occur in Brazil')
-                 }
-                 
-               }else
-               {
-                 x <- fb2020[index==TRUE,] %>%
-                   # dplyr::add_row()  %>%
-                   dplyr::mutate(searchedName=searchedName,
-                                 taxon_status_of_searchedName = NA,
-                                 plant_name_id_of_searchedName = NA,
-                                 taxon_authors_of_searchedName = NA,
-                                 verified_author = index_author,
-                                 verified_speciesName = verified_speciesName,
-                                 searchNotes=ifelse(is.na(taxonomicStatus),'',taxonomicStatus))
-               }
-               
-             }
-             
-             if(ntaxa > 1)
-             {
-               
-               taxon_status_of_searchedName <- paste(fb2020[index==TRUE,]$taxonomicStatus, collapse = '|')
-               plant_name_id_of_searchedName <- paste(fb2020[index==TRUE,]$taxonID, collapse = '|')
-               # taxon_authors_of_searchedName <- paste(paste0(fb2020[index==TRUE,]$taxon_name, ' ',fb2020[index==TRUE,]$taxon_authors), collapse = '|')
-               taxon_authors_of_searchedName <- paste(fb2020[index==TRUE,]$scientificNameAuthorship, collapse = '|')
-               
-               
-               # Accepted or Homonyms
-               {
-                 index_status <- fb2020$scientificNamewithoutAuthorship_U %in% toupper(sp_fb$standardizeName) &
-                   fb2020$taxonomicStatus %in% c( "NOME_ACEITO")
-                 
-                 ntaxa_status <- NROW(fb2020[index_status==TRUE,])
-                 
-                 if(ntaxa_status == 1)
-                 {
-                   
-                   x <- fb2020[index_status==TRUE,] %>%
-                     dplyr::mutate(searchedName=searchedName,
-                                   taxon_status_of_searchedName = taxon_status_of_searchedName,
-                                   plant_name_id_of_searchedName = plant_name_id_of_searchedName,
-                                   taxon_authors_of_searchedName = taxon_authors_of_searchedName,
-                                   verified_author = index_author,
-                                   verified_speciesName = 100/ntaxa,
-                                   searchNotes=taxonomicStatus)
-                 }
-                 else
-                 {
-                   
-                   
-                   x <- fb2020[1==2,] %>%
-                     dplyr::add_row()  %>%
-                     dplyr::mutate(searchedName=searchedName,
-                                   taxon_status_of_searchedName = taxon_status_of_searchedName,
-                                   plant_name_id_of_searchedName = plant_name_id_of_searchedName,
-                                   taxon_authors_of_searchedName = taxon_authors_of_searchedName,
-                                   verified_author = index_author,
-                                   verified_speciesName = 0,
-                                   searchNotes='Homonyms')
-                   
-                 }
-                 
-               }
-               
-             }
-             
-             # 'Homonyms' ajustar família
-             
-             if(x$searchNotes == 'Not found' )
-             {
-                ### reconhecer genero e familia
-                # x <-{}
-                w1 <- toupper(word(sp_fb$standardizeName))
-                
-                index <- fb2020$genus_U %in% toupper(w1) & fb2020$taxonRank == 'GENERO' & !is.na(fb2020$acceptedNameUsageID)
-                ntaxa <- NROW(fb2020[index==TRUE,])
-                
-                g_f <- 'g'
-                
-                if(ntaxa == 0 )
-                {
-                   index <- fb2020$family_U %in% toupper(w1) & fb2020$taxonRank == 'FAMILIA' & !is.na(fb2020$acceptedNameUsageID)
-                   ntaxa <- NROW(fb2020[index==TRUE,])
-                   g_f <- 'f'
-                }    
-                
-                if(ntaxa == 1)
-                {
-                   verified_speciesName <- 100
-                   
-                   id_accept <- ifelse(is.na(fb2020$acceptedNameUsageID[index==TRUE]),'', fb2020$acceptedNameUsageID[index==TRUE])
-                   
-                   if((!is.na(fb2020$acceptedNameUsageID[index==TRUE])) &
-                      (fb2020$taxonID[index==TRUE] != id_accept ))
-                   {
-                      
-                      x <- fb2020[index==TRUE,]
-                      
-                      taxon_status_of_searchedName <- fb2020[index==TRUE,]$taxonomicStatus
-                      plant_name_id_of_searchedName <- fb2020[index==TRUE,]$taxonID
-                      taxon_authors_of_searchedName <- fb2020[index==TRUE,]$scientificNamewithoutAuthorship
-                      
-                      index_synonym <- fb2020$taxonID %in% x$acceptedNameUsageID 
-                      
-                      if(sum(index_synonym==TRUE)==1)
-                      {
-                         x <- fb2020[index_synonym==TRUE,] %>%
-                            dplyr::mutate(searchedName=searchedName,
-                                          taxon_status_of_searchedName = taxon_status_of_searchedName,
-                                          plant_name_id_of_searchedName = plant_name_id_of_searchedName,
-                                          taxon_authors_of_searchedName = taxon_authors_of_searchedName,
-                                          verified_author = index_author,
-                                          verified_speciesName = verified_speciesName,
-                                          searchNotes=  ifelse(g_f=='g', 'Updated_genus', 'Updated_family') )
-                         
-                      }else
-                      {
-                         x <- fb2020[index==TRUE,] %>%
-                            dplyr::mutate(searchedName=searchedName,
-                                          taxon_status_of_searchedName = taxon_status_of_searchedName,
-                                          plant_name_id_of_searchedName = plant_name_id_of_searchedName,
-                                          taxon_authors_of_searchedName = taxon_authors_of_searchedName,
-                                          verified_author = index_author,
-                                          verified_speciesName = verified_speciesName,
-                                          searchNotes= 'Does not occur in Brazil')
-                      }
-                      
-                   }else
-                   {
-                      x <- fb2020[index==TRUE,] %>%
-                         # dplyr::add_row()  %>%
-                         dplyr::mutate(searchedName=searchedName,
-                                       taxon_status_of_searchedName = NA,
-                                       plant_name_id_of_searchedName = NA,
-                                       taxon_authors_of_searchedName = NA,
-                                       verified_author = index_author,
-                                       verified_speciesName = verified_speciesName,
-                                       searchNotes=taxonomicStatus)
-                   }
-                   
-                }
-                
-                
-                if(ntaxa >1)
-                {
-                   
-                   x <- fb2020[index==TRUE,][1,] %>%
-                      # dplyr::add_row()  %>%
-                      dplyr::mutate(taxonID = '',                           
-                                    acceptedNameUsageID = '',
-                                    parentNameUsageID = '',         
-                                    originalNameUsageID = '',          
-                                    
-                                    # scientificName = ifelse(g_f=='g', genus, family),                    
-                                    scientificName = '', 
-                                    
-                                    acceptedNameUsage  = '',                
-                                    parentNameUsage = '',                   
-                                    namePublishedIn = '',                  
-                                    namePublishedInYear = '',               
-                                    higherClassification = '',             
-                                    # kingdom                           
-                                    # phylum                           
-                                    # class                             
-                                    # order                            
-                                    # family                            
-                                    # genus                            
-                                    specificEpithet = '',                   
-                                    infraspecificEpithet = '',             
-                                    
-                                    # taxonRank = ifelse(g_f=='g',"GENERO", "FAMILIA"),   
-                                    taxonRank = '',
-                                       
-                                    scientificNameAuthorship = '',
-                                    taxonomicStatus = '',                   
-                                    nomenclaturalStatus = '',              
-                                    modified = '',                          
-                                    bibliographicCitation = '',            
-                                    references = '',                        
-                                    scientificNamewithoutAuthorship = ifelse(g_f=='g', genus, family),
-                                    scientificNamewithoutAuthorship_U = ifelse(g_f=='g', genus_U, family_U),
-                                    scientificNameAuthorship_U = '',       
-                                    genus_U,                           
-                                    family_U) %>%
-                      dplyr::mutate(searchedName=searchedName,
-                                    taxon_status_of_searchedName = NA,
-                                    plant_name_id_of_searchedName = NA,
-                                    taxon_authors_of_searchedName = NA,
-                                    verified_author = NA,
-                                    verified_speciesName = NA,
-                                    searchNotes=taxonRank)
-                }
-                ###
-                
-             }
-             
-             colnames(x) <- str_c('fb2020_',colnames(x))
-             return(x)
-             
-           }
-           
-         }
-         
-         # source("C:\\Dados\\Kew\functions\\standardize_scientificName.R", encoding = "UTF-8")
-         
-      }
-     
-    
-      
-   }
-   
-   #' @details finalizar tempo de processamento
-   tempo_processo <- get_tempo_processamento(tempo_processo_tmp)
-   
-}
-
-
-#' @section Selecionar UC
-{
-   # 
-   # nome_uc <- 'Serra das Lontras'
-   # 
-   # 
-   # path_source <- 'C:\\Dados\\CNCFlora\\shiny\\cncflora\\scriptsAdd\\CatalogoUCs_v2\\busca_manual'
-   # path_uc <- paste0(path_source,'\\',nome_uc)
-   # path_results <- paste0(path_uc,'\\results')
-   # 
-   # path_reflora <- paste0(path_uc,'\\reflora')
-   # path_jabot <- paste0(path_uc,'\\jabot')
-   # path_splink <- paste0(path_uc,'\\splink')
-   # path_gbif <- paste0(path_uc,'\\gbif')
-   # 
-   # if(!dir.exists(path_uc)){dir.create(path_uc)}
-   # if(!dir.exists(path_results)){dir.create(path_results)}
-   # if(!dir.exists(path_reflora)){dir.create(path_reflora)}
-   # if(!dir.exists(path_jabot)){dir.create(path_jabot)}
-   # if(!dir.exists(path_splink)){dir.create(path_splink)}
-   # if(!dir.exists(path_gbif)){dir.create(path_gbif)}
-   # 
-   # files_reflora <- list.files(path =  path_reflora, full.names = T) #xlsx
-   # files_jabot <- list.files(path =  path_jabot, full.names = T) #xlsx
-   # files_splink <- list.files(path =  path_splink, full.names = T) #xlsx
-   # files_gbif <- list.files(path =  path_gbif, full.names = T) #xlsx
-   # 
-   # seleção de colunas
-   # colunas_fb2020_sel 
-   # colunas_ctrl_dwc
-   {
-      colunas_wcvp_sel <<- c("wcvp_kew_id",
-                             "wcvp_family",
-                             "wcvp_genus",
-                             "wcvp_species",
-                             "wcvp_infraspecies",
-                             "wcvp_taxon_name",
-                             "wcvp_authors",
-                             "wcvp_rank",
-                             "wcvp_taxonomic_status",
-                             "wcvp_accepted_kew_id" ,
-                             "wcvp_accepted_name",
-                             "wcvp_accepted_authors",
-                             "wcvp_parent_kew_id",
-                             "wcvp_parent_name",
-                             "wcvp_parent_authors",  
-                             "wcvp_reviewed",         
-                             "wcvp_publication",
-                             "wcvp_original_name_id",
-                             "wcvp_TAXON_NAME_U",
-                             "wcvp_searchNotes",
-                             "wcvp_searchedName")
-      
-      colunas_fb2020_sel <<- c("fb2020_taxonID",
-                               "fb2020_acceptedNameUsageID",
-                               "fb2020_parentNameUsageID",
-                               "fb2020_originalNameUsageID",
-                               "fb2020_scientificName",
-                               # "fb2020_acceptedNameUsage",
-                               # "fb2020_parentNameUsage",
-                               "fb2020_namePublishedIn",                  
-                               "fb2020_namePublishedInYear",
-                               "fb2020_higherClassification",             
-                               # "fb2020_kingdom",
-                               # "fb2020_phylum",                           
-                               # "fb2020_class",
-                               # "fb2020_order",                            
-                               "fb2020_family",
-                               # "fb2020_genus",                            
-                               "fb2020_specificEpithet",
-                               "fb2020_infraspecificEpithet",             
-                               "fb2020_taxonRank",
-                               "fb2020_scientificNameAuthorship",
-                               "fb2020_taxonomicStatus",
-                               "fb2020_nomenclaturalStatus",              
-                               "fb2020_modified",
-                               "fb2020_bibliographicCitation",
-                               "fb2020_references",
-                               "fb2020_scientificNamewithoutAuthorship",  
-                               "fb2020_scientificNamewithoutAuthorship_U",
-                               "fb2020_searchNotes",
-                               "fb2020_searchedName")
-      
-      colunas_ctrl_dwc <<- c('Ctrl_occurrenceID',
-                             # Ctrl_lastCrawled,
-                             # Ctrl_lastParsed,
-                             # Ctrl_lastInterpreted,
-                             'Ctrl_bibliographicCitation',
-                             'Ctrl_downloadAsSynonym',
-                             'Ctrl_scientificNameSearched',
-                             'Ctrl_scientificNameReference',
-                             'Ctrl_acceptedNameUsage',
-                             'Ctrl_scientificNameAuthorship',
-                             'Ctrl_scientificName', 
-                             'Ctrl_scientificNameOriginalSource', # aqui
-                             'Ctrl_family',
-                             'Ctrl_genus',
-                             'Ctrl_specificEpithet',
-                             'Ctrl_infraspecificEpithet',
-                             'Ctrl_modified',
-                             'Ctrl_institutionCode',
-                             'Ctrl_collectionCode',
-                             'Ctrl_catalogNumber',
-                             # 'Ctrl_barCode', #aqui
-                             'Ctrl_identificationQualifier',
-                             'Ctrl_identifiedBy',
-                             'Ctrl_dateIdentified',
-                             'Ctrl_typeStatus',
-                             'Ctrl_recordNumber',
-                             'Ctrl_recordedBy',
-                             'Ctrl_fieldNumber',
-                             'Ctrl_country',
-                             'Ctrl_stateProvince',
-                             'Ctrl_municipality',
-                             'Ctrl_locality',
-                             
-                             # 18-10-21
-                             'Ctrl_year',
-                             'Ctrl_month',
-                             'Ctrl_day',
-                             
-                             'Ctrl_decimalLatitude',
-                             'Ctrl_decimalLongitude',
-                             'Ctrl_occurrenceRemarks',
-                             'Ctrl_occurrenceID',
-                             'Ctrl_comments',
-                             'Ctrl_taxonRank')
-      
-      colunas_verbatin_check <<- c('verbatimNotes',
-                                   'temAnoColeta',
-                                   'temCodigoInstituicao',
-                                   'temNumeroCatalogo',
-                                   'temColetor',
-                                   'temNumeroColeta',
-                                   'temPais',
-                                   'temUF',
-                                   'temMunicipio',
-                                   'temLocalidade',
-                                   'temIdentificador',
-                                   'temDataIdentificacao')
-      
-      
-      colunas_main_collectors_dictionary <<- c('Ctrl_key_family_recordedBy_recordNumber',
-                                               'Ctrl_nameRecordedBy_Standard',
-                                               'Ctrl_recordNumber_Standard',
-                                               'Ctrl_key_year_recordedBy_recordNumber')
-      
-      colunas_collection_code_dictionary <<- c('Ctrl_key_collectionCode_catalogNumber',
-                                               'Ctrl_collectionCode_Standard',
-                                               'Ctrl_catalogNumber_Standard')
-      
-      
-   }
-   
-   {
-      fb2020_names <- data.frame(stringsAsFactors = FALSE,
-                                 
-                                 fb2020_taxonID = NA,
-                                 fb2020_acceptedNameUsageID = NA,
-                                 fb2020_parentNameUsageID = NA,
-                                 fb2020_originalNameUsageID = NA,
-                                 fb2020_scientificName = NA,
-                                 # fb2020_acceptedNameUsage = NA,
-                                 # fb2020_parentNameUsage = NA,
-                                 fb2020_namePublishedIn = NA,                  
-                                 fb2020_namePublishedInYear = NA,
-                                 fb2020_higherClassification = NA,             
-                                 # fb2020_kingdom = NA,
-                                 # fb2020_phylum = NA,                           
-                                 # fb2020_class = NA,
-                                 # fb2020_order = NA,                            
-                                 fb2020_family = NA,
-                                 # fb2020_genus = NA,                            
-                                 fb2020_specificEpithet = NA,
-                                 fb2020_infraspecificEpithet = NA,             
-                                 fb2020_taxonRank = NA,
-                                 fb2020_scientificNameAuthorship = NA,
-                                 fb2020_taxonomicStatus = NA,
-                                 fb2020_nomenclaturalStatus = NA,              
-                                 fb2020_modified = NA,
-                                 fb2020_bibliographicCitation = NA,
-                                 fb2020_references = NA,
-                                 fb2020_scientificNamewithoutAuthorship = NA,  
-                                 fb2020_scientificNamewithoutAuthorship_U = NA,
-                                 fb2020_searchNotes = NA,
-                                 fb2020_searchedName = NA)
-      
-      wcvp_names <- data.frame(stringsAsFactors = FALSE,
-                               
-                               wcvp_kew_id = NA,
-                               wcvp_family = NA,
-                               wcvp_genus = NA,
-                               wcvp_species = NA,
-                               wcvp_infraspecies = NA,
-                               wcvp_taxon_name = NA,
-                               wcvp_authors = NA,
-                               wcvp_rank = NA,
-                               wcvp_taxonomic_status = NA,
-                               wcvp_accepted_kew_id  = NA,
-                               wcvp_accepted_name = NA,
-                               wcvp_accepted_authors = NA,
-                               wcvp_parent_kew_id = NA,
-                               wcvp_parent_name = NA,
-                               wcvp_parent_authors = NA,  
-                               wcvp_reviewed = NA,         
-                               wcvp_publication = NA,
-                               wcvp_original_name_id = NA,
-                               wcvp_TAXON_NAME_U = NA,
-                               wcvp_searchNotes = NA,
-                               wcvp_searchedName = NA)
-      
-      join_dwc <- data.frame(stringsAsFactors = FALSE,
-                             
-                             Ctrl_occurrenceID = NA,
-                             # Ctrl_lastCrawled = NA,
-                             # Ctrl_lastParsed = NA,
-                             # Ctrl_lastInterpreted = NA,
-                             Ctrl_bibliographicCitation = NA,
-                             Ctrl_downloadAsSynonym = NA,
-                             Ctrl_scientificNameSearched = NA,
-                             Ctrl_scientificNameReference = NA,
-                             Ctrl_acceptedNameUsage = NA,
-                             Ctrl_scientificNameAuthorship = NA,
-                             Ctrl_scientificName = NA, 
-                             Ctrl_scientificNameOriginalSource = NA, # aqui
-                             Ctrl_family = NA,
-                             Ctrl_genus = NA,
-                             Ctrl_specificEpithet = NA,
-                             Ctrl_infraspecificEpithet = NA,
-                             Ctrl_modified = NA,
-                             Ctrl_institutionCode = NA,
-                             Ctrl_collectionCode = NA,
-                             Ctrl_catalogNumber = NA,
-                             # Ctrl_barCode = NA, #aqui
-                             Ctrl_identificationQualifier = NA,
-                             Ctrl_identifiedBy = NA,
-                             Ctrl_dateIdentified = NA,
-                             Ctrl_typeStatus = NA,
-                             Ctrl_recordNumber = NA,
-                             Ctrl_recordedBy = NA,
-                             Ctrl_fieldNumber = NA,
-                             Ctrl_country = NA,
-                             Ctrl_stateProvince = NA,
-                             Ctrl_municipality = NA,
-                             Ctrl_locality = NA,
-                             
-                             # 18-10-21
-                             Ctrl_year = NA,
-                             Ctrl_month = NA,
-                             Ctrl_day = NA,
-                             
-                             Ctrl_decimalLatitude = NA,
-                             Ctrl_decimalLongitude = NA,
-                             Ctrl_occurrenceRemarks = NA,
-                             Ctrl_occurrenceID = NA,
-                             Ctrl_comments = NA,
-                             Ctrl_taxonRank = NA)
-      
-      verbatin_check <- data.frame(stringsAsFactors = FALSE,
-                                   verbatimNotes = NA,
-                                   temAnoColeta = NA,
-                                   temCodigoInstituicao = NA,
-                                   temNumeroCatalogo = NA,
-                                   temColetor = NA,
-                                   temNumeroColeta = NA,
-                                   temPais = NA,
-                                   temUF = NA,
-                                   temMunicipio = NA,
-                                   temLocalidade = NA,
-                                   temIdentificador = NA,
-                                   temDataIdentificacao = NA)
-      
-      main_collectors_dictionary <- data.frame(stringsAsFactors = FALSE,
-                                               Ctrl_key_family_recordedBy_recordNumber = NA,
-                                               Ctrl_nameRecordedBy_Standard = NA,
-                                               Ctrl_recordNumber_Standard = NA,
-                                               Ctrl_key_year_recordedBy_recordNumber = NA)
-      
-      collection_code_dictionary <- data.frame(stringsAsFactors = FALSE,
-                                               Ctrl_key_collectionCode_catalogNumber = NA,
-                                               Ctrl_collectionCode_Standard = NA,
-                                               Ctrl_catalogNumber_Standard = NA)
-      
-      
-   }
-   
-   
-   occ_result <<- list(
-      fb2020_names = fb2020_names,
-      wcvp_names = wcvp_names,
-      join_dwc = join_dwc)
-   
-   
-}
-
-
-# geo
-#' @section Install and load packeges to test
-{
-   
-   # install.packages("monochromeR")      
-   library(monographaR)
-   
-   # library(remotes)
-   # options("install.lock"=FALSE)
-   # remotes::install_github("brunobrr/bdc")
-   library(bdc)
-   # # devtools::install_github("ropensci/rnaturalearthhires")
-   
-   # # devtools::install_github("ropensci/CoordinateCleaner")
-   # library(CoordinateCleaner)
-   
-   # if (!"occAssess" %in% installed.packages()) devtools::install_github("https://github.com/robboyd/occAssess")
-   # library(occAssess)   
-   
-   # # install.packages("countrycode")
-   library(countrycode)
-   
-   # install.packages("MazamaSpatialUtils")
-   library(MazamaSpatialUtils)
-   
-   # options("install.lock"=FALSE)
-   # install.packages("GADMTools")
-   # library(GADMTools)
-   
-   
-}
-
-
-#' @section Gerar centroides
-{
-   # path_data <<- 'C:\\Dados\\APP_GBOT\\data'
-  
-  # path_data <<- 'C:\\catalogoUCsBR - github.com\\data'
-  if (!dir.exists("c:/R_temp")){dir.create("c:/R_temp")}
-  path_data <<- "c:/R_temp"
-  
-   # # file.centroids <- paste0(path_data,"\\centroids.csv")
-   # 
-   # # Load libraries
-   # # library('GADMTools')
-   # library('raster')
-   # library('geosphere')
-   # library('mapview') # incredible interactive map visualization in R
-   # 
-   # # Get SpatialPolygonsDataFrame object example
-   # 
-   # # if(!file.exists(file.centroids))
-   # # {   
-   # 
-   # get_centroids <- function(countryCode_ISO3=NULL)
-   # {
-   #    centroids <- data.frame(countryCode_ISO3=NA,
-   #                            name0=NA,
-   #                            name1=NA,
-   #                            name2=NA,
-   #                            level=NA,
-   #                            lon=NA,
-   #                            lat=NA)[-1,]
-   #    
-   #    i=1   
-   #    for (i in 1:NROW(countryCode_ISO3))
-   #    {   
-   #       if(is.na(countryCode_ISO3[i])){next}
-   #       
-   #       polygons <- getData('GADM', country = countryCode_ISO3[i], level = 0)
-   #       
-   #       # Get polygons centroids
-   #       centroids_tmp <- as.data.frame(centroid(polygons))
-   #       colnames(centroids_tmp) <- c("lon", "lat") 
-   #       
-   #       centroids <- rbind(centroids, data.frame(countryCode_ISO3=polygons$GID_0,
-   #                                                name0=polygons$NAME_0,
-   #                                                name1=rep(NA, NROW(centroids_tmp)),
-   #                                                name2=rep(NA, NROW(centroids_tmp)),
-   #                                                level=rep(0, NROW(centroids_tmp)),
-   #                                                lon=centroids_tmp$lon,
-   #                                                lat=centroids_tmp$lat))
-   #       
-   #       print(countryCode_ISO3[i])
-   #    }
-   #    
-   #    i=1   
-   #    for (i in 1:NROW(countryCode_ISO3))
-   #    {   
-   #       
-   #       if(is.na(countryCode_ISO3[i])){next}
-   #       
-   #       polygons <- NULL
-   #       try(polygons <- getData('GADM', country = countryCode_ISO3[i], level = 1))
-   #       if(is.null(polygons)){next}
-   #       
-   #       
-   #       # Get polygons centroids
-   #       centroids_tmp <- as.data.frame(centroid(polygons))
-   #       colnames(centroids_tmp) <- c("lon", "lat") 
-   #       
-   #       centroids <- rbind(centroids, data.frame(countryCode_ISO3=polygons$GID_0,
-   #                                                name0=polygons$NAME_0,
-   #                                                name1=polygons$NAME_1,
-   #                                                name2=rep(NA, NROW(centroids_tmp)),
-   #                                                level=rep(1, NROW(centroids_tmp)),
-   #                                                lon=centroids_tmp$lon,
-   #                                                lat=centroids_tmp$lat))
-   #       
-   #       print(countryCode_ISO3[i])
-   #    }
-   #    
-   #    i=1   
-   #    for (i in 1:NROW(countryCode_ISO3))
-   #    {   
-   #       
-   #       if(is.na(countryCode_ISO3[i])){next}
-   #       
-   #       polygons <- NULL
-   #       try(polygons <- getData('GADM', country = countryCode_ISO3[i], level = 2))
-   #       if(is.null(polygons)){next}
-   #       
-   #       
-   #       # Get polygons centroids
-   #       centroids_tmp <- as.data.frame(centroid(polygons))
-   #       colnames(centroids_tmp) <- c("lon", "lat") 
-   #       
-   #       centroids <- rbind(centroids, data.frame(countryCode_ISO3=polygons$GID_0,
-   #                                                name0=polygons$NAME_0,
-   #                                                name1=polygons$NAME_1,
-   #                                                name2=polygons$NAME_2,
-   #                                                level=rep(2, NROW(centroids_tmp)),
-   #                                                lon=centroids_tmp$lon,
-   #                                                lat=centroids_tmp$lat))
-   #       
-   #       print(countryCode_ISO3[i])
-   #    }
-   #    
-   #    # write.csv(centroids, file.centroids, fileEncoding = "UTF-8", na = "", row.names = FALSE)
-   #    # }
-   #    # else
-   #    # {
-   #    #    centroids <-  readr::read_csv(file.centroids, 
-   #    #                                  locale = locale(encoding = "UTF-8"),
-   #    #                                  show_col_types = FALSE)
-   #    # }
-   #    
-   #    return(centroids)
-   # }
-   
-}
-
-
-#' @details pano de fundo  
-{
-   world_path <- paste0(path_data,"\\countries_gadm36_sp.rds")
-   
-   # Reference data
-   if (file.exists(world_path))
-   {
-      world <- readRDS(world_path)
-   } else
-   {
-      world <- raster::getData("countries", path=path_data, download = TRUE)
-   }  
-   # Renaming the column in the mask to use in coordinateCleaner
-   names(world)[names(world) == "ISO"] <- "iso_a3_eh"
-}
-
 
 # app
 {
+   {
+      #' @section 0 - Preparar ambiente R
+      {
+         #' @details limpar memória
+         rm(list = ls())
+         
+         #' @details direcionar memória para processamento temporário em disco
+         { 
+            # if (!dir.exists("c:/R_temp")){dir.create("c:/R_temp")}
+            # tempdir <- function() "c:/R_temp"
+            tempdir <- tempdir()
+            # unlockBinding("tempdir", baseenv()) 
+            # assignInNamespace("tempdir", tempdir, ns="base", envir=baseenv())
+            # assign("tempdir", tempdir, baseenv())
+            # lockBinding("tempdir", baseenv())
+            # tempdir()
+         }
+         
+         #' @details carregar funcões para mensurar tempos de processamento
+         {
+            tempo_processo <- data.frame(nome_processo="",
+                                         tempo_processamento="")[-1,]
+            
+            inicia_tempo_processamento <- function(nome_processo='',
+                                                   tempo_processo="")
+            {
+               return(list(ini.time = Sys.time(),
+                           nome_processo=nome_processo,
+                           tempo_processo=tempo_processo))
+            }  
+            
+            get_tempo_processamento <- function(tempo_processo_tmp)
+            {
+               
+               tempo_processamento <- difftime(Sys.time(), tempo_processo_tmp$ini.time , units = 'min')
+               tempo_processo <- rbind(tempo_processo_tmp$tempo_processo,
+                                       data.frame(nome_processo=tempo_processo_tmp$nome_processo,
+                                                  tempo_processamento=tempo_processamento))
+               print(tempo_processo)
+               return(tempo_processo)
+            }  
+         }
+         
+         #' @details inicar tempo de processamento
+         tempo_processo_tmp <- inicia_tempo_processamento('Preparação do ambiente de trabalho em R',
+                                                          tempo_processo)
+         #' @details carregar pacotes básicos
+         {
+            library(writexl)
+            
+            # install.packages('plyr', dependencies = TRUE)
+            library(plyr) 
+            
+            # install.packages('readxl', dependencies = TRUE)
+            library(readxl) 
+            
+            # install.packages('dplyr', dependencies = TRUE)
+            library(dplyr)
+            
+            # install.packages('tidyr', dependencies = TRUE)
+            library(tidyr)
+            
+            # install.packages('biogeo', dependencies = TRUE)
+            # library(biogeo)
+            
+            # install.packages('readr', dependencies = TRUE)
+            library(readr)
+            
+            # install.packages('stringr', dependencies = TRUE)
+            library(stringr)
+            
+            # install.packages('devtools', dependencies = TRUE)
+            library(devtools)
+            
+            # devtools::install_github("ropensci/CoordinateCleaner")
+            library(CoordinateCleaner)
+            
+            # install.packages('dplyr', dependencies = TRUE)
+            library(dplyr)
+            
+            # install.packages('textclean', dependencies = TRUE)
+            library(textclean)
+            
+            # install.packages('googledrive', dependencies = TRUE)
+            # library(googledrive)
+            
+            # install.packages('rvest', dependencies = TRUE)
+            library(rvest)
+            
+            # install.packages('flora', dependencies = TRUE)
+            # library(flora)
+            
+            # install.packages('raster', dependencies = TRUE)
+            library(raster)
+            
+            # install.packages('sp', dependencies = TRUE)
+            library(sp)
+            
+            # install.packages('lubridate', dependencies = TRUE)
+            library(lubridate)
+            
+            # install.packages('rnaturalearthdata', dependencies = TRUE)
+            library(rnaturalearthdata)
+            
+            # install.packages('geobr', dependencies = TRUE)
+            # library(geobr) 
+            
+            # install.packages('monographaR', dependencies = TRUE)
+            # library(monographaR) 
+            
+            # install.packages('jsonlite', dependencies = TRUE)
+            library(jsonlite)
+            
+            # install.packages('sqldf', dependencies = TRUE)
+            library(sqldf) 
+            
+            # install.packages('rvest', dependencies = TRUE)
+            # install.packages("rvest")
+            library(rvest)
+            
+            # install.packages('shiny', dependencies = TRUE)
+            library(shiny) 
+            
+            library(shinydashboardPlus)
+            
+            library(shinydashboard)
+            
+            # install.packages('shinydashboard', dependencies = TRUE)
+            library(shinydashboard)
+            
+            # install.packages('mapview', dependencies = TRUE)
+            # library(mapview)
+            
+            # install.packages('DT', dependencies = TRUE)
+            library(DT)
+            
+            # install.packages('rhandsontable', dependencies = TRUE)
+            library(rhandsontable) # tabela editavel
+            
+            # install.packages('shinyWidgets', dependencies = TRUE)
+            library(shinyWidgets) # botoes
+            
+            # install.packages('measurements', dependencies = TRUE)
+            library(measurements)
+            
+            # install.packages('downloader', dependencies = TRUE)
+            library(downloader)
+            
+            options(shiny.maxRequestSize=10000*1024^2) 
+            
+         }
+         
+         #' @details cerregar funções desenvolvidas pelo CNCFLora
+         {
+            #' @details baixar e tabela FB2020 IPT 
+            #' Rodar somente em atualizações do IPT, aproximadamente 6 horas de processamento.
+            # source('./functions/FB2020_IPT_Get.R', encoding = "UTF-8")
+            
+            #' @details carregar tabela FB2020 IPT e funções de acesso
+            #' conferência taxonômica 
+            #' carregar informações da espécie
+            #' somente aqui encontramos dados de tipo de vegetação conforme FB2020
+            
+            # source('./functions/FB2020_IPT_Use.R', encoding = "UTF-8")  # colnames(FloraBrasil2020) <- paste0(colnames(FloraBrasil2020),'_FB2020')
+            # colnames(FloraBrasil2020) <- paste0(colnames(FloraBrasil2020),'_FB2020')
+            
+            #' @details carregar funções para acesso APIs FB2020 v1 e v2
+            #' conferência taxonômica 
+            #' carregar informações da espécie
+            
+            # source("./functions/FB2020_get_taxon_scientificname_from_API.R", encoding = "UTF-8") 
+            # source("C:/ENB_fluxo_processamento/functions/FB2020_get_taxon_scientificname_from_API.R", encoding = "UTF-8") 
+            
+            # txt_search <- occ[[source_data]]$scientificname
+            
+            check_identificationQualifier <- function(txt_search='',
+                                                      keyword = c(' aff.', ' cf.'))
+            {
+               df <- data.frame(txt_search=txt_search, stringsAsFactors = FALSE)
+               df$identificationQualifier <- '' 
+               
+               for(kw in keyword)
+               {
+                  index <- grepl(kw, txt_search, 
+                                 ignore.case = TRUE,
+                                 fixed = TRUE)
+                  
+                  if (any(index)==TRUE) 
+                     # { df$identificationQualifier[index==TRUE] <- rep(gsub('\\\\<|\\\\>','',kw),count(index==TRUE)[2,2]) }
+                  { df$identificationQualifier[index==TRUE] <- rep(gsub('\\\\<|\\\\>','',kw),sum(index==TRUE)) }
+                  
+                  df$txt_search[index==TRUE]
+               }
+               return(df$identificationQualifier)
+            }  
+            
+            #' @details carregar pacotes R e funções
+            {
+               # source("C:/Dados/CNCFlora/shiny/cncflora/functions/verbatimCleaning_v3.R", encoding = "UTF-8")
+               {
+                  substituir_siglas <- function(x)
+                  {
+                     
+                     sigla_estados <- data.frame(nome='',
+                                                 sigla='',
+                                                 Ctrl_standardized_stateProvince='')[-1,]
+                     
+                     sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Bahia', sigla='ba', Ctrl_standardized_stateProvince='bahia')
+                     sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Pará' , sigla='pa', Ctrl_standardized_stateProvince='para')
+                     sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Rio de Janeiro', sigla='rj', Ctrl_standardized_stateProvince='rio de janeiro')
+                     sigla_estados <- sigla_estados %>% dplyr::add_row(nome='São Paulo', sigla='sp', Ctrl_standardized_stateProvince='sao paulo')
+                     sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Espírito Santo', sigla='es', Ctrl_standardized_stateProvince='espirito santo')
+                     sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Paraíba', sigla='pb', Ctrl_standardized_stateProvince='paraiba')
+                     sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Pernambuco', sigla='pe', Ctrl_standardized_stateProvince='alagoas')
+                     sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Alagoas', sigla='al', Ctrl_standardized_stateProvince='alagoas')
+                     sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Sergipe', sigla='se', Ctrl_standardized_stateProvince='sergipe')
+                     sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Piauí', sigla='pi', Ctrl_standardized_stateProvince='piaui')
+                     sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Maranhão', sigla='ma', Ctrl_standardized_stateProvince='maranhao')
+                     sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Minas Gerais', sigla='mg', Ctrl_standardized_stateProvince='minas gerais')
+                     sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Santa Catarina', sigla='sc', Ctrl_standardized_stateProvince='santa catarina')
+                     sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Paraná', sigla='pr', Ctrl_standardized_stateProvince='parana')
+                     sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Goiás', sigla='go', Ctrl_standardized_stateProvince='goias')
+                     sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Mato Grosso', sigla='mt', Ctrl_standardized_stateProvince='mato grosso')
+                     sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Mato Grosso do Sul', sigla='ms', Ctrl_standardized_stateProvince='mato grosso do sul')
+                     sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Distrito Federal', sigla='df', Ctrl_standardized_stateProvince='distrito federal')
+                     sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Rio Grande do Norte', sigla='rn', Ctrl_standardized_stateProvince='rio grande do norte')
+                     sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Roraima', sigla='rr', Ctrl_standardized_stateProvince='roraima')
+                     sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Ceará', sigla='ce', Ctrl_standardized_stateProvince='ceara')
+                     sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Tocantins', sigla='to', Ctrl_standardized_stateProvince='tocantins')
+                     sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Amapá', sigla='ap', Ctrl_standardized_stateProvince='amapa')
+                     sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Amazonas', sigla='am', Ctrl_standardized_stateProvince='amazonas')
+                     sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Rio Grande do Sul', sigla='rs', Ctrl_standardized_stateProvince='rio grande do sul')
+                     sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Acre', sigla='ac', Ctrl_standardized_stateProvince='acre')
+                     sigla_estados <- sigla_estados %>% dplyr::add_row(nome='Rondônia', sigla='ro', Ctrl_standardized_stateProvince='rondonia')
+                     
+                     x1 <- textclean::replace_non_ascii(tolower(x))
+                     if (any(sigla_estados$sigla %in% x1)) {
+                        return(as.character(sigla_estados$nome[which(sigla_estados$sigla == x1)]))
+                        
+                     } else {
+                        as.character(x)
+                     }
+                  }
+                  
+                  # occ_tmp <- occ_j$all
+                  verbatimCleaning_v2 <- function(occ_tmp,
+                                                  view_summary=FALSE)
+                  {
+                     
+                     #' @section Limpeza
+                     #' @description Remover registros não informativos, sem coletor, numero de coleta, ano e informações de localidade
+                     
+                     
+                     frase_saida_verbatim <- c('ano', 
+                                               'código de instituição',
+                                               'número de catálogo',
+                                               'coletor',
+                                               'número de coleta',
+                                               'país',
+                                               'estado',
+                                               'município',
+                                               'localidade',
+                                               'identificador',
+                                               'data identificação')
+                     
+                     frase_saida_verbatim <- c('year', 
+                                               'institutionCode', #Ctrl_institutionCode
+                                               'catalogNumber', #Ctrl_catalogNumber
+                                               'recordedBy', #Ctrl_recordedBy
+                                               'recordNumber', #Ctrl_recordNumber
+                                               'country', #Ctrl_country
+                                               'stateProvince', #Ctrl_stateProvince_standardized
+                                               'municipality', #Ctrl_municipality_standardized
+                                               'locality', #Ctrl_locality_standardized
+                                               'identifiedBy', #Ctrl_identifiedBy
+                                               'dateIdentified') #Ctrl_dateIdentified
+                     
+                     # substituir_siglas(occ_tmp$Ctrl_stateProvince[1])
+                     # purrr::map(occ_tmp$Ctrl_stateProvince[1], .f = substituir_siglas) %>% simplify2array() %>% replace_non_ascii() %>% toupper()
+                     
+                     occ_tmp <- occ_tmp %>%
+                        # dplyr::filter(Ctrl_deletedRecord==TRUE) %>%
+                        dplyr::mutate(verbatimNotes = '', 
+                                      temAnoColeta = FALSE,
+                                      temCodigoInstituicao = FALSE,
+                                      temNumeroCatalogo = FALSE,
+                                      temColetor = FALSE,
+                                      temNumeroColeta = FALSE,
+                                      temPais = FALSE,
+                                      temUF = FALSE,
+                                      temMunicipio = FALSE,
+                                      temLocalidade = FALSE,
+                                      temIdentificador = FALSE,
+                                      temDataIdentificacao = FALSE) %>%
+                        
+                        dplyr::mutate(Ctrl_country_standardized = '',
+                                      Ctrl_municipality_standardized = textclean::replace_non_ascii(Ctrl_municipality) %>% toupper(),
+                                      Ctrl_stateProvince_standardized = purrr::map(Ctrl_stateProvince, .f = substituir_siglas) %>% simplify2array() %>% replace_non_ascii() %>% toupper(),
+                                      Ctrl_locality_standardized = textclean::replace_non_ascii(Ctrl_locality) %>% toupper(),
+                                      Ctrl_lastParsed = "") %>%
+                        
+                        dplyr::mutate(temAnoColeta =  ifelse( is.na(Ctrl_year) | Ctrl_year == ""  | Ctrl_year == 0 | Ctrl_year <= 10,
+                                                              FALSE, TRUE) %>%
+                                         ifelse(is.na(.), FALSE,.),
+                                      
+                                      
+                                      temCodigoInstituicao = ifelse( is.na(Ctrl_institutionCode) | Ctrl_institutionCode=="",
+                                                                     FALSE, TRUE) %>%
+                                         ifelse(is.na(.), FALSE,.),
+                                      
+                                      
+                                      temNumeroCatalogo = ifelse( is.na(Ctrl_catalogNumber) | Ctrl_catalogNumber=="",
+                                                                  FALSE, TRUE) %>%
+                                         ifelse(is.na(.), FALSE,.),
+                                      
+                                      
+                                      temColetor = ifelse( is.na(Ctrl_recordedBy) | Ctrl_recordedBy=="",
+                                                           FALSE, TRUE) %>%
+                                         ifelse(is.na(.), FALSE,.),
+                                      
+                                      
+                                      temNumeroColeta = ifelse( is.na(Ctrl_recordNumber) | Ctrl_recordNumber=="",
+                                                                FALSE, TRUE) %>%
+                                         ifelse(is.na(.), FALSE,.),
+                                      
+                                      
+                                      temPais = ifelse( is.na(Ctrl_country) | 
+                                                           (! toupper(Ctrl_country) %in% c("BRAZIL", "BRASIL", "BRESIL", "BRÉSIL","BRA","BR")),
+                                                        FALSE, TRUE) %>%
+                                         ifelse(is.na(.), FALSE,.),
+                                      
+                                      
+                                      temUF = ifelse( is.na(Ctrl_stateProvince_standardized) | Ctrl_stateProvince_standardized=="",
+                                                      FALSE, TRUE) %>%
+                                         ifelse(is.na(.), FALSE,.),
+                                      
+                                      
+                                      temMunicipio = ifelse( is.na(Ctrl_municipality_standardized) | Ctrl_municipality_standardized=="",
+                                                             FALSE, TRUE) %>%
+                                         ifelse(is.na(.), FALSE,.),
+                                      
+                                      
+                                      temLocalidade = ifelse( is.na(Ctrl_locality_standardized) | Ctrl_locality_standardized=="",
+                                                              FALSE, TRUE) %>%
+                                         ifelse(is.na(.), FALSE,.),
+                                      
+                                      
+                                      temIdentificador = ifelse( is.na(Ctrl_identifiedBy) | Ctrl_identifiedBy=="",
+                                                                 FALSE, TRUE) %>%
+                                         ifelse(is.na(.), FALSE,.),
+                                      
+                                      
+                                      temDataIdentificacao = ifelse( is.na(Ctrl_dateIdentified) | Ctrl_dateIdentified=="",
+                                                                     FALSE, TRUE) %>%
+                                         ifelse(is.na(.), FALSE,.)) %>%
+                        
+                        dplyr::mutate(Ctrl_country_standardized = ifelse(temPais==TRUE,
+                                                                         'BRA' ,'')) %>%
+                        
+                        dplyr::mutate(verbatimNotes = ifelse(temAnoColeta==FALSE,
+                                                             paste(verbatimNotes, frase_saida_verbatim[1] , sep = ' - '), #'ano de coleta'
+                                                             verbatimNotes)) %>%
+                        
+                        dplyr::mutate(verbatimNotes = ifelse(temCodigoInstituicao==FALSE,
+                                                             paste(verbatimNotes, frase_saida_verbatim[2], sep = ' - '), #'código de instituição'
+                                                             verbatimNotes)) %>%
+                        
+                        dplyr::mutate(verbatimNotes = ifelse(temNumeroCatalogo==FALSE,
+                                                             paste(verbatimNotes, frase_saida_verbatim[3] , sep = ' - '), #'número de catálogo'
+                                                             verbatimNotes)) %>%
+                        
+                        dplyr::mutate(verbatimNotes = ifelse(temColetor==FALSE,
+                                                             paste(verbatimNotes, frase_saida_verbatim[4], sep = ' - '), #'coletor'
+                                                             verbatimNotes)) %>%
+                        
+                        dplyr::mutate(verbatimNotes = ifelse(temNumeroColeta==FALSE,
+                                                             paste(verbatimNotes, frase_saida_verbatim[5], sep = ' - '), #'número de coleta'
+                                                             verbatimNotes)) %>%
+                        
+                        dplyr::mutate(verbatimNotes = ifelse(temPais==FALSE,
+                                                             paste(verbatimNotes, frase_saida_verbatim[6], sep = ' - '),
+                                                             verbatimNotes)) %>%
+                        
+                        dplyr::mutate(verbatimNotes = ifelse(temUF==FALSE,
+                                                             paste(verbatimNotes, frase_saida_verbatim[7], sep = ' - '),
+                                                             verbatimNotes)) %>%
+                        
+                        dplyr::mutate(verbatimNotes = ifelse(temMunicipio==FALSE,
+                                                             paste(verbatimNotes, frase_saida_verbatim[8], sep = ' - '),
+                                                             verbatimNotes)) %>%
+                        
+                        dplyr::mutate(verbatimNotes = ifelse(temLocalidade==FALSE,
+                                                             paste(verbatimNotes, frase_saida_verbatim[9], sep = ' - '),
+                                                             verbatimNotes)) %>%
+                        
+                        dplyr::mutate(verbatimNotes = ifelse(temIdentificador==FALSE,
+                                                             paste(verbatimNotes, frase_saida_verbatim[10], sep = ' - '),
+                                                             verbatimNotes)) %>%
+                        
+                        dplyr::mutate(verbatimNotes = ifelse(temDataIdentificacao==FALSE,
+                                                             paste(verbatimNotes, frase_saida_verbatim[11], sep = ' - '),
+                                                             verbatimNotes)) %>%
+                        
+                        dplyr::mutate(Ctrl_lastParsed = format(Sys.time(), "%Y %m %d %X"))
+                     
+                     if (view_summary==TRUE)
+                     {
+                        occ_tmp %>%
+                           # dplyr::filter(Ctrl_deletedRecord==TRUE) %>%
+                           dplyr::select(verbatimNotes, 
+                                         temAnoColeta,
+                                         temCodigoInstituicao,
+                                         temNumeroCatalogo,
+                                         temColetor,
+                                         temNumeroColeta,
+                                         temPais,
+                                         temUF,
+                                         temMunicipio,
+                                         temLocalidade,
+                                         temIdentificador,
+                                         temDataIdentificacao,
+                                         Ctrl_country,
+                                         Ctrl_municipality, Ctrl_locality,
+                                         Ctrl_recordedBy, Ctrl_recordNumber,
+                                         Ctrl_institutionCode,  
+                                         Ctrl_catalogNumber,
+                                         Ctrl_year, 
+                                         Ctrl_identifiedBy,
+                                         Ctrl_dateIdentified,
+                                         Ctrl_decimalLatitude, 
+                                         Ctrl_decimalLongitude) %>%
+                           View()
+                     }   
+                     
+                     print(NROW(occ_tmp))
+                     return(occ_tmp)
+                     
+                  }
+                  
+               }
+               
+               # source("C:/Dados/CNCFlora/shiny/cncflora/functions/duplicata_digital_v2.R", encoding = "UTF-8")
+               {
+                  selectMoreInformativeRecord_v2 <- function(occ_tmp, 
+                                                             onlyLatLon = TRUE,
+                                                             include_unmatched = TRUE,
+                                                             view_summary = FALSE,
+                                                             unmatched = c("__"))
+                  {  
+                     {
+                        
+                        occ_tmp <- occ_tmp %>%
+                           dplyr::mutate(verbatim_quality = (temAnoColeta +
+                                                                temCodigoInstituicao +
+                                                                temNumeroCatalogo+
+                                                                temLocalidade+
+                                                                temMunicipio+
+                                                                temUF))
+                        
+                        occ_tmp <- occ_tmp %>%
+                           dplyr::mutate(key_quality = (temColetor + temNumeroColeta))
+                        
+                        occ_tmp$key_quality
+                        occ_tmp$autoGeoStatus
+                        occ_tmp$coordenadasIncidemMunicipio %>% is.na() %>% any()
+                        occ_tmp$encontrouLocalidade %>% is.na() %>% any()
+                        
+                        occ_tmp <- occ_tmp %>%
+                           dplyr::mutate(geo_quality = (autoGeoStatus+coordenadasCentroideMunicipio+(encontrouLocalidade*2)+(coordenadasIncidemMunicipio*3)))
+                        
+                        occ_tmp$geo_quality
+                        
+                        occ_tmp <- occ_tmp %>%
+                           dplyr::mutate(Ctrl_moreInformativeRecord  = (key_quality + geo_quality + verbatim_quality))
+                        # dplyr::mutate(Ctrl_moreInformativeRecord  = (verbatim_quality))
+                        
+                        occ_tmp$Ctrl_moreInformativeRecord
+                        
+                     }
+                     
+                     {
+                        
+                        print("let's go...")
+                        recordedBy_unique <- occ_tmp$Ctrl_key_family_recordedBy_recordNumber %>% unique() %>%  as.factor()
+                        print(NROW(recordedBy_unique))
+                        
+                        occ_tmp$Ctrl_selectedMoreInformativeRecord <- FALSE
+                        occ_tmp$Ctrl_thereAreDuplicates <- FALSE
+                        occ_tmp$Ctrl_unmatched <- TRUE
+                        
+                        # r=recordedBy_unique[1]
+                        # r='Chrysobalanaceae_RODRIGUES_9408'
+                        # r='Chrysobalanaceae_GUEDES_13405'
+                        # r='Polygalaceae_GARDNER_3582'
+                        # r='Polygalaceae_HAENKE_Haenke s.n.'
+                        # r='Chrysobalanaceae__NA'
+                        # r='Myrtaceae_BARBOSA_217'
+                        # r='Apocynaceae_RIZZO_9413'
+                        # r='Polygalaceae_HASSLER_9468'
+                        
+                        for (r in recordedBy_unique)
+                        {
+                           print(r)
+                           
+                           index_occ <- (occ_tmp$Ctrl_key_family_recordedBy_recordNumber %in% r) %>% ifelse(is.na(.), FALSE,.)
+                           num_records <- NROW(occ_tmp[index_occ==TRUE,])
+                           
+                           # flaq que inidica que há duplicatas
+                           occ_tmp[index_occ==TRUE, ]$Ctrl_thereAreDuplicates <- num_records > 1 
+                           
+                           if (num_records == 0) 
+                           {
+                              print(r)
+                              print('table')
+                              break
+                           }
+                           
+                           n_inc <- lapply(unmatched, grepl, x=r) %>%
+                              simplify2array(., higher = TRUE) %>% sum()
+                           
+                           # if (r %in% unmatched) 
+                           if (n_inc>0)
+                           {
+                              
+                              # incluir filtro espacial
+                              
+                              index_end <- occ_tmp[index_occ==TRUE, ]$autoGeoStatus == TRUE
+                              
+                              occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[index_end==TRUE] <- include_unmatched
+                              
+                              occ_tmp[index_occ==TRUE, ]$Ctrl_unmatched[index_end==TRUE] <- FALSE
+                              
+                              next
+                           }
+                           
+                           occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord <- 
+                              (occ_tmp[index_occ==TRUE, ]$Ctrl_moreInformativeRecord == 
+                                  max(occ_tmp[index_occ==TRUE, ]$Ctrl_moreInformativeRecord) ) 
+                           
+                           occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord
+                           occ_tmp[index_occ==TRUE, ]$Ctrl_bibliographicCitation
+                           
+                           if (sum(occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord)>1)
+                           {
+                              
+                              index_end <- occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord == TRUE &
+                                 # occ_tmp[index_occ==TRUE, ]$autoGeoStatus == TRUE &
+                                 occ_tmp[index_occ==TRUE, ]$Ctrl_bibliographicCitation == "REFLORA"
+                              
+                              
+                              if (sum(index_end)>0)
+                              {
+                                 n_tmp <- NROW(occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[index_end==TRUE])
+                                 if (n_tmp==1)
+                                 {
+                                    occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[index_end==FALSE] <- FALSE
+                                 } else
+                                 {
+                                    occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[index_end==FALSE] <- FALSE
+                                    occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[index_end==TRUE][2:n_tmp] <- FALSE
+                                 }   
+                              } else
+                              {
+                                 index_end <- occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord == TRUE &
+                                    # occ_tmp[index_occ==TRUE, ]$autoGeoStatus == TRUE &
+                                    occ_tmp[index_occ==TRUE, ]$Ctrl_bibliographicCitation == "SPLINK"
+                                 
+                                 if (sum(index_end)>0)
+                                 {
+                                    n_tmp <- NROW(occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[index_end==TRUE])
+                                    if (n_tmp==1)
+                                    {
+                                       occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[index_end==FALSE] <- FALSE
+                                    } else
+                                    {
+                                       occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[index_end==FALSE] <- FALSE
+                                       occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[index_end==TRUE][2:n_tmp] <- FALSE
+                                    }   
+                                    
+                                 } else
+                                 {
+                                    index_end <- occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord == TRUE 
+                                    # &
+                                    #    occ_tmp[index_occ==TRUE, ]$autoGeoStatus == TRUE
+                                    
+                                    
+                                    if (sum(index_end)>0)
+                                    {
+                                       n_tmp <- NROW(occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[index_end==TRUE])
+                                       if (n_tmp==1)
+                                       {
+                                          occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[index_end==FALSE] <- FALSE
+                                       } else
+                                       {
+                                          occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[index_end==FALSE] <- FALSE
+                                          occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[index_end==TRUE][2:n_tmp] <- FALSE
+                                       }   
+                                    } else
+                                    {
+                                       if (onlyLatLon==TRUE)
+                                       {
+                                          # todos
+                                          occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[1:num_records] <- FALSE
+                                       } else
+                                       {
+                                          # exceto o primeiro
+                                          occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[2:num_records] <- FALSE 
+                                       }   
+                                    }
+                                    
+                                    # }   
+                                 }   
+                              }   
+                           } else 
+                           {
+                              
+                              index_end <- occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord == TRUE 
+                              
+                              # &
+                              #    # is.na(occ_tmp[index_occ==TRUE, ]$new_Lat) == FALSE 
+                              #    occ_tmp[index_occ==TRUE, ]$temCoordenadas == TRUE
+                              
+                              if (sum(index_end)>0)
+                              {
+                                 n_tmp <- NROW(occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[index_end==TRUE])
+                                 if (n_tmp==1)
+                                 {
+                                    occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[index_end==FALSE] <- FALSE
+                                 } else
+                                 {
+                                    occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[index_end==FALSE] <- FALSE
+                                    occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[index_end==TRUE][2:n_tmp] <- FALSE
+                                 }   
+                              } else
+                              {
+                                 if (onlyLatLon==TRUE)
+                                 {
+                                    # todos
+                                    occ_tmp[index_occ==TRUE, ]$Ctrl_selectedMoreInformativeRecord[1:num_records] <- FALSE
+                                 }   
+                              }
+                           }   
+                        }
+                        
+                        # }   
+                     }
+                     
+                     
+                     res_in <- occ_tmp %>%
+                        dplyr::select(Ctrl_key_family_recordedBy_recordNumber,
+                                      Ctrl_numberRecordsOfSample,
+                                      Ctrl_bibliographicCitation,
+                                      Ctrl_moreInformativeRecord,
+                                      Ctrl_autoGeoLongitude,
+                                      Ctrl_autoGeoLatitude,
+                                      Ctrl_selectedMoreInformativeRecord,
+                                      autoGeoStatus,
+                                      autoGeoNotes,
+                                      verbatimNotes,
+                                      Ctrl_occurrenceID)
+                     
+                     if (view_summary==TRUE)
+                     {
+                        res_in %>%
+                           View()
+                     }
+                     
+                     
+                     print('...finished!')
+                     # return(occ_tmp)
+                     return(list(occ = occ_tmp,
+                                 summary_MIR = res_in))
+                  }
+                  
+               }
+               
+               # source("C:/Dados/CNCFlora/shiny/cncflora/functions/prepere_lastNameRecordedBy_v3.R", encoding = "UTF-8")
+               {
+                  prepere_lastNameRecordedBy_v3 <- function(occ_tmp, 
+                                                            coletoresDB=coletoresDB)
+                  {  
+                     
+                     coletoresDB <- coletoresDB %>%
+                        dplyr::rename(Ctrl_nameRecordedBy_Standard_CNCFlora = Ctrl_nameRecordedBy_Standard)
+                     
+                     
+                     Ctrl_lastNameRecordedBy <- lapply(occ_tmp$Ctrl_recordedBy %>% 
+                                                          toupper() %>%
+                                                          unique(), 
+                                                       get_lastNameRecordedBy) %>% 
+                        do.call(rbind.data.frame, .)
+                     
+                     recordedBy_Standart <- data.frame(
+                        Ctrl_nameRecordedBy_Standard =  textclean::replace_non_ascii(toupper(Ctrl_lastNameRecordedBy[,1])),
+                        Ctrl_recordedBy = occ_tmp$Ctrl_recordedBy %>% toupper() %>% unique(),
+                        stringsAsFactors = FALSE) 
+                     
+                     recordedBy_Standart <- left_join(recordedBy_Standart,
+                                                      coletoresDB,
+                                                      by = c('Ctrl_recordedBy')) %>%
+                        # dplyr::mutate(coletoresDB='') %>% 
+                        dplyr::mutate(coletoresDB=ifelse(!is.na(Ctrl_nameRecordedBy_Standard_CNCFlora),
+                                                         'Banco de Coletores OK',
+                                                         '')) %>%
+                        dplyr::mutate(Ctrl_nameRecordedBy_Standard = ifelse(coletoresDB=='Banco de Coletores OK',
+                                                                            Ctrl_nameRecordedBy_Standard_CNCFlora,
+                                                                            Ctrl_nameRecordedBy_Standard)) %>% 
+                        dplyr::arrange(coletoresDB, Ctrl_nameRecordedBy_Standard, Ctrl_recordedBy) %>%
+                        dplyr::mutate(Ctrl_notes = Ctrl_notes %>% as.character(),
+                                      Ctrl_update = Ctrl_update %>% as.character(),
+                                      Ctrl_nameRecordedBy_Standard = Ctrl_nameRecordedBy_Standard %>% as.character(),
+                                      Ctrl_recordedBy = Ctrl_recordedBy %>% as.character(),
+                                      collectorName = collectorName %>% as.character(),
+                                      Ctrl_fullName = Ctrl_fullName %>% as.character(),
+                                      Ctrl_fullNameII = Ctrl_fullNameII %>% as.character(),
+                                      CVStarrVirtualHerbarium_PersonDetails = CVStarrVirtualHerbarium_PersonDetails %>% as.character()) %>%
+                        # dplyr::select(Ctrl_notes,
+                        #               Ctrl_update,
+                        #               Ctrl_nameRecordedBy_Standard,
+                        #               Ctrl_recordedBy,
+                        #               collectorName,
+                        #               Ctrl_fullName,
+                        #               Ctrl_fullNameII,
+                        #               CVStarrVirtualHerbarium_PersonDetails)
+                        dplyr::select(Ctrl_nameRecordedBy_Standard,
+                                      Ctrl_recordedBy,
+                                      Ctrl_notes,
+                                      coletoresDB,
+                                      Ctrl_update,
+                                      collectorName,
+                                      Ctrl_fullName,
+                                      Ctrl_fullNameII,
+                                      CVStarrVirtualHerbarium_PersonDetails)
+                     
+                     
+                     # colnames(recordedBy_Standart)
+                     xn <- nrow((recordedBy_Standart))
+                     recordedBy_Standart <- recordedBy_Standart %>%
+                        dplyr::distinct_('Ctrl_recordedBy', .keep_all =TRUE)
+                     
+                     print( paste0(' Ctrl_recordedBy repetidos na base: ',xn-nrow(recordedBy_Standart)))
+                     
+                     return(recordedBy_Standart)
+                  }
+                  
+               }
+               
+               # source("C:/Dados/CNCFlora/shiny/cncflora/functions/get_lastNameRecordedBy.R", encoding = "UTF-8")
+               {
+                  get_lastNameRecordedBy <- function(x) 
+                  {
+                     
+                     #aqui
+                     # x = gsub("et al.","",x, fixed=TRUE) # teste pablo 10-02-2020
+                     # x = gsub("et. al.","",x, fixed=TRUE) # teste pablo 10-02-2020
+                     # x = gsub("et al","",x, fixed=TRUE) # teste pablo 10-02-2020
+                     # x = gsub("s.c.","",x, fixed=TRUE) # teste pablo 10-02-2020
+                     # x = gsub("s/c","",x, fixed=TRUE) # teste pablo 10-02-2020
+                     # x = gsub("sc","",x, fixed=TRUE) # teste pablo 10-02-2020
+                     
+                     
+                     x = gsub("[?]","",x) # teste pablo 10-02-2020
+                     
+                     x = gsub("[.]"," ",x) # teste pablo 10-02-2020
+                     
+                     if (length(grep("\\|",x))>0)
+                     {
+                        x = strsplit(x,"\\|")[[1]][1]
+                     }
+                     
+                     x = gsub("[á|à|â|ã|ä]","a",x)
+                     x = gsub("[Á|À|Â|Ã|Ä]","A",x)
+                     
+                     x = gsub("[ó|ò|ô|õ|ö]","o",x)
+                     x = gsub("[Ó|Ò|Ô|Õ|Ö]","O",x)
+                     
+                     x = gsub("[í|ì|î|ï]","i",x)
+                     x = gsub("[Í|Ì|Î|Ï]","I",x)
+                     
+                     x = gsub("[ú|ù|û|ü]","u",x)
+                     x = gsub("[Ú|Ù|Û|Ü]","U",x)
+                     
+                     x = gsub("[é|è|ê|ë]","e",x)
+                     x = gsub("[É|È|Ê|Ë]","E",x)
+                     
+                     x = gsub("ñ","n",x)
+                     x = gsub("Ñ","N",x)
+                     
+                     x = gsub("ç","c",x)
+                     x = gsub("Ç","C",x)
+                     
+                     x = gsub("\\(|\\)"," ",x) # teste pablo 10-02-2020
+                     x = gsub("\\[|\\]"," ",x) # teste pablo 10-02-2020
+                     x = gsub("[\"]"," ",x) # teste pablo 10-02-2020
+                     
+                     #pega o primeiro nome de uma lista de coletores separados por & se houver
+                     if (length(grep("&",x))>0)
+                     {
+                        x = strsplit(x,"&")[[1]][1]
+                     }
+                     
+                     #pega o primeiro nome de uma lista de coletores separados por ";" se houver
+                     if (length(grep(";",x))>0)
+                     {
+                        x_t <- strsplit(x,";")[[1]][1]
+                        
+                        # para capturar padrão iniciado por ;
+                        if (nchar(x_t)==0)
+                        {
+                           x_t <- strsplit(x,";")[[1]][2]
+                           if (is.na(x_t )) { x_t <- ""}
+                        }
+                        
+                        if (nchar(x_t)>0)
+                        {
+                           x <- x_t 
+                        } else
+                        {
+                           x <- ''
+                        }  
+                        
+                     }
+                     #se houver v?rgula pode ser dois casos:
+                     #1. ou o valor antes da v?rgula ? o sobrenome (padr?o INPA)
+                     #2. ou a v?rgula esta separando diferentes coletores (e neste caso as palavras do primeiro elemento n?o s?o apenas abrevia??es)
+                     
+                     # aqui
+                     # vl = grep(",|.",x) 
+                     
+                     vl = grep(",| ",x) 
+                     
+                     #se tem v?rgula
+                     if (length(vl)>0) {
+                        
+                        # aqui 2 se der pau voltar
+                        # x = gsub("[.]"," ",x) # teste pablo 10-02-2020
+                        
+                        #separa pela v?rgula e pega o primeiro elemento
+                        xx = strsplit(x,",")[[1]][1]
+                        
+                        #separa o primeiro elemento antes da v?rgula por espa?os
+                        xx = strsplit(xx," ")[[1]]
+                        
+                        #apaga elementos vazios
+                        xx = xx[xx!=""]
+                        
+                        #se o numero de caracteres da maior palavra for maior do que 2, ent?o o primeiro elemento era todo o nome do coletor, pega apenas o sobrenome
+                        if (max(nchar(xx))>2) {
+                           #1 pegue esta palavra como sobrenome se houver apenas 1 palavra
+                           vll = which(nchar(xx)==max(nchar(xx)))
+                           #ou 2, se houver mais de uma palavra com o mesmo tamanho, pega a ?ltima delas
+                           if (length(vll)>1) {
+                              vll = vll[length(vll)]
+                           } 
+                           sobren = xx[vll]
+                           # ##############
+                           #       # teste para pegar o ultimo nome
+                           #       #1 pegue esta palavra como sobrenome se houver apenas 1 palavra
+                           #       sobren = xx[[length(nchar(xx))]]
+                           # ##############
+                           #       
+                        } else {
+                           #caso contrario h? apenas abrevia??es em xx, ent?o, virgula separa apenas sobrenome de abreviacoes ou prenome 
+                           sb = strsplit(x,",")[[1]]
+                           sb = str_trim(sb)
+                           nsb = nchar(sb)
+                           sbvl = which(nsb==max(nsb))
+                           if (length(sbvl)>1) {
+                              sbvl = sbvl[length(sbvl)]
+                           }
+                           sobren = sb[sbvl]
+                        }
+                     } else {
+                        #neste caso n?o h? virgula, ent?o o ultimo nome ? o sobrenome
+                        xx = strsplit(x," ")[[1]]
+                        sobren = xx[length(xx)]
+                     }
+                     sobren = str_trim(sobren)
+                     sobren = gsub("?","", sobren)
+                     sobren = paste(sobren,sep="-")
+                     if (length(sobren)>0){
+                        x = strsplit(sobren,"\\|")[[1]]
+                        sobren = x[1]
+                        #print(sobren)
+                        return(sobren)
+                     } else {
+                        return("")
+                     }
+                  }
+                  
+               } 
+               
+               # source('C:/Dados/CNCFlora/shiny/cncflora/functions/update_lastNameRecordedBy_v5.R')
+               {
+                  update_lastNameRecordedBy_v5 <- function(occ_tmp, 
+                                                           recordedBy_ajusted,
+                                                           coletoresDB)
+                  {  
+                     colunas <- colnames(coletoresDB)
+                     
+                     coletoresDB <- coletoresDB %>% 
+                        dplyr::rename(Ctrl_nameRecordedBy_Standard_CNCFlora = Ctrl_nameRecordedBy_Standard) %>%
+                        dplyr::select(Ctrl_recordedBy, Ctrl_nameRecordedBy_Standard_CNCFlora)
+                     
+                     recordedBy_ajusted$Ctrl_recordedBy <- recordedBy_ajusted$Ctrl_recordedBy %>% 
+                        toupper() %>% as.character()
+                     
+                     coletoresDB$Ctrl_recordedBy <- coletoresDB$Ctrl_recordedBy %>% 
+                        toupper() %>% as.character()
+                     
+                     recordedBy_ajusted_new <- anti_join(recordedBy_ajusted,
+                                                         coletoresDB,
+                                                         by = c('Ctrl_recordedBy')) %>%
+                        dplyr::select(colunas)
+                     
+                     ####
+                     
+                     occ_tmp <- occ_tmp %>%
+                        dplyr::mutate(Ctrl_nameRecordedBy_Standard='')
+                     
+                     recordedBy_unique <- occ_tmp$Ctrl_recordedBy %>% unique() %>%  as.factor()
+                     recordedBy_unique <- recordedBy_unique %>% toupper()
+                     # NROW(recordedBy_unique)
+                     
+                     print("let's go...")
+                     print(NROW(recordedBy_unique))
+                     
+                     # atualizando tabela de occorencias
+                     
+                     rt <- NROW(recordedBy_unique)
+                     ri <- 0
+                     
+                     r=recordedBy_unique[1] 
+                     for (r in recordedBy_unique)
+                     {
+                        ri <- ri + 1
+                        
+                        if (is.na(r)) {next}
+                        index_occ <- (occ_tmp$Ctrl_recordedBy %>% toupper() %in% r) %>% ifelse(is.na(.), FALSE,.)
+                        num_records <- NROW(occ_tmp[index_occ==TRUE,])
+                        index_ajusted <- (recordedBy_ajusted$Ctrl_recordedBy == r) %>% ifelse(is.na(.), FALSE,.)
+                        
+                        # sum(index_ajusted)
+                        # any(index_ajusted)
+                        
+                        # group_by_(campo) %>% summarise(frecuencia = n() ))
+                        # recordedBy_ajusted[index_ajusted==TRUE,] %>% dplyr::select(Ctrl_recordedBy)
+                        
+                        print(paste0(ri, ' de ', rt, ' - ', r,' : ',num_records, ' registros' ))
+                        
+                        if (NROW(recordedBy_ajusted[index_ajusted==TRUE,]) == 0)
+                        {
+                           # occ_tmp[index_occ==TRUE, c('Ctrl_nameRecordedBy_Standard')] =
+                           #    data.frame(Ctrl_nameRecordedBy_Standard  = 'undefined collector')
+                           print(r)
+                           print('in ajusted')
+                           next
+                        }
+                        
+                        if (num_records == 0)
+                        {
+                           print(r)
+                           print('table')
+                           break
+                        }
+                        
+                        recordedBy_ajusted_tmp <- recordedBy_ajusted %>%
+                           dplyr::filter(index_ajusted) %>%
+                           dplyr::select(Ctrl_nameRecordedBy_Standard)
+                        
+                        # 09-09-2022
+                        recordedBy_ajusted_tmp <- recordedBy_ajusted_tmp[1,]
+                        
+                        # 18-10-21
+                        #pode-se ajustar aqui as duplicações
+                        
+                        occ_tmp[index_occ==TRUE, c('Ctrl_nameRecordedBy_Standard')] =
+                           data.frame(Ctrl_nameRecordedBy_Standard  = recordedBy_ajusted_tmp)
+                        
+                        # # 08-02-2022 - desliguei essa conferencia desnecessária e que exige grande processamento
+                        # index_ck <- occ_tmp$Ctrl_nameRecordedBy_Standard %in% recordedBy_ajusted_tmp &
+                        #    index_occ
+                        # 
+                        # num_records_ck <- NROW(occ_tmp[index_ck==TRUE,])
+                        # 
+                        # # print(num_records)
+                        # if ((num_records-num_records_ck)>0){print(num_records-num_records_ck)}
+                        
+                     }
+                     
+                     print('...finished!')
+                     
+                     # teste antigo removido
+                     
+                     occ_tmp$Ctrl_recordNumber_Standard <- str_replace_all(occ_tmp$Ctrl_recordNumber, "[^0-9]", "")
+                     
+                     occ_tmp$Ctrl_recordNumber_Standard <- ifelse(is.na(occ_tmp$Ctrl_recordNumber_Standard) |
+                                                                     occ_tmp$Ctrl_recordNumber_Standard=='',"",occ_tmp$Ctrl_recordNumber_Standard  %>% strtoi())
+                     # occ_tmp$Ctrl_recordNumber_Standard <- ifelse(is.na(occ_tmp$Ctrl_recordNumber_Standard),"",occ_tmp$Ctrl_recordNumber_Standard)
+                     
+                     occ_tmp$Ctrl_recordNumber_Standard
+                     
+                     occ_tmp$Ctrl_key_family_recordedBy_recordNumber <- ""
+                     occ_tmp <- occ_tmp %>%
+                        dplyr::mutate(Ctrl_key_family_recordedBy_recordNumber =
+                                         paste(Ctrl_family %>% toupper() %>% glue::trim(),
+                                               Ctrl_nameRecordedBy_Standard,
+                                               Ctrl_recordNumber_Standard,
+                                               # Ctrl_recordNumber,
+                                               
+                                               # Ctrl_year,
+                                               # Ctrl_standardized_stateProvince,
+                                               sep='_'))
+                     
+                     occ_tmp$Ctrl_key_year_recordedBy_recordNumber <- ""
+                     occ_tmp <- occ_tmp %>%
+                        dplyr::mutate(Ctrl_key_year_recordedBy_recordNumber =
+                                         paste(ifelse(Ctrl_year %>% is.na() == TRUE, 'noYear',Ctrl_year)  %>% glue::trim(),
+                                               Ctrl_nameRecordedBy_Standard,
+                                               Ctrl_recordNumber_Standard,
+                                               sep='_'))
+                     
+                     # # numero de registros por frase saída in
+                     res_in <- occ_tmp %>% dplyr::count(paste0(Ctrl_key_family_recordedBy_recordNumber))
+                     colnames(res_in) <- c('Key',
+                                           'numberOfRecords')
+                     res_in <- res_in %>% dplyr::arrange_at(c('numberOfRecords'), desc )
+                     
+                     print(occ_tmp$Ctrl_key_family_recordedBy_recordNumber %>% unique())
+                     return(list(occ = occ_tmp,
+                                 summary = res_in,
+                                 MainCollectorLastNameDB_new=recordedBy_ajusted_new))
+                     
+                     ptint('Finished2!')
+                     
+                  }
+               } 
+               
+               # no app
+               # source("C:/Dados/APP_GBOT/functions/get_wcvp.R", encoding = "UTF-8")
+               update_wcvp <<- FALSE
+               
+               # source("C:/Dados/APP_GBOT/functions/get_floraFungaBrasil_v2.R", encoding = "UTF-8")
+               {
+                  get_floraFungaBrasil_v2 <- function(url_source = "http://ipt.jbrj.gov.br/jbrj/archive.do?r=lista_especies_flora_brasil",
+                                                      path_results = tempdir)#'C:\\Dados\\APP_GBOT\\data') # if NULL
+                     
+                  {  
+                     
+                     require(dplyr)
+                     require(downloader)
+                     require(stringr)
+                     require(plyr)
+                     
+                     #' @details criar pasta para salvar raultados do dataset
+                     path_results <- paste0(path_results,'/FloraFungaBrasil')
+                     if (!dir.exists(path_results)){dir.create(path_results)}
+                     
+                     destfile <- paste0(path_results,"/IPT_FloraFungaBrasil_.zip")
+                     
+                     
+                     #' @details ultima versao
+                     # destfile <- paste0(path_results,"/",Sys.Date(),'.zip')
+                     downloader::download(url = url_source, destfile = destfile, mode = "wb") 
+                     utils::unzip(destfile, exdir = path_results) # descompactar e salvar dentro subpasta "ipt" na pasta principal
+                     
+                     
+                     taxon.file <- paste0(path_results,"/taxon.txt")
+                     
+                     # taxon.file <- paste0("C:\\Dados\\APP_GBOT\\data\\FloraFungaBrasil\\taxon.txt")
+                     
+                     
+                     
+                     #' @details taxon
+                     fb2020_taxon  <- readr::read_delim(taxon.file, delim = "\t", quote = "") %>% 
+                        dplyr::select(-id)
+                     
+                     ### familia
+                     # index = fb2020_taxon$taxonRank %in% c("ESPECIE",
+                     #                                       "SUB_ESPECIE",
+                     #                                       "VARIEDADE",
+                     #                                       "FORMA")
+                     
+                     index = fb2020_taxon$taxonRank %in% c("ESPECIE",
+                                                           "SUB_ESPECIE",
+                                                           "VARIEDADE",
+                                                           "FORMA",
+                                                           "FAMILIA",
+                                                           "GENERO")
+                     ###
+                     
+                     fb2020_taxon  <- fb2020_taxon[index==TRUE,] 
+                     
+                     
+                     scientificName_tmp <- fb2020_taxon$scientificName %>% stringr::str_split(.,pattern = ' ', simplify = TRUE)
+                     
+                     
+                     # carregando especie sem autor
+                     scientificName <- rep('',nrow(fb2020_taxon))
+                     
+                     # scientificName[index==TRUE] <- scientificName_tmp[index==TRUE,1] %>% trimws(.,'right')
+                     
+                     index = fb2020_taxon$taxonRank %in% c("ESPECIE")
+                     
+                     scientificName[index==TRUE] <-  paste0(scientificName_tmp[index==TRUE,1], ' ', scientificName_tmp[index==TRUE,2]) #%>% trimws(.,'right')
+                     
+                     index = fb2020_taxon$taxonRank %in% c("VARIEDADE")
+                     scientificName[index==TRUE] <-  paste0(fb2020_taxon$genus[index==TRUE], ' ', fb2020_taxon$specificEpithet[index==TRUE], ' var. ', fb2020_taxon$infraspecificEpithet[index==TRUE])# %>% trimws(.,'right')
+                     
+                     index = fb2020_taxon$taxonRank %in% c("SUB_ESPECIE")
+                     scientificName[index==TRUE] <-  paste0(fb2020_taxon$genus[index==TRUE], ' ', fb2020_taxon$specificEpithet[index==TRUE], ' subsp. ', fb2020_taxon$infraspecificEpithet[index==TRUE])# %>% trimws(.,'right')
+                     
+                     index = fb2020_taxon$taxonRank %in% c("FORMA")
+                     scientificName[index==TRUE] <-  paste0(fb2020_taxon$genus[index==TRUE], ' ', fb2020_taxon$specificEpithet[index==TRUE], ' form. ', fb2020_taxon$infraspecificEpithet[index==TRUE])# %>% trimws(.,'right')
+                     
+                     fb2020_taxon$scientificNamewithoutAuthorship <- scientificName
+                     fb2020_taxon$scientificNamewithoutAuthorship_U <- toupper(scientificName)
+                     
+                     fb2020_taxon$scientificNameAuthorship_U <- toupper(fb2020_taxon$scientificNameAuthorship)
+                     
+                     ### reconhecer genero e familia
+                     
+                     fb2020_taxon$genus_U <- toupper(fb2020_taxon$genus)
+                     
+                     fb2020_taxon$family_U <- toupper(fb2020_taxon$family)
+                     
+                     ###
+                     
+                     return(fb2020_taxon)
+                     
+                  }
+                  
+               }
+               
+               # source("C:/Dados/APP_GBOT/functions/checkName_WCVP.R", encoding = "UTF-8")
+               
+               # source("C:/Dados/APP_GBOT/functions/checkName_FloraFungaBrasil.R", encoding = "UTF-8")
+               {
+                  standardize_scientificName <- function(searchedName = 'Alomia angustata (Gardner) Benth. ex Baker')
+                  {
+                     
+                     x <- {}
+                     
+                     infrataxa = ''
+                     # str_squish(x)
+                     # setdiff(vec1, vec2)
+                     
+                     #' @details Transformação padrão GBIF de híbrido para wcvp 
+                     searchedName_raw <- searchedName
+                     # searchedName <- gsub('×','x ',searchedName)
+                     searchedName <- gsub('×','× ',searchedName)
+                     searchedName_ori <- searchedName
+                     
+                     # if(!is.na(taxonRank))
+                     # {
+                     #   
+                     #   searchedName_clear <- ifelse(taxonRank %in% c('GENUS','FAMILY'),word(searchedName,1),
+                     #                                ifelse(taxonRank=='SPECIES',paste0(word(searchedName,1),' ',word(searchedName,2)),
+                     #                                       ifelse(taxonRank=='VARIETY',paste0(word(searchedName,1),' ', word(searchedName,2), ' var. ', word(searchedName,4)),
+                     #                                              ifelse(taxonRank=='SUBSPECIES',paste0(word(searchedName,1),' ', word(searchedName,2), ' subsp. ', word(searchedName,4)),
+                     #                                                     ifelse(taxonRank=='FORM',paste0(word(searchedName,1),' ', word(searchedName,2), ' f. ', word(searchedName,4)), 
+                     #                                                            '')))))
+                     #   
+                     #   return(list(searchedName = searchedName_raw,
+                     #               standardizeName = searchedName,
+                     #               taxonAuthors= taxon_authors))
+                     #   
+                     # }
+                     
+                     
+                     
+                     sp <- str_split(searchedName, ' ', simplify = T)
+                     padrao <- c('var.', 'subsp.', ' f. ')
+                     padrao_s <- c('var.', 'subsp.', 'f.')
+                     
+                     # Urtica gracilis Aiton subsp. gracilis
+                     
+                     if(length(sp)>1)
+                     {
+                        # if(any(str_detect(searchedName, padrao))==T)
+                        if(grepl(padrao[1],searchedName, fixed = T)|grepl(padrao[2],searchedName, fixed = T)|grepl(padrao[3],searchedName, fixed = T) ) 
+                        {
+                           ip <- 1
+                           for(ip in 1:length(padrao))
+                           {
+                              # grepl(padrao[ip],'teste var. teste', fixed = T)
+                              # grepl(padrao[ip],'"Elatostema variabile C.B.Rob."', fixed = T)
+                              
+                              # if(str_detect(searchedName, padrao[ip])==TRUE)
+                              if(grepl(padrao[ip],searchedName, fixed = T)==TRUE)
+                              {
+                                 indx <- sp == padrao_s[ip]
+                                 
+                                 if(length(sp)>3){if(indx[3]==T){infrataxa <- sp[4]}}
+                                 if(length(sp)>4){if(indx[4]==T){infrataxa <- sp[5]}}
+                                 if(length(sp)>5){if(indx[5]==T){infrataxa <- sp[6]}}
+                                 if(length(sp)>6){if(indx[6]==T){infrataxa <- sp[7]}}
+                                 if(length(sp)>7){if(indx[7]==T){infrataxa <- sp[8]}}
+                                 if(length(sp)>8){if(indx[8]==T){infrataxa <- sp[9]}}
+                                 if(length(sp)>9){if(indx[9]==T){infrataxa <- sp[10]}}
+                                 if(length(sp)>10){if(indx[10]==T){infrataxa <- sp[11]}}
+                                 if(length(sp)>11){if(indx[11]==T){infrataxa <- sp[12]}}
+                                 if(length(sp)>12){if(indx[12]==T){infrataxa <- sp[13]}}
+                                 
+                                 if(str_detect(searchedName_raw, '×')==TRUE)
+                                 {
+                                    searchedName <- paste0(sp[1], ' × ', sp[3], ifelse(infrataxa=='','',paste0(' ', padrao_s[ip], ' ', infrataxa)))  
+                                 }else
+                                 {
+                                    searchedName <- paste0(sp[1], ' ', sp[2], ' ', padrao_s[ip], ' ', infrataxa)   
+                                 }
+                                 
+                                 
+                                 
+                                 break
+                                 
+                              }
+                           }
+                        }else
+                        {
+                           
+                           if(str_detect(searchedName_raw, '×')==TRUE)
+                           {
+                              
+                              searchedName <- paste0(sp[1], ' × ', sp[3])  
+                              
+                           }else
+                           {
+                              if((str_sub(sp[2],1,1)==toupper(str_sub(sp[2],1,1)) |
+                                  str_sub(sp[2],1,1)=="(") )
+                              {
+                                 searchedName <- sp[1]
+                              }else
+                              {
+                                 searchedName <- paste0(sp[1], ' ', sp[2])
+                              } 
+                           }
+                        }
+                     }else
+                     {
+                        searchedName <- sp[1]
+                     }
+                     
+                     sp2 <- str_split(searchedName, ' ', simplify = T)
+                     
+                     taxon_authors <- str_sub(searchedName_ori, str_locate(searchedName_ori, sp2[length(sp2)])[2]+2, nchar(searchedName_ori))
+                     # if(length(sp2)>=4){if( paste0(sp2[3], ' ',sp2[4])==taxon_authors){taxon_authors <- ''}}
+                     
+                     if(length(sp2)==4 &!is.na(taxon_authors)){if(paste0(sp2[3], ' ',sp2[4])==taxon_authors){taxon_authors <- ''}}
+                     
+                     # if( (str_sub(sp[3],1,1)==toupper(str_sub(sp[3],1,1)) | str_sub(sp[3],1,1)=="(") & any(str_detect(searchedName, padrao))==TRUE ){taxon_authors <- ''}
+                     
+                     xi <- str_locate(taxon_authors,'\\(')
+                     xf <- str_locate(taxon_authors,'\\)')
+                     
+                     
+                     if(!is.na(xi)[1] & nchar(taxon_authors) > 0)
+                     {    
+                        if(xi[1]==1)
+                        {
+                           taxon_authors_last <- str_sub(taxon_authors,xf[2]+ifelse(str_sub(taxon_authors,xf[2]+1,xf[2]+1)==' ',2,1),nchar(taxon_authors))
+                        }
+                     }else
+                     {
+                        taxon_authors_last <- ''  
+                     }
+                     
+                     if(is.na(taxon_authors)){taxon_authors <- ''}
+                     
+                     
+                     return(list(searchedName = searchedName_raw,
+                                 standardizeName = searchedName,
+                                 taxonAuthors= taxon_authors,
+                                 taxonAuthors_last= taxon_authors_last))
+                  }
+                  
+                  # searchedName = "Acacia plumosa"
+                  # searchedName = "Furnarius rufus"
+                  
+                  # searchedName = "Oncidium cebolleta"
+                  
+                  checkName_FloraFungaBrasil <- function(searchedName = 'Alomia angustata',
+                                                         fb2020="",
+                                                         if_author_fails_try_without_combinations=TRUE)
+                  {
+                     print(searchedName)
+                     # https://powo.science.kew.org/about-wcvp#unplacednames
+                     
+                     x <- {}  
+                     sp_fb <- standardize_scientificName(searchedName)
+                     
+                     if(sp_fb$taxonAuthors != "")
+                     {
+                        
+                        index_author <- 100
+                        
+                        index <- fb2020$scientificNamewithoutAuthorship_U %in% toupper(sp_fb$standardizeName) & 
+                           fb2020$scientificNameAuthorship_U %in% toupper(gsub ("\\s+", "", sp_fb$taxonAuthors ))
+                        ntaxa <- NROW(fb2020[index==TRUE,])
+                        
+                        if(ntaxa == 0 & if_author_fails_try_without_combinations == TRUE)
+                        {
+                           index_author <- 50
+                           index <- fb2020$scientificNamewithoutAuthorship_U %in% toupper(sp_fb$standardizeName) & 
+                              fb2020$scientificNameAuthorship_U %in% toupper(gsub ("\\s+", "", sp_fb$taxonAuthors_last ))
+                           ntaxa <- NROW(fb2020[index==TRUE,])
+                        }
+                        
+                        
+                        if(ntaxa == 0)
+                        {
+                           index_author <- 0
+                           index <- fb2020$scientificNamewithoutAuthorship_U %in% toupper(sp_fb$standardizeName)
+                           ntaxa <- NROW(fb2020[index==TRUE,])
+                        }
+                        
+                     }else
+                     {
+                        index_author <- 0
+                        index <- fb2020$scientificNamewithoutAuthorship_U %in% toupper(sp_fb$standardizeName)
+                        ntaxa <- NROW(fb2020[index==TRUE,])
+                     }
+                     
+                     if(ntaxa == 0 | sp_fb$standardizeName=="")
+                     {
+                        x <- fb2020[index==TRUE,] %>%
+                           dplyr::add_row()  %>%
+                           dplyr::mutate(searchedName=searchedName,
+                                         taxon_status_of_searchedName = "",
+                                         plant_name_id_of_searchedName = "",
+                                         taxon_authors_of_searchedName = "",
+                                         verified_author = index_author,
+                                         verified_speciesName = 0,
+                                         searchNotes='Not found')
+                     }
+                     
+                     if(ntaxa == 1)
+                     {
+                        verified_speciesName <- 100
+                        
+                        id_accept <- ifelse(is.na(fb2020$acceptedNameUsageID[index==TRUE]),'', fb2020$acceptedNameUsageID[index==TRUE])
+                        
+                        if((!is.na(fb2020$acceptedNameUsageID[index==TRUE])) &
+                           (fb2020$taxonID[index==TRUE] != id_accept ))
+                        {
+                           
+                           x <- fb2020[index==TRUE,]
+                           
+                           taxon_status_of_searchedName <- fb2020[index==TRUE,]$taxonomicStatus
+                           plant_name_id_of_searchedName <- fb2020[index==TRUE,]$taxonID
+                           taxon_authors_of_searchedName <- fb2020[index==TRUE,]$scientificNamewithoutAuthorship
+                           
+                           index_synonym <- fb2020$taxonID %in% x$acceptedNameUsageID 
+                           
+                           if(sum(index_synonym==TRUE)==1)
+                           {
+                              x <- fb2020[index_synonym==TRUE,] %>%
+                                 dplyr::mutate(searchedName=searchedName,
+                                               taxon_status_of_searchedName = taxon_status_of_searchedName,
+                                               plant_name_id_of_searchedName = plant_name_id_of_searchedName,
+                                               taxon_authors_of_searchedName = taxon_authors_of_searchedName,
+                                               verified_author = index_author,
+                                               verified_speciesName = verified_speciesName,
+                                               searchNotes= 'Updated')
+                              
+                           }else
+                           {
+                              x <- fb2020[index==TRUE,] %>%
+                                 dplyr::mutate(searchedName=searchedName,
+                                               taxon_status_of_searchedName = taxon_status_of_searchedName,
+                                               plant_name_id_of_searchedName = plant_name_id_of_searchedName,
+                                               taxon_authors_of_searchedName = taxon_authors_of_searchedName,
+                                               verified_author = index_author,
+                                               verified_speciesName = verified_speciesName,
+                                               searchNotes= 'Does not occur in Brazil')
+                           }
+                           
+                        }else
+                        {
+                           x <- fb2020[index==TRUE,] %>%
+                              # dplyr::add_row()  %>%
+                              dplyr::mutate(searchedName=searchedName,
+                                            taxon_status_of_searchedName = "",
+                                            plant_name_id_of_searchedName = "",
+                                            taxon_authors_of_searchedName = "",
+                                            verified_author = index_author,
+                                            verified_speciesName = verified_speciesName,
+                                            searchNotes=ifelse(is.na(taxonomicStatus),'',taxonomicStatus))
+                        }
+                        
+                     }
+                     
+                     if(ntaxa > 1)
+                     {
+                        
+                        taxon_status_of_searchedName <- paste(fb2020[index==TRUE,]$taxonomicStatus, collapse = '|')
+                        plant_name_id_of_searchedName <- paste(fb2020[index==TRUE,]$taxonID, collapse = '|')
+                        # taxon_authors_of_searchedName <- paste(paste0(fb2020[index==TRUE,]$taxon_name, ' ',fb2020[index==TRUE,]$taxon_authors), collapse = '|')
+                        taxon_authors_of_searchedName <- paste(fb2020[index==TRUE,]$scientificNameAuthorship, collapse = '|')
+                        
+                        
+                        # Accepted or Homonyms
+                        {
+                           index_status <- fb2020$scientificNamewithoutAuthorship_U %in% toupper(sp_fb$standardizeName) &
+                              fb2020$taxonomicStatus %in% c( "NOME_ACEITO")
+                           
+                           ntaxa_status <- NROW(fb2020[index_status==TRUE,])
+                           
+                           if(ntaxa_status == 1)
+                           {
+                              
+                              x <- fb2020[index_status==TRUE,] %>%
+                                 dplyr::mutate(searchedName=searchedName,
+                                               taxon_status_of_searchedName = taxon_status_of_searchedName,
+                                               plant_name_id_of_searchedName = plant_name_id_of_searchedName,
+                                               taxon_authors_of_searchedName = taxon_authors_of_searchedName,
+                                               verified_author = index_author,
+                                               verified_speciesName = 100/ntaxa,
+                                               searchNotes=taxonomicStatus)
+                           }
+                           else
+                           {
+                              
+                              
+                              x <- fb2020[1==2,] %>%
+                                 dplyr::add_row()  %>%
+                                 dplyr::mutate(searchedName=searchedName,
+                                               taxon_status_of_searchedName = taxon_status_of_searchedName,
+                                               plant_name_id_of_searchedName = plant_name_id_of_searchedName,
+                                               taxon_authors_of_searchedName = taxon_authors_of_searchedName,
+                                               verified_author = index_author,
+                                               verified_speciesName = 0,
+                                               searchNotes='Homonyms')
+                              
+                           }
+                           
+                        }
+                        
+                     }
+                     
+                     # 'Homonyms' ajustar família
+                     
+                     if(x$searchNotes == 'Not found' )
+                     {
+                        ### reconhecer genero e familia
+                        # x <-{}
+                        w1 <- toupper(word(sp_fb$standardizeName))
+                        
+                        index <- fb2020$genus_U %in% toupper(w1) & fb2020$taxonRank == 'GENERO' & !is.na(fb2020$acceptedNameUsageID)
+                        ntaxa <- NROW(fb2020[index==TRUE,])
+                        
+                        g_f <- 'g'
+                        
+                        if(ntaxa == 0 )
+                        {
+                           index <- fb2020$family_U %in% toupper(w1) & fb2020$taxonRank == 'FAMILIA' & !is.na(fb2020$acceptedNameUsageID)
+                           ntaxa <- NROW(fb2020[index==TRUE,])
+                           g_f <- 'f'
+                        }    
+                        
+                        if(ntaxa == 1)
+                        {
+                           verified_speciesName <- 100
+                           
+                           id_accept <- ifelse(is.na(fb2020$acceptedNameUsageID[index==TRUE]),'', fb2020$acceptedNameUsageID[index==TRUE])
+                           
+                           if((!is.na(fb2020$acceptedNameUsageID[index==TRUE])) &
+                              (fb2020$taxonID[index==TRUE] != id_accept ))
+                           {
+                              
+                              x <- fb2020[index==TRUE,]
+                              
+                              taxon_status_of_searchedName <- fb2020[index==TRUE,]$taxonomicStatus
+                              plant_name_id_of_searchedName <- fb2020[index==TRUE,]$taxonID
+                              taxon_authors_of_searchedName <- fb2020[index==TRUE,]$scientificNamewithoutAuthorship
+                              
+                              index_synonym <- fb2020$taxonID %in% x$acceptedNameUsageID 
+                              
+                              if(sum(index_synonym==TRUE)==1)
+                              {
+                                 x <- fb2020[index_synonym==TRUE,] %>%
+                                    dplyr::mutate(searchedName=searchedName,
+                                                  taxon_status_of_searchedName = taxon_status_of_searchedName,
+                                                  plant_name_id_of_searchedName = plant_name_id_of_searchedName,
+                                                  taxon_authors_of_searchedName = taxon_authors_of_searchedName,
+                                                  verified_author = index_author,
+                                                  verified_speciesName = verified_speciesName,
+                                                  searchNotes=  ifelse(g_f=='g', 'Updated_genus', 'Updated_family') )
+                                 
+                              }else
+                              {
+                                 x <- fb2020[index==TRUE,] %>%
+                                    dplyr::mutate(searchedName=searchedName,
+                                                  taxon_status_of_searchedName = taxon_status_of_searchedName,
+                                                  plant_name_id_of_searchedName = plant_name_id_of_searchedName,
+                                                  taxon_authors_of_searchedName = taxon_authors_of_searchedName,
+                                                  verified_author = index_author,
+                                                  verified_speciesName = verified_speciesName,
+                                                  searchNotes= 'Does not occur in Brazil')
+                              }
+                              
+                           }else
+                           {
+                              x <- fb2020[index==TRUE,] %>%
+                                 # dplyr::add_row()  %>%
+                                 dplyr::mutate(searchedName=searchedName,
+                                               taxon_status_of_searchedName = "",
+                                               plant_name_id_of_searchedName = "",
+                                               taxon_authors_of_searchedName = "",
+                                               verified_author = index_author,
+                                               verified_speciesName = verified_speciesName,
+                                               searchNotes=taxonomicStatus)
+                           }
+                           
+                        }
+                        
+                        
+                        if(ntaxa >1)
+                        {
+                           
+                           x <- fb2020[index==TRUE,][1,] %>%
+                              # dplyr::add_row()  %>%
+                              dplyr::mutate(taxonID = '',                           
+                                            acceptedNameUsageID = '',
+                                            parentNameUsageID = '',         
+                                            originalNameUsageID = '',          
+                                            
+                                            # scientificName = ifelse(g_f=='g', genus, family),                    
+                                            scientificName = '', 
+                                            
+                                            acceptedNameUsage  = '',                
+                                            parentNameUsage = '',                   
+                                            namePublishedIn = '',                  
+                                            namePublishedInYear = '',               
+                                            higherClassification = '',             
+                                            # kingdom                           
+                                            # phylum                           
+                                            # class                             
+                                            # order                            
+                                            # family                            
+                                            # genus                            
+                                            specificEpithet = '',                   
+                                            infraspecificEpithet = '',             
+                                            
+                                            # taxonRank = ifelse(g_f=='g',"GENERO", "FAMILIA"),   
+                                            taxonRank = '',
+                                            
+                                            scientificNameAuthorship = '',
+                                            taxonomicStatus = '',                   
+                                            nomenclaturalStatus = '',              
+                                            modified = '',                          
+                                            bibliographicCitation = '',            
+                                            references = '',                        
+                                            scientificNamewithoutAuthorship = ifelse(g_f=='g', genus, family),
+                                            scientificNamewithoutAuthorship_U = ifelse(g_f=='g', genus_U, family_U),
+                                            scientificNameAuthorship_U = '',       
+                                            genus_U,                           
+                                            family_U) %>%
+                              dplyr::mutate(searchedName=searchedName,
+                                            taxon_status_of_searchedName = "",
+                                            plant_name_id_of_searchedName = "",
+                                            taxon_authors_of_searchedName = "",
+                                            verified_author = "",
+                                            verified_speciesName = "",
+                                            searchNotes=taxonRank)
+                        }
+                        ###
+                        
+                     }
+                     
+                     colnames(x) <- str_c('fb2020_',colnames(x))
+                     return(x)
+                     
+                  }
+                  
+               }
+               
+               # source("C:\\Dados\\Kew\functions\\standardize_scientificName.R", encoding = "UTF-8")
+               
+            }
+            
+            
+            
+         }
+         
+         #' @details finalizar tempo de processamento
+         tempo_processo <- get_tempo_processamento(tempo_processo_tmp)
+         
+      }
+      
+      
+      #' @section Selecionar UC
+      {
+         # 
+         # nome_uc <- 'Serra das Lontras'
+         # 
+         # 
+         # path_source <- 'C:\\Dados\\CNCFlora\\shiny\\cncflora\\scriptsAdd\\CatalogoUCs_v2\\busca_manual'
+         # path_uc <- paste0(path_source,'\\',nome_uc)
+         # path_results <- paste0(path_uc,'\\results')
+         # 
+         # path_reflora <- paste0(path_uc,'\\reflora')
+         # path_jabot <- paste0(path_uc,'\\jabot')
+         # path_splink <- paste0(path_uc,'\\splink')
+         # path_gbif <- paste0(path_uc,'\\gbif')
+         # 
+         # if(!dir.exists(path_uc)){dir.create(path_uc)}
+         # if(!dir.exists(path_results)){dir.create(path_results)}
+         # if(!dir.exists(path_reflora)){dir.create(path_reflora)}
+         # if(!dir.exists(path_jabot)){dir.create(path_jabot)}
+         # if(!dir.exists(path_splink)){dir.create(path_splink)}
+         # if(!dir.exists(path_gbif)){dir.create(path_gbif)}
+         # 
+         # files_reflora <- list.files(path =  path_reflora, full.names = T) #xlsx
+         # files_jabot <- list.files(path =  path_jabot, full.names = T) #xlsx
+         # files_splink <- list.files(path =  path_splink, full.names = T) #xlsx
+         # files_gbif <- list.files(path =  path_gbif, full.names = T) #xlsx
+         # 
+         # seleção de colunas
+         # colunas_fb2020_sel 
+         # colunas_ctrl_dwc
+         {
+            colunas_wcvp_sel <<- c("wcvp_kew_id",
+                                   "wcvp_family",
+                                   "wcvp_genus",
+                                   "wcvp_species",
+                                   "wcvp_infraspecies",
+                                   "wcvp_taxon_name",
+                                   "wcvp_authors",
+                                   "wcvp_rank",
+                                   "wcvp_taxonomic_status",
+                                   "wcvp_accepted_kew_id" ,
+                                   "wcvp_accepted_name",
+                                   "wcvp_accepted_authors",
+                                   "wcvp_parent_kew_id",
+                                   "wcvp_parent_name",
+                                   "wcvp_parent_authors",  
+                                   "wcvp_reviewed",         
+                                   "wcvp_publication",
+                                   "wcvp_original_name_id",
+                                   "wcvp_TAXON_NAME_U",
+                                   "wcvp_searchNotes",
+                                   "wcvp_searchedName")
+            
+            colunas_fb2020_sel <<- c("fb2020_taxonID",
+                                     "fb2020_acceptedNameUsageID",
+                                     "fb2020_parentNameUsageID",
+                                     "fb2020_originalNameUsageID",
+                                     "fb2020_scientificName",
+                                     # "fb2020_acceptedNameUsage",
+                                     # "fb2020_parentNameUsage",
+                                     "fb2020_namePublishedIn",                  
+                                     "fb2020_namePublishedInYear",
+                                     "fb2020_higherClassification",             
+                                     # "fb2020_kingdom",
+                                     # "fb2020_phylum",                           
+                                     # "fb2020_class",
+                                     # "fb2020_order",                            
+                                     "fb2020_family",
+                                     # "fb2020_genus",                            
+                                     "fb2020_specificEpithet",
+                                     "fb2020_infraspecificEpithet",             
+                                     "fb2020_taxonRank",
+                                     "fb2020_scientificNameAuthorship",
+                                     "fb2020_taxonomicStatus",
+                                     "fb2020_nomenclaturalStatus",              
+                                     "fb2020_modified",
+                                     "fb2020_bibliographicCitation",
+                                     "fb2020_references",
+                                     "fb2020_scientificNamewithoutAuthorship",  
+                                     "fb2020_scientificNamewithoutAuthorship_U",
+                                     "fb2020_searchNotes",
+                                     "fb2020_searchedName")
+            
+            colunas_ctrl_dwc <<- c('Ctrl_occurrenceID',
+                                   # Ctrl_lastCrawled,
+                                   # Ctrl_lastParsed,
+                                   # Ctrl_lastInterpreted,
+                                   'Ctrl_bibliographicCitation',
+                                   'Ctrl_downloadAsSynonym',
+                                   'Ctrl_scientificNameSearched',
+                                   'Ctrl_scientificNameReference',
+                                   'Ctrl_acceptedNameUsage',
+                                   'Ctrl_scientificNameAuthorship',
+                                   'Ctrl_scientificName', 
+                                   'Ctrl_scientificNameOriginalSource', # aqui
+                                   'Ctrl_family',
+                                   'Ctrl_genus',
+                                   'Ctrl_specificEpithet',
+                                   'Ctrl_infraspecificEpithet',
+                                   'Ctrl_modified',
+                                   'Ctrl_institutionCode',
+                                   'Ctrl_collectionCode',
+                                   'Ctrl_catalogNumber',
+                                   # 'Ctrl_barCode', #aqui
+                                   'Ctrl_identificationQualifier',
+                                   'Ctrl_identifiedBy',
+                                   'Ctrl_dateIdentified',
+                                   'Ctrl_typeStatus',
+                                   'Ctrl_recordNumber',
+                                   'Ctrl_recordedBy',
+                                   'Ctrl_fieldNumber',
+                                   'Ctrl_country',
+                                   'Ctrl_stateProvince',
+                                   'Ctrl_municipality',
+                                   'Ctrl_locality',
+                                   
+                                   # 18-10-21
+                                   'Ctrl_year',
+                                   'Ctrl_month',
+                                   'Ctrl_day',
+                                   
+                                   'Ctrl_decimalLatitude',
+                                   'Ctrl_decimalLongitude',
+                                   'Ctrl_occurrenceRemarks',
+                                   'Ctrl_occurrenceID',
+                                   'Ctrl_comments',
+                                   'Ctrl_taxonRank')
+            
+            colunas_verbatin_check <<- c('verbatimNotes',
+                                         'temAnoColeta',
+                                         'temCodigoInstituicao',
+                                         'temNumeroCatalogo',
+                                         'temColetor',
+                                         'temNumeroColeta',
+                                         'temPais',
+                                         'temUF',
+                                         'temMunicipio',
+                                         'temLocalidade',
+                                         'temIdentificador',
+                                         'temDataIdentificacao')
+            
+            
+            colunas_main_collectors_dictionary <<- c('Ctrl_key_family_recordedBy_recordNumber',
+                                                     'Ctrl_nameRecordedBy_Standard',
+                                                     'Ctrl_recordNumber_Standard',
+                                                     'Ctrl_key_year_recordedBy_recordNumber')
+            
+            colunas_collection_code_dictionary <<- c('Ctrl_key_collectionCode_catalogNumber',
+                                                     'Ctrl_collectionCode_Standard',
+                                                     'Ctrl_catalogNumber_Standard')
+            
+            
+         }
+         
+         {
+            fb2020_names <- data.frame(stringsAsFactors = FALSE,
+                                       
+                                       fb2020_taxonID = 0,
+                                       fb2020_acceptedNameUsageID = 0,
+                                       fb2020_parentNameUsageID = 0,
+                                       fb2020_originalNameUsageID = "0",
+                                       fb2020_scientificName = "",
+                                       # fb2020_acceptedNameUsage = "",
+                                       # fb2020_parentNameUsage = "",
+                                       fb2020_namePublishedIn = "",                  
+                                       fb2020_namePublishedInYear = 0,
+                                       fb2020_higherClassification = "",             
+                                       # fb2020_kingdom = "",
+                                       # fb2020_phylum = "",                           
+                                       # fb2020_class = "",
+                                       # fb2020_order = "",                            
+                                       fb2020_family = "",
+                                       # fb2020_genus = "",                            
+                                       fb2020_specificEpithet = "",
+                                       fb2020_infraspecificEpithet = "",             
+                                       fb2020_taxonRank = "",
+                                       fb2020_scientificNameAuthorship = "",
+                                       fb2020_taxonomicStatus = "",
+                                       fb2020_nomenclaturalStatus = "",              
+                                       fb2020_modified = lubridate::as_datetime("2021-10-31 21:13:33.77"),
+                                       fb2020_bibliographicCitation = "",
+                                       fb2020_references = "",
+                                       fb2020_scientificNamewithoutAuthorship = "",  
+                                       fb2020_scientificNamewithoutAuthorship_U = "",
+                                       fb2020_searchNotes = "",
+                                       fb2020_searchedName = "")
+            
+            wcvp_names <- data.frame(stringsAsFactors = FALSE,
+                                     
+                                     wcvp_kew_id = "",
+                                     wcvp_family = "",
+                                     wcvp_genus = "",
+                                     wcvp_species = "",
+                                     wcvp_infraspecies = "",
+                                     wcvp_taxon_name = "",
+                                     wcvp_authors = "",
+                                     wcvp_rank = "",
+                                     wcvp_taxonomic_status = "",
+                                     wcvp_accepted_kew_id  = "",
+                                     wcvp_accepted_name = "",
+                                     wcvp_accepted_authors = "",
+                                     wcvp_parent_kew_id = "",
+                                     wcvp_parent_name = "",
+                                     wcvp_parent_authors = "",  
+                                     wcvp_reviewed = "",         
+                                     wcvp_publication = "",
+                                     wcvp_original_name_id = "",
+                                     wcvp_TAXON_NAME_U = "",
+                                     wcvp_searchNotes = "",
+                                     wcvp_searchedName = "")
+            
+            join_dwc <- data.frame(stringsAsFactors = FALSE,
+                                   
+                                   Ctrl_occurrenceID = "",
+                                   # Ctrl_lastCrawled = "",
+                                   # Ctrl_lastParsed = "",
+                                   # Ctrl_lastInterpreted = "",
+                                   Ctrl_bibliographicCitation = "",
+                                   Ctrl_downloadAsSynonym = "",
+                                   Ctrl_scientificNameSearched = "",
+                                   Ctrl_scientificNameReference = "",
+                                   Ctrl_acceptedNameUsage = "",
+                                   Ctrl_scientificNameAuthorship = "",
+                                   Ctrl_scientificName = "", 
+                                   Ctrl_scientificNameOriginalSource = "", # aqui
+                                   Ctrl_family = "",
+                                   Ctrl_genus = "",
+                                   Ctrl_specificEpithet = "",
+                                   Ctrl_infraspecificEpithet = "",
+                                   Ctrl_modified = "",
+                                   Ctrl_institutionCode = "",
+                                   Ctrl_collectionCode = "",
+                                   Ctrl_catalogNumber = "",
+                                   # Ctrl_barCode = "", #aqui
+                                   Ctrl_identificationQualifier = "",
+                                   Ctrl_identifiedBy = "",
+                                   Ctrl_dateIdentified = "",
+                                   Ctrl_typeStatus = "",
+                                   Ctrl_recordNumber = "",
+                                   Ctrl_recordedBy = "",
+                                   Ctrl_fieldNumber = "",
+                                   Ctrl_country = "",
+                                   Ctrl_stateProvince = "",
+                                   Ctrl_municipality = "",
+                                   Ctrl_locality = "",
+                                   
+                                   # 18-10-21
+                                   Ctrl_year = "",
+                                   Ctrl_month = "",
+                                   Ctrl_day = "",
+                                   
+                                   Ctrl_decimalLatitude = "",
+                                   Ctrl_decimalLongitude = "",
+                                   Ctrl_occurrenceRemarks = "",
+                                   Ctrl_occurrenceID = "",
+                                   Ctrl_comments = "",
+                                   Ctrl_taxonRank = "")
+            
+            verbatin_check <- data.frame(stringsAsFactors = FALSE,
+                                         verbatimNotes = "",
+                                         temAnoColeta = "",
+                                         temCodigoInstituicao = "",
+                                         temNumeroCatalogo = "",
+                                         temColetor = "",
+                                         temNumeroColeta = "",
+                                         temPais = "",
+                                         temUF = "",
+                                         temMunicipio = "",
+                                         temLocalidade = "",
+                                         temIdentificador = "",
+                                         temDataIdentificacao = "")
+            
+            main_collectors_dictionary <- data.frame(stringsAsFactors = FALSE,
+                                                     Ctrl_key_family_recordedBy_recordNumber = "",
+                                                     Ctrl_nameRecordedBy_Standard = "",
+                                                     Ctrl_recordNumber_Standard = "",
+                                                     Ctrl_key_year_recordedBy_recordNumber = "")
+            
+            collection_code_dictionary <- data.frame(stringsAsFactors = FALSE,
+                                                     Ctrl_key_collectionCode_catalogNumber = "",
+                                                     Ctrl_collectionCode_Standard = "",
+                                                     Ctrl_catalogNumber_Standard = "")
+            
+            
+         }
+         
+         
+         occ_result <<- list(
+            fb2020_names = fb2020_names,
+            wcvp_names = wcvp_names,
+            join_dwc = join_dwc)
+         
+         
+      }
+      
+      
+      # geo
+      #' @section Install and load packeges to test
+      {
+         
+         # install.packages("monochromeR")      
+         # library(monographaR)
+         
+         # library(remotes)
+         # options("install.lock"=FALSE)
+         # remotes::install_github("brunobrr/bdc")
+         library(bdc)
+         # # devtools::install_github("ropensci/rnaturalearthhires")
+         
+         # # devtools::install_github("ropensci/CoordinateCleaner")
+         # library(CoordinateCleaner)
+         
+         # if (!"occAssess" %in% installed.packages()) devtools::install_github("https://github.com/robboyd/occAssess")
+         # library(occAssess)   
+         
+         # # install.packages("countrycode")
+         library(countrycode)
+         
+         # install.packages("MazamaSpatialUtils")
+         library(MazamaSpatialUtils)
+         
+         # options("install.lock"=FALSE)
+         # install.packages("GADMTools")
+         # library(GADMTools)
+         
+         
+      }
+      
+      
+      #' @section Gerar centroides
+      {
+         # path_data <<- 'C:\\Dados\\APP_GBOT\\data'
+         
+         # path_data <<- 'C:\\catalogoUCsBR - github.com\\data'
+         if (!dir.exists("c:/R_temp")){dir.create("c:/R_temp")}
+         path_data <<- "c:/R_temp"
+         
+         # # file.centroids <- paste0(path_data,"\\centroids.csv")
+         # 
+         # # Load libraries
+         # # library('GADMTools')
+         # library('raster')
+         # library('geosphere')
+         # library('mapview') # incredible interactive map visualization in R
+         # 
+         # # Get SpatialPolygonsDataFrame object example
+         # 
+         # # if(!file.exists(file.centroids))
+         # # {   
+         # 
+         # get_centroids <- function(countryCode_ISO3=NULL)
+         # {
+         #    centroids <- data.frame(countryCode_ISO3="",
+         #                            name0="",
+         #                            name1="",
+         #                            name2="",
+         #                            level="",
+         #                            lon="",
+         #                            lat="")[-1,]
+         #    
+         #    i=1   
+         #    for (i in 1:NROW(countryCode_ISO3))
+         #    {   
+         #       if(is.na(countryCode_ISO3[i])){next}
+         #       
+         #       polygons <- getData('GADM', country = countryCode_ISO3[i], level = 0)
+         #       
+         #       # Get polygons centroids
+         #       centroids_tmp <- as.data.frame(centroid(polygons))
+         #       colnames(centroids_tmp) <- c("lon", "lat") 
+         #       
+         #       centroids <- rbind(centroids, data.frame(countryCode_ISO3=polygons$GID_0,
+         #                                                name0=polygons$NAME_0,
+         #                                                name1=rep("", NROW(centroids_tmp)),
+         #                                                name2=rep("", NROW(centroids_tmp)),
+         #                                                level=rep(0, NROW(centroids_tmp)),
+         #                                                lon=centroids_tmp$lon,
+         #                                                lat=centroids_tmp$lat))
+         #       
+         #       print(countryCode_ISO3[i])
+         #    }
+         #    
+         #    i=1   
+         #    for (i in 1:NROW(countryCode_ISO3))
+         #    {   
+         #       
+         #       if(is.na(countryCode_ISO3[i])){next}
+         #       
+         #       polygons <- NULL
+         #       try(polygons <- getData('GADM', country = countryCode_ISO3[i], level = 1))
+         #       if(is.null(polygons)){next}
+         #       
+         #       
+         #       # Get polygons centroids
+         #       centroids_tmp <- as.data.frame(centroid(polygons))
+         #       colnames(centroids_tmp) <- c("lon", "lat") 
+         #       
+         #       centroids <- rbind(centroids, data.frame(countryCode_ISO3=polygons$GID_0,
+         #                                                name0=polygons$NAME_0,
+         #                                                name1=polygons$NAME_1,
+         #                                                name2=rep("", NROW(centroids_tmp)),
+         #                                                level=rep(1, NROW(centroids_tmp)),
+         #                                                lon=centroids_tmp$lon,
+         #                                                lat=centroids_tmp$lat))
+         #       
+         #       print(countryCode_ISO3[i])
+         #    }
+         #    
+         #    i=1   
+         #    for (i in 1:NROW(countryCode_ISO3))
+         #    {   
+         #       
+         #       if(is.na(countryCode_ISO3[i])){next}
+         #       
+         #       polygons <- NULL
+         #       try(polygons <- getData('GADM', country = countryCode_ISO3[i], level = 2))
+         #       if(is.null(polygons)){next}
+         #       
+         #       
+         #       # Get polygons centroids
+         #       centroids_tmp <- as.data.frame(centroid(polygons))
+         #       colnames(centroids_tmp) <- c("lon", "lat") 
+         #       
+         #       centroids <- rbind(centroids, data.frame(countryCode_ISO3=polygons$GID_0,
+         #                                                name0=polygons$NAME_0,
+         #                                                name1=polygons$NAME_1,
+         #                                                name2=polygons$NAME_2,
+         #                                                level=rep(2, NROW(centroids_tmp)),
+         #                                                lon=centroids_tmp$lon,
+         #                                                lat=centroids_tmp$lat))
+         #       
+         #       print(countryCode_ISO3[i])
+         #    }
+         #    
+         #    # write.csv(centroids, file.centroids, fileEncoding = "UTF-8", na = "", row.names = FALSE)
+         #    # }
+         #    # else
+         #    # {
+         #    #    centroids <-  readr::read_csv(file.centroids, 
+         #    #                                  locale = locale(encoding = "UTF-8"),
+         #    #                                  show_col_types = FALSE)
+         #    # }
+         #    
+         #    return(centroids)
+         # }
+         
+      }
+      
+      
+      #' @details pano de fundo  
+      {
+         world_path <- paste0(path_data,"\\countries_gadm36_sp.rds")
+         
+         # Reference data
+         if (file.exists(world_path))
+         {
+            world <- readRDS(world_path)
+         } else
+         {
+            world <- raster::getData("countries", path=path_data, download = TRUE)
+         }  
+         # Renaming the column in the mask to use in coordinateCleaner
+         names(world)[names(world) == "ISO"] <- "iso_a3_eh"
+      }
+      
+   }
+   
    # global
    {
       Ctrl_dateIdentified <<- Sys.Date()
@@ -2297,7 +2302,7 @@ app_prepare <- function()
                              collapsed = TRUE),
             
             dashboardBody(
-               navbarPage("Workflow",
+               navbarPage("Fluxo de processamento",
                           tabPanel(icon("table"), 
                                    
                                    navbarPage("1 - Carregar arquivos de ocorrência de diferentes fontes de dados",
@@ -2398,21 +2403,21 @@ app_prepare <- function()
                                    )),
                           
                           tabPanel(icon("refresh"), 
-                                   navbarPage("2 - Standardize and Join occurrences to Darwin Corre Terms",
+                                   navbarPage("2 - Padronizar e unir ocorrências no formato Darwin Corre",
                                               tabPanel(icon("refresh"), 
-                                                       shinydashboard::box(title = "Step 1 data sources",
+                                                       shinydashboard::box(title = "Registros padronizados",
                                                            status = "primary",
                                                            width = 12,
                                                            fluidRow(
                                                               column(width = 12,
-                                                                     actionButton("standardizeJoinBtn", "Standardize and Join from step 1 sources", icon = icon("play"))
+                                                                     actionButton("standardizeJoinBtn", "Padronizar e unir ocorrências", icon = icon("play"))
                                                               )),
                                                            
                                                            br(),
                                                            
                                                            fluidRow(   
                                                               column(width = 4,
-                                                                     downloadButton("downloadData", "Download")),
+                                                                     downloadButton("downloadData", "Baixar")),
                                                               
                                                            ),    
                                                            
@@ -2424,13 +2429,13 @@ app_prepare <- function()
                                                        )),
                                               
                                               tabPanel(icon("upload"), 
-                                                       shinydashboard::box(title = "Upload standardized occurrences CSV file",
+                                                       shinydashboard::box(title = "Carregar arquivo CSV de ocorrências já padronizado formato Darwin Corre",
                                                            status = "primary",
                                                            width = 12,
                                                            fluidRow(
                                                               column(width = 12,
                                                                      fileInput(inputId = "occCollectionsFile",
-                                                                               label = "Upload CSV file",
+                                                                               label = "Carregar arquivo CSV",
                                                                                multiple = FALSE))
                                                            ),
                                                            
@@ -2512,21 +2517,21 @@ app_prepare <- function()
                           # getMainCollectorLastName
                           ###
                           tabPanel(icon("user"), 
-                                   navbarPage("3 - Standardize the main collector's last name",
+                                   navbarPage("3 - Padronizar o sobrenome do colecionador principal",
                                               tabPanel(icon("user"), 
-                                                       shinydashboard::box(title = "Get the unique main collector's last name",
+                                                       shinydashboard::box(title = "Obter o sobrenome do coletor principal",
                                                            status = "primary",
                                                            width = 12,
                                                            fluidRow(
                                                               column(width = 12,
-                                                                     actionButton("getMainCollectorLastNameBtn", "Get the unique main collector's last name standardized", icon = icon("play")))
+                                                                     actionButton("getMainCollectorLastNameBtn", "Obter o sobrenome do coletor principal padronizado", icon = icon("play")))
                                                            ),
                                                            
                                                            br(),
                                                            
                                                            fluidRow(
                                                               column(width = 12,
-                                                                     downloadButton("downloadDataMainCollectorLastName", "Download")),
+                                                                     downloadButton("downloadDataMainCollectorLastName", "Baixar")),
                                                            ),
                                                            
                                                            br(),
@@ -2538,13 +2543,13 @@ app_prepare <- function()
                                                        )),
                                               
                                               tabPanel(icon("upload"), 
-                                                       shinydashboard::box(title = "Upload main collector's last name CSV file",
+                                                       shinydashboard::box(title = "Carregar arquivo CSV com o sobrenome do coletor principal padronizado",
                                                            status = "primary",
                                                            width = 12,
                                                            fluidRow(
                                                               column(width = 12,
                                                                      fileInput(inputId = "mainCollectorLastNameFile",
-                                                                               label = "Upload CSV file",
+                                                                               label = "Carregar arquivo CSV",
                                                                                multiple = FALSE))
                                                            ),
                                                            
@@ -2555,14 +2560,14 @@ app_prepare <- function()
                                                                      rhandsontable::rHandsontableOutput('getMainCollectorLastNameContents_II')))
                                                        )),
                                               tabPanel(icon("file-import"), 
-                                                       shinydashboard::box(title = "Apply to standardize main collector's last name",
+                                                       shinydashboard::box(title = "Aplicar Dicionário de Coletores para padronizar sobrenome do coletor principal",
                                                            status = "primary",
                                                            width = 12,
                                                            fluidRow(
                                                               column(width = 12,
-                                                                     actionButton("applyMainCollectorLastNameBtn", "Apply to standardize main collector's last name", icon = icon("play")),
-                                                                     downloadButton("downloadData_applyMainCollectorLastName_Summary", "Download Summary"),
-                                                                     downloadButton("downloadData_applyMainCollectorLastName_NewMainCollectorLastName_Dictionary", "Download New Collector Dictionary")
+                                                                     actionButton("applyMainCollectorLastNameBtn", "Aplicar Dicionário de Coletores", icon = icon("play")),
+                                                                     downloadButton("downloadData_applyMainCollectorLastName_Summary", "Baixar resumo"),
+                                                                     downloadButton("downloadData_applyMainCollectorLastName_NewMainCollectorLastName_Dictionary", "Baixar novidades no Dicionário de Coletores")
                                                               )),
                                                            
                                                            
@@ -2619,7 +2624,7 @@ app_prepare <- function()
                           
                           # species names
                           tabPanel(icon("sitemap"),
-                                   navbarPage("4 - Check species names",
+                                   navbarPage("4 - Verifique os nomes das espécies",
                                               # tabPanel(icon("sitemap"),
                                               #          shinydashboard::box(title = "Check from WCVPN",
                                               #              status = "primary",
@@ -2657,12 +2662,12 @@ app_prepare <- function()
                                               
                                               ###
                                               tabPanel(icon("sitemap"),
-                                                       shinydashboard::box(title = "Check from FB2020",
+                                                       shinydashboard::box(title = "4 - Verifique os nomes das espécies a partir de Flora e Funga do Brasil",
                                                            status = "primary",
                                                            width = 12,
                                                            fluidRow(
                                                               column(width = 12,
-                                                                     actionButton("checkSpeciesNames_FB2020_Btn", "Get species names fom FB2020", icon = icon("play"))
+                                                                     actionButton("checkSpeciesNames_FB2020_Btn", "Carregar nomes das espécies de Flora e Funga do Brasil", icon = icon("play"))
                                                               )),
                                                            
                                                            fluidRow(
@@ -2696,7 +2701,7 @@ app_prepare <- function()
                                               
                                               ###
                                               tabPanel(icon("file-import"),
-                                                       shinydashboard::box(title = "Apply taxonomic alignment",
+                                                       shinydashboard::box(title = "Aplicar alinhamento taxonômico",
                                                            status = "primary",
                                                            width = 12,
                                                            
@@ -2704,7 +2709,7 @@ app_prepare <- function()
                                                               column(width = 12,
                                                                      
                                                                      selectInput(inputId = 'taxonomicBackbone',
-                                                                                 label = 'Choose the taxonomic backbone:',
+                                                                                 label = 'Escolha a espinha dorsal taxonômica:',
                                                                                  choices = list('FloraFungaBrasil'),
                                                                                  multiple = TRUE,
                                                                                  selected = c('FloraFungaBrasil')
@@ -2713,9 +2718,9 @@ app_prepare <- function()
                                                            
                                                            fluidRow(
                                                               column(width = 12,
-                                                                     actionButton("applyTaxonomicAlignment_Btn", "Apply taxonomic alignment of the chosen backbone", icon = icon("play")),
+                                                                     actionButton("applyTaxonomicAlignment_Btn", "Aplicar alinhamento taxonômico", icon = icon("play")),
                                                                      
-                                                                     downloadButton("downloadData_applyTaxonomicAlignment", "Download taxonomic alignment")
+                                                                     downloadButton("downloadData_applyTaxonomicAlignment", "Baixar")
                                                                      
                                                                      # occ[['taxonomicAlignment']]
                                                                      
@@ -2738,24 +2743,55 @@ app_prepare <- function()
                           
                           #' @details Tela junção de resultados
                           tabPanel(icon("file-import"), 
-                                   navbarPage("5 - Merge and save the updated occurrences CSV file: collection code and main collector's last name",
+                                   navbarPage("5 - Mesclar e salvar resultados",
                                               tabPanel(icon("file-import"), 
-                                                       shinydashboard::box(title = "Merge the updated occurrences CSV file",
+                                                       shinydashboard::box(title = "Mesclar resultados",
                                                            status = "primary",
                                                            width = 12,
+                                                           
+                                                           br(),
                                                            fluidRow(
                                                               column(width = 12,
-                                                                     actionButton("mergeOccurrencesCollectionCodeMainCollectorBtn", "Merge the updated occurrences CSV file", icon = icon("play")),
-                                                                     downloadButton("downloadDataMgeOccurrencesCollectionCodeMainCollector", "Download updated occurrences CSV file - collection code and main collector's last name")),
+                                                                     actionButton("mergeOccurrencesCollectionCodeMainCollectorBtn", "Mesclar resultados", icon = icon("play")),
+                                                                     downloadButton("downloadDataMgeOccurrencesCollectionCodeMainCollector", "Baixar arquivo CSV Completo")),
                                                            ),
                                                            
                                                            br(),
                                                            
                                                            fluidRow(
+                                                              column(
+                                                                 width = 12,
+                                                                 downloadButton("download_ModeloCatalogo", "Baixar planilha Modelo Catálogo de Plantas das Unidades de Conservação do Brasil"),
+                                                              )),
+                                                           
+                                                           br(),
+                                                           
+                                                           fluidRow(
                                                               column(width = 12,
-                                                                     DT::dataTableOutput('mergeOccurrencesCollectionCodeMainCollectorContents')))
+                                                                     # DT::dataTableOutput('mergeOccurrencesCollectionCodeMainCollectorContents'),
+                                                                     
+                                                                     br(),
+                                                                     
+                                                                     rHandsontableOutput("hot_mergeOccurrencesContents")
+
+                                                                     ))
                                                        ))
-                                   ))
+                                   )),
+                          
+                          wellPanel(
+                             fluidRow(
+                                
+                                column(
+                                   width = 12,
+                                   helpText("Administrado pelo Instituto de Pesquisas Jardim Botânico do Rio de Janeiro "),
+                                   
+                                   helpText("Desenvolvido por: Melo, Pablo Hendrigo Alves de, Bochorny, Thuane & Forzza, Rafaela Campostrini"),
+                                   
+                                   helpText("Versão 1.0.0 de agosto/2024"),
+                                   
+                                ))
+                             
+                          )
                           
 
                           
@@ -2858,108 +2894,108 @@ app_prepare <- function()
                                       # NROW(name_search_wcvp)
                                       
                                       occ_all <- occ_all %>%
-                                         dplyr::mutate(wcvp_kew_id = NA,
-                                                       wcvp_family = NA,
-                                                       wcvp_genus = NA,
-                                                       wcvp_species = NA,
-                                                       wcvp_infraspecies = NA,
-                                                       wcvp_taxon_name = NA,
-                                                       wcvp_authors = NA,
-                                                       wcvp_rank = NA,
-                                                       wcvp_taxonomic_status = NA,
-                                                       wcvp_accepted_kew_id = NA,
-                                                       wcvp_accepted_name = NA,
-                                                       wcvp_accepted_authors = NA,
-                                                       wcvp_parent_kew_id = NA,
-                                                       wcvp_parent_name = NA,
-                                                       wcvp_parent_authors = NA,
-                                                       wcvp_reviewed = NA,
-                                                       wcvp_publication = NA,
-                                                       wcvp_original_name_id = NA,
-                                                       wcvp_TAXON_NAME_U = NA,
-                                                       wcvp_searchNotes = NA,
-                                                       wcvp_searchedName = NA) %>%
-                                         dplyr::mutate(fb2020_taxonID = NA,
-                                                       fb2020_acceptedNameUsageID = NA,
-                                                       fb2020_parentNameUsageID = NA,
-                                                       fb2020_originalNameUsageID = NA,
-                                                       fb2020_scientificName = NA,
-                                                       # fb2020_acceptedNameUsage = NA,
-                                                       # fb2020_parentNameUsage = NA,
-                                                       fb2020_namePublishedIn = NA,
-                                                       fb2020_namePublishedInYear = NA,
-                                                       fb2020_higherClassification = NA,             
-                                                       # fb2020_kingdom = NA,
-                                                       # fb2020_phylum = NA,                     
-                                                       # fb2020_class = NA,
-                                                       # fb2020_order = NA,                       
-                                                       fb2020_family = NA,
-                                                       # fb2020_genus = NA,                      
-                                                       fb2020_specificEpithet = NA,
-                                                       fb2020_infraspecificEpithet = NA,             
-                                                       fb2020_taxonRank = NA,
-                                                       fb2020_scientificNameAuthorship = NA,
-                                                       fb2020_taxonomicStatus = NA,
-                                                       fb2020_nomenclaturalStatus = NA,             
-                                                       fb2020_modified = NA,
-                                                       fb2020_bibliographicCitation = NA,
-                                                       fb2020_references = NA,
-                                                       fb2020_scientificNamewithoutAuthorship = NA,
-                                                       fb2020_scientificNamewithoutAuthorship_U = NA,
-                                                       fb2020_searchNotes = NA,
-                                                       fb2020_searchedName = NA)
+                                         dplyr::mutate(wcvp_kew_id = "",
+                                                       wcvp_family = "",
+                                                       wcvp_genus = "",
+                                                       wcvp_species = "",
+                                                       wcvp_infraspecies = "",
+                                                       wcvp_taxon_name = "",
+                                                       wcvp_authors = "",
+                                                       wcvp_rank = "",
+                                                       wcvp_taxonomic_status = "",
+                                                       wcvp_accepted_kew_id = "",
+                                                       wcvp_accepted_name = "",
+                                                       wcvp_accepted_authors = "",
+                                                       wcvp_parent_kew_id = "",
+                                                       wcvp_parent_name = "",
+                                                       wcvp_parent_authors = "",
+                                                       wcvp_reviewed = "",
+                                                       wcvp_publication = "",
+                                                       wcvp_original_name_id = "",
+                                                       wcvp_TAXON_NAME_U = "",
+                                                       wcvp_searchNotes = "",
+                                                       wcvp_searchedName = "") %>%
+                                         dplyr::mutate(fb2020_taxonID = 0,
+                                                       fb2020_acceptedNameUsageID = 0,
+                                                       fb2020_parentNameUsageID = 0,
+                                                       fb2020_originalNameUsageID = 0,
+                                                       fb2020_scientificName = "",
+                                                       # fb2020_acceptedNameUsage = "",
+                                                       # fb2020_parentNameUsage = "",
+                                                       fb2020_namePublishedIn = "",
+                                                       fb2020_namePublishedInYear = 0,
+                                                       fb2020_higherClassification = "",             
+                                                       # fb2020_kingdom = "",
+                                                       # fb2020_phylum = "",                     
+                                                       # fb2020_class = "",
+                                                       # fb2020_order = "",                       
+                                                       fb2020_family = "",
+                                                       # fb2020_genus = "",                      
+                                                       fb2020_specificEpithet = "",
+                                                       fb2020_infraspecificEpithet = "",             
+                                                       fb2020_taxonRank = "",
+                                                       fb2020_scientificNameAuthorship = "",
+                                                       fb2020_taxonomicStatus = "",
+                                                       fb2020_nomenclaturalStatus = "",             
+                                                       fb2020_modified = lubridate::as_datetime("2021-10-31 21:13:33.77"),
+                                                       fb2020_bibliographicCitation = "",
+                                                       fb2020_references = "",
+                                                       fb2020_scientificNamewithoutAuthorship = "",
+                                                       fb2020_scientificNamewithoutAuthorship_U = "",
+                                                       fb2020_searchNotes = "",
+                                                       fb2020_searchedName = "")
                                       
-                                      wcvp_na <- data.frame(wcvp_kew_id = NA,
-                                                            wcvp_family = NA,
-                                                            wcvp_genus = NA,
-                                                            wcvp_species = NA,
-                                                            wcvp_infraspecies = NA,
-                                                            wcvp_taxon_name = NA,
-                                                            wcvp_authors = NA,
-                                                            wcvp_rank = NA,
-                                                            wcvp_taxonomic_status = NA,
-                                                            wcvp_accepted_kew_id = NA,
-                                                            wcvp_accepted_name = NA,
-                                                            wcvp_accepted_authors = NA,
-                                                            wcvp_parent_kew_id = NA,
-                                                            wcvp_parent_name = NA,
-                                                            wcvp_parent_authors = NA,
-                                                            wcvp_reviewed = NA,
-                                                            wcvp_publication = NA,
-                                                            wcvp_original_name_id = NA,
-                                                            wcvp_TAXON_NAME_U = NA,
-                                                            wcvp_searchNotes = NA,
-                                                            wcvp_searchedName = NA)
+                                      wcvp_na <- data.frame(wcvp_kew_id = "",
+                                                            wcvp_family = "",
+                                                            wcvp_genus = "",
+                                                            wcvp_species = "",
+                                                            wcvp_infraspecies = "",
+                                                            wcvp_taxon_name = "",
+                                                            wcvp_authors = "",
+                                                            wcvp_rank = "",
+                                                            wcvp_taxonomic_status = "",
+                                                            wcvp_accepted_kew_id = "",
+                                                            wcvp_accepted_name = "",
+                                                            wcvp_accepted_authors = "",
+                                                            wcvp_parent_kew_id = "",
+                                                            wcvp_parent_name = "",
+                                                            wcvp_parent_authors = "",
+                                                            wcvp_reviewed = "",
+                                                            wcvp_publication = "",
+                                                            wcvp_original_name_id = "",
+                                                            wcvp_TAXON_NAME_U = "",
+                                                            wcvp_searchNotes = "",
+                                                            wcvp_searchedName = "")
                                       
-                                      fb2020_na <- data.frame(fb2020_taxonID = NA,
-                                                              fb2020_acceptedNameUsageID = NA,
-                                                              fb2020_parentNameUsageID = NA,
-                                                              fb2020_originalNameUsageID = NA,
-                                                              fb2020_scientificName = NA,
-                                                              # fb2020_acceptedNameUsage = NA,
-                                                              # fb2020_parentNameUsage = NA,
-                                                              fb2020_namePublishedIn = NA,
-                                                              fb2020_namePublishedInYear = NA,
-                                                              fb2020_higherClassification = NA,             
-                                                              # fb2020_kingdom = NA,
-                                                              # fb2020_phylum = NA,                     
-                                                              # fb2020_class = NA,
-                                                              # fb2020_order = NA,                       
-                                                              fb2020_family = NA,
-                                                              # fb2020_genus = NA,                      
-                                                              fb2020_specificEpithet = NA,
-                                                              fb2020_infraspecificEpithet = NA,             
-                                                              fb2020_taxonRank = NA,
-                                                              fb2020_scientificNameAuthorship = NA,
-                                                              fb2020_taxonomicStatus = NA,
-                                                              fb2020_nomenclaturalStatus = NA,             
-                                                              fb2020_modified = NA,
-                                                              fb2020_bibliographicCitation = NA,
-                                                              fb2020_references = NA,
-                                                              fb2020_scientificNamewithoutAuthorship = NA,
-                                                              fb2020_scientificNamewithoutAuthorship_U = NA,
-                                                              fb2020_searchNotes = NA,
-                                                              fb2020_searchedName = NA)
+                                      fb2020_na <- data.frame(fb2020_taxonID = 0,
+                                                              fb2020_acceptedNameUsageID = 0,
+                                                              fb2020_parentNameUsageID = 0,
+                                                              fb2020_originalNameUsageID = 0,
+                                                              fb2020_scientificName = "",
+                                                              # fb2020_acceptedNameUsage = "",
+                                                              # fb2020_parentNameUsage = "",
+                                                              fb2020_namePublishedIn = "",
+                                                              fb2020_namePublishedInYear = 0,
+                                                              fb2020_higherClassification = "",             
+                                                              # fb2020_kingdom = "",
+                                                              # fb2020_phylum = "",                     
+                                                              # fb2020_class = "",
+                                                              # fb2020_order = "",                       
+                                                              fb2020_family = "",
+                                                              # fb2020_genus = "",                      
+                                                              fb2020_specificEpithet = "",
+                                                              fb2020_infraspecificEpithet = "",             
+                                                              fb2020_taxonRank = "",
+                                                              fb2020_scientificNameAuthorship = "",
+                                                              fb2020_taxonomicStatus = "",
+                                                              fb2020_nomenclaturalStatus = "",             
+                                                              fb2020_modified = lubridate::as_datetime("2021-10-31 21:13:33.77"),
+                                                              fb2020_bibliographicCitation = "",
+                                                              fb2020_references = "",
+                                                              fb2020_scientificNamewithoutAuthorship = "",
+                                                              fb2020_scientificNamewithoutAuthorship_U = "",
+                                                              fb2020_searchNotes = "",
+                                                              fb2020_searchedName = "")
                                       
                                       # fb2020_na <- fb2020[1,]
                                       # fb2020_na[1,] <- NA
@@ -3400,195 +3436,6 @@ app_prepare <- function()
          }                                                             
          
          
-         # mergeOccurrencesCollectionCodeMainCollector
-         {
-            mergeOccurrencesCollectionCodeMainCollector <- eventReactive(input$mergeOccurrencesCollectionCodeMainCollectorBtn,
-                                                                         {
-                                                                            withProgress(message = 'Processing...', style = 'notification', value = 0.5, {
-                                                                               
-                                                                               if(NROW(occ[['all']])>0)
-                                                                               {
-                                                                                  r_tmp <- data.frame(idtmp=1:NROW(occ[['all']]))
-                                                                                  
-                                                                                  if(NROW(occ[['all_collectionCode']])==NROW(occ[['all']]))
-                                                                                  {
-                                                                                     r_tmp <- cbind(r_tmp,
-                                                                                                    occ[['all_collectionCode']] %>% 
-                                                                                                       dplyr::select(Ctrl_collectionCode_Standard,
-                                                                                                                     Ctrl_catalogNumber_Standard,
-                                                                                                                     Ctrl_key_collectionCode_catalogNumber))
-                                                                                  }
-                                                                                  
-                                                                                  
-                                                                                  if(NROW(occ[['all_mainCollectorLastName']])==NROW(occ[['all']]))
-                                                                                  {
-                                                                                     r_tmp <- cbind(r_tmp,
-                                                                                                    occ[['all_mainCollectorLastName']] %>% 
-                                                                                                       dplyr::select(Ctrl_nameRecordedBy_Standard,
-                                                                                                                     Ctrl_recordNumber_Standard,
-                                                                                                                     Ctrl_key_family_recordedBy_recordNumber,
-                                                                                                                     Ctrl_key_year_recordedBy_recordNumber))
-                                                                                  }
-                                                                                  
-                                                                                  if(NROW(occ[['occ_vc']])==NROW(occ[['all']]))
-                                                                                  {
-                                                                                     r_tmp <- cbind(r_tmp,
-                                                                                                    occ[['occ_vc']] %>% 
-                                                                                                       dplyr::select(verbatimNotes,
-                                                                                                                     temAnoColeta,
-                                                                                                                     temCodigoInstituicao,
-                                                                                                                     temNumeroCatalogo,
-                                                                                                                     temColetor,
-                                                                                                                     temNumeroColeta,
-                                                                                                                     temPais,
-                                                                                                                     temUF,
-                                                                                                                     temMunicipio,
-                                                                                                                     temLocalidade,
-                                                                                                                     temIdentificador,
-                                                                                                                     temDataIdentificacao
-                                                                                                                     # Ctrl_country_standardized,
-                                                                                                                     # Ctrl_municipality_standardized,
-                                                                                                                     # Ctrl_stateProvince_standardized,
-                                                                                                                     # Ctrl_locality_standardized,
-                                                                                                                     # Ctrl_lastParsed
-                                                                                                       ))
-                                                                                     
-                                                                                  }
-                                                                                  
-                                                                                  
-                                                                                  if(NROW(occ[['taxonomicAlignment']])==NROW(occ[['all']]))
-                                                                                  {
-                                                                                     r_tmp <- cbind(r_tmp,
-                                                                                                    occ[['taxonomicAlignment']] %>%
-                                                                                                       dplyr::select(
-                                                                                                          c(wcvp_kew_id,
-                                                                                                            wcvp_family,
-                                                                                                            wcvp_genus,
-                                                                                                            wcvp_species,
-                                                                                                            wcvp_infraspecies,
-                                                                                                            wcvp_taxon_name,
-                                                                                                            wcvp_authors,
-                                                                                                            wcvp_rank,
-                                                                                                            wcvp_taxonomic_status,
-                                                                                                            wcvp_accepted_kew_id ,
-                                                                                                            wcvp_accepted_name,
-                                                                                                            wcvp_accepted_authors,
-                                                                                                            wcvp_parent_kew_id,
-                                                                                                            wcvp_parent_name,
-                                                                                                            wcvp_parent_authors,
-                                                                                                            wcvp_reviewed,
-                                                                                                            wcvp_publication,
-                                                                                                            wcvp_original_name_id,
-                                                                                                            wcvp_TAXON_NAME_U,
-                                                                                                            wcvp_searchNotes,
-                                                                                                            wcvp_searchedName,
-                                                                                                            
-                                                                                                            ###
-                                                                                                            
-                                                                                                            fb2020_taxonID,
-                                                                                                            fb2020_acceptedNameUsageID,
-                                                                                                            fb2020_parentNameUsageID,
-                                                                                                            fb2020_originalNameUsageID,
-                                                                                                            fb2020_scientificName,
-                                                                                                            # fb2020_acceptedNameUsage,
-                                                                                                            # fb2020_parentNameUsage,
-                                                                                                            fb2020_namePublishedIn,                  
-                                                                                                            fb2020_namePublishedInYear,
-                                                                                                            fb2020_higherClassification,             
-                                                                                                            # fb2020_kingdom,
-                                                                                                            # fb2020_phylum,                           
-                                                                                                            # fb2020_class,
-                                                                                                            # fb2020_order,                            
-                                                                                                            fb2020_family,
-                                                                                                            # fb2020_genus,                            
-                                                                                                            fb2020_specificEpithet,
-                                                                                                            fb2020_infraspecificEpithet,             
-                                                                                                            fb2020_taxonRank,
-                                                                                                            fb2020_scientificNameAuthorship,
-                                                                                                            fb2020_taxonomicStatus,
-                                                                                                            fb2020_nomenclaturalStatus,              
-                                                                                                            fb2020_modified,
-                                                                                                            fb2020_bibliographicCitation,
-                                                                                                            fb2020_references,
-                                                                                                            fb2020_scientificNamewithoutAuthorship,  
-                                                                                                            fb2020_scientificNamewithoutAuthorship_U,
-                                                                                                            fb2020_searchNotes,
-                                                                                                            fb2020_searchedName)
-                                                                                                       ))
-                                                                                     
-                                                                                  }
-                                                                                  
-                                                                                  
-                                                                                  
-                                                                                  
-                                                                                  r_tmp <- cbind(r_tmp,
-                                                                                                 occ[['all']]) %>% 
-                                                                                     dplyr::select(-idtmp) %>%
-                                                                                     dplyr::mutate(Ctrl_voucherAmostra = FALSE,
-                                                                                                   Ctrl_amostraVerificada = FALSE,
-                                                                                                   Ctrl_naoPossivelVerificar = FALSE,
-                                                                                                   Ctrl_observacaoNaoPossivelVerificar = '',
-                                                                                                   
-                                                                                                   Ctrl_dataVerificacao = '',
-                                                                                                   Ctrl_verificadoPor = '',
-                                                                                                   Ctrl_emailVerificador = '',
-                                                                                                   Ctrl_scientificName_verified	= '',
-                                                                                                   Ctrl_family_verified = '',
-                                                                                                   
-                                                                                                   Ctrl_Record_ID_Review = 1:NROW(occ[['all']])
-                                                                                     )
-                                                                                  
-                                                                                  
-                                                                                  # updated occurrences CSV file: collection code and main collector's last name
-                                                                                  
-                                                                                  # source_data <- 'all_updated_collection_collector'
-                                                                                  # occ[[source_data]] <<- r_tmp
-                                                                                  
-                                                                                  source_data <- 'all_results'
-                                                                                  occ[[source_data]] <<- r_tmp
-                                                                                  
-                                                                               }
-                                                                               
-                                                                               
-                                                                               incProgress(100, detail = '100')
-                                                                            })
-                                                                            
-                                                                            
-                                                                            return(r_tmp)
-                                                                            # all_collectionCode
-                                                                            # all_mainCollectorLastName
-                                                                            # 
-                                                                            # mergeOccurrencesCollectionCodeMainCollectorBtn
-                                                                            # downloadDataMgeOccurrencesCollectionCodeMainCollector
-                                                                            # mergeOccurrencesCollectionCodeMainCollectorContents
-                                                                            # 
-                                                                            # Ctrl_collectionCode_Standard
-                                                                            # Ctrl_catalogNumber_Standard
-                                                                            # Ctrl_key_collectionCode_catalogNumber
-                                                                            # 
-                                                                            # Ctrl_nameRecordedBy_Standard
-                                                                            # Ctrl_recordNumber_Standard
-                                                                            # Ctrl_key_family_recordedBy_recordNumber
-                                                                            # Ctrl_key_year_recordedBy_recordNumber
-                                                                            
-                                                                            
-                                                                         })
-            
-            output$mergeOccurrencesCollectionCodeMainCollectorContents <- DT::renderDataTable(options = list(scrollX = TRUE),
-                                                                                              {
-                                                                                                 mergeOccurrencesCollectionCodeMainCollector()
-                                                                                              })
-            
-            output$downloadDataMgeOccurrencesCollectionCodeMainCollector <- downloadHandler(
-               filename = function() {
-                  paste("Standardize_Updated_Occurrences_CollectionCode_MainCollector - ", Sys.Date(), ".csv", sep="")
-               },
-               content = function(file) {
-                  write.csv(occ[['all_results']] %>% data.frame(stringsAsFactors = FALSE), file, row.names = FALSE, fileEncoding = "UTF-8", na = "")
-               })
-         }
-         
-         
          # applyMainCollectorLastName
          {
             # applyMainCollectorLastNameBtn
@@ -3658,7 +3505,7 @@ app_prepare <- function()
                content = function(file) {
                   write.csv(occ[['mainCollectorLastNameNew']] %>% data.frame(stringsAsFactors = FALSE), file, row.names = FALSE, fileEncoding = "UTF-8", na = "")
                })
-            
+
          }
          
          
@@ -4035,7 +3882,10 @@ app_prepare <- function()
                      paste("Standardize_Join_Occurrences_Darwin_Corre_Terms - ", Sys.Date(), ".csv", sep="")
                   },
                   content = function(file) {
-                     write.csv(occ[['all']], file, row.names = FALSE, fileEncoding = "UTF-8", na = "")
+                     
+                     dt <- occ[['all']]
+                     write.csv(dt, file, row.names = FALSE, fileEncoding = "UTF-8", na = "")
+                     
                   }
                )
             }
@@ -4099,8 +3949,8 @@ app_prepare <- function()
                               longitude<-gsub('º','',longitude)
                               latitude<-gsub('º','',latitude)
                               
-                              latitude <- ifelse(latitude=='-0 0 0 ',NA,latitude)
-                              longitude <- ifelse(longitude=='-0 0 0 ',NA,longitude)
+                              latitude <- ifelse(latitude=='-0 0 0 ',"",latitude)
+                              longitude <- ifelse(longitude=='-0 0 0 ',"",longitude)
                               
                               # convert from decimal minutes to decimal degrees
                               decimalLatitude <- as.vector(sapply(latitude, measurements::conv_unit, from = 'deg_min_sec', to = 'dec_deg'), mode = 'character')
@@ -4134,8 +3984,8 @@ app_prepare <- function()
                                                                                   ifelse(`Rank:`=='Variedade', 'VARIETY',
                                                                                          ifelse(`Rank:`=='Subespécie', 'SUBSPECIES',
                                                                                                 ifelse(`Rank:`=='Forma', 'FORM',
-                                                                                                       NA)))))),
-                                                 institutionCode = NA,
+                                                                                                       "")))))),
+                                                 institutionCode = "",
                                                  collectionCode = `Herbário de Origem`,
                                                  catalogNumber = `Código de Barra`,
                                                  
@@ -4174,13 +4024,13 @@ app_prepare <- function()
                                                Ctrl_genus = Gênero,
                                                Ctrl_specificEpithet = Espécie,
                                                Ctrl_infraspecificEpithet = `subsp./var./forma`,
-                                               Ctrl_scientificNameSearched = NA,
-                                               Ctrl_scientificNameReference = NA,
+                                               Ctrl_scientificNameSearched = "",
+                                               Ctrl_scientificNameReference = "",
                                                Ctrl_bibliographicCitation = 'reflora',
-                                               Ctrl_downloadAsSynonym = NA,
+                                               Ctrl_downloadAsSynonym = "",
                                                Ctrl_taxonRank = taxonRank) %>%
                                  dplyr::mutate(CNCFlora_lastParsed = Sys.time(),
-                                               Ctrl_modified = NA,
+                                               Ctrl_modified = "",
                                                Ctrl_institutionCode = institutionCode,
                                                Ctrl_collectionCode = collectionCode,  #'Herbário.de.Origem',
                                                Ctrl_catalogNumber =  catalogNumber,#'Código.de.Barra',
@@ -4190,7 +4040,7 @@ app_prepare <- function()
                                                Ctrl_typeStatus = typeStatus,
                                                Ctrl_recordNumber = recordNumber, #'Número.da.Coleta',
                                                Ctrl_recordedBy = recordedBy, # Coletor,
-                                               Ctrl_fieldNumber = NA,
+                                               Ctrl_fieldNumber = "",
                                                Ctrl_country =  country, # País,
                                                Ctrl_stateProvince = stateProvince, #Estado,
                                                Ctrl_municipality = municipality, #Município,
@@ -4203,7 +4053,7 @@ app_prepare <- function()
                                                Ctrl_decimalLatitude = decimalLatitude,
                                                Ctrl_decimalLongitude = decimalLongitude,
                                                Ctrl_occurrenceRemarks = paste0(fieldNotes, ', ' ,occurrenceRemarks),
-                                               Ctrl_comments = NA,
+                                               Ctrl_comments = "",
                                                
                                                # memória de registro
                                                Ctrl_occurrenceID = paste0('reflora=',catalogNumber) %>% as.character()) %>%
@@ -4290,7 +4140,7 @@ app_prepare <- function()
                                                                                                    
                                                                                                    ifelse(taxonRank=='ssp.', paste0(genus, ' ', specificEpithet, ' subsp. ', infraspecificEpithet),
                                                                                                           ifelse(taxonRank=='f.', paste0(genus, ' ', specificEpithet, ' form. ', infraspecificEpithet), 
-                                                                                                                 NA))))))),
+                                                                                                                 ""))))))),
                                                
                                                taxonRank = ifelse(taxonRank=='family','FAMILY',
                                                                   ifelse(taxonRank=='genus','GENUS',
@@ -4300,7 +4150,7 @@ app_prepare <- function()
                                                                                               
                                                                                               ifelse(taxonRank=='ssp.', 'SUBSPECIES',
                                                                                                      ifelse(taxonRank=='f.', 'FORM', 
-                                                                                                            NA))))))))
+                                                                                                            ""))))))))
                            }
                            
                            # padronizar pre-processamento
@@ -4313,10 +4163,10 @@ app_prepare <- function()
                                                Ctrl_genus = genus,
                                                Ctrl_specificEpithet = specificEpithet,
                                                Ctrl_infraspecificEpithet = infraspecificEpithet,
-                                               Ctrl_scientificNameSearched = NA,
-                                               Ctrl_scientificNameReference = NA,
+                                               Ctrl_scientificNameSearched = "",
+                                               Ctrl_scientificNameReference = "",
                                                Ctrl_bibliographicCitation = 'jabot',
-                                               Ctrl_downloadAsSynonym = NA,
+                                               Ctrl_downloadAsSynonym = "",
                                                Ctrl_taxonRank = taxonRank) %>%
                                  dplyr::mutate(
                                     # CNCFlora_lastParsed = Sys.time(),
@@ -4335,7 +4185,7 @@ app_prepare <- function()
                                     Ctrl_typeStatus = typeStatus, 
                                     Ctrl_recordNumber = recordNumber, #'Número.da.Coleta', 
                                     Ctrl_recordedBy = recordedBy, # Coletor,
-                                    Ctrl_fieldNumber = NA, 
+                                    Ctrl_fieldNumber = "", 
                                     Ctrl_country =  country, # País, 
                                     Ctrl_stateProvince = stateProvince, #Estado, 
                                     Ctrl_municipality =  municipality , #county, #Município, 
@@ -4347,7 +4197,7 @@ app_prepare <- function()
                                     Ctrl_decimalLongitude = decimalLongitude, 
                                     Ctrl_occurrenceRemarks = paste0(fieldNotes, ', ',occurrenceRemarks), 
                                     
-                                    Ctrl_comments = NA,
+                                    Ctrl_comments = "",
                                     
                                     # memória de registro
                                     # 21-08-2021
@@ -4436,7 +4286,7 @@ app_prepare <- function()
                                                                                                    
                                                                                                    ifelse(taxonRank=='subsp.', paste0(genus, ' ', specificEpithet, ' subsp. ', infraspecificEpithet),
                                                                                                           ifelse(taxonRank=='f.', paste0(genus, ' ', specificEpithet, ' form. ', infraspecificEpithet), 
-                                                                                                                 NA))))))),
+                                                                                                                 ""))))))),
                                                
                                                taxonRank = ifelse(taxonRank=='fam.','FAMILY',
                                                                   ifelse(taxonRank=='gen.','GENUS',
@@ -4446,7 +4296,7 @@ app_prepare <- function()
                                                                                               
                                                                                               ifelse(taxonRank=='subsp.', 'SUBSPECIES',
                                                                                                      ifelse(taxonRank=='f.', 'FORM', 
-                                                                                                            NA))))))))
+                                                                                                            ""))))))))
                               
 
                            }
@@ -4461,10 +4311,10 @@ app_prepare <- function()
                                                Ctrl_genus = genus,
                                                Ctrl_specificEpithet = specificEpithet,
                                                Ctrl_infraspecificEpithet = infraspecificEpithet,
-                                               Ctrl_scientificNameSearched = NA,
-                                               Ctrl_scientificNameReference = NA,
+                                               Ctrl_scientificNameSearched = "",
+                                               Ctrl_scientificNameReference = "",
                                                Ctrl_bibliographicCitation = 'jabotRB',
-                                               Ctrl_downloadAsSynonym = NA,
+                                               Ctrl_downloadAsSynonym = "",
                                                Ctrl_taxonRank = taxonRank) %>%
                                  dplyr::mutate(
                                     # CNCFlora_lastParsed = Sys.time(),
@@ -4483,7 +4333,7 @@ app_prepare <- function()
                                     Ctrl_typeStatus = typeStatus, 
                                     Ctrl_recordNumber = recordNumber, #'Número.da.Coleta', 
                                     Ctrl_recordedBy = recordedBy, # Coletor,
-                                    Ctrl_fieldNumber = NA, 
+                                    Ctrl_fieldNumber = "", 
                                     Ctrl_country =  country, # País, 
                                     Ctrl_stateProvince = stateProvince, #Estado, 
                                     Ctrl_municipality =  municipality , #county, #Município, 
@@ -4495,7 +4345,7 @@ app_prepare <- function()
                                     Ctrl_decimalLongitude = decimalLongitude, 
                                     Ctrl_occurrenceRemarks = paste0(fieldNotes, ', ',occurrenceRemarks), 
                                     
-                                    Ctrl_comments = NA,
+                                    Ctrl_comments = "",
                                     
                                     # memória de registro
                                     # 21-08-2021
@@ -4584,7 +4434,7 @@ app_prepare <- function()
                                                                                 ifelse(is.na(subspecies) & !is.na(species) & !is.na(genus), 'SPECIES', 
                                                                                        ifelse(is.na(subspecies) & is.na(species) & !is.na(genus), 'GENUS', 
                                                                                               ifelse(is.na(subspecies) & is.na(species) & is.na(genus) & !is.na(family), 'GENUS', 
-                                                                                                     NA))))))
+                                                                                                     ""))))))
                                  )
                               
                               # http://www.botanicaamazonica.wiki.br/labotam/doku.php?id=bot89:precurso:1textfun:inicio
@@ -4608,10 +4458,10 @@ app_prepare <- function()
                                                                  subspecies,
                                                                  ignore.case = TRUE))  
                               occ[[source_data]] <- occ[[source_data]] %>%
-                                 dplyr::mutate(family = ifelse(trim(family)=='',NA,family)) %>%
-                                 dplyr::mutate(genus = ifelse(trim(genus)=='',NA,genus)) %>%
-                                 dplyr::mutate(species = ifelse(trim(species)=='',NA,species)) %>%
-                                 dplyr::mutate(subspecies = ifelse(trim(subspecies)=='',NA,subspecies))
+                                 dplyr::mutate(family = ifelse(trim(family)=='',"",family)) %>%
+                                 dplyr::mutate(genus = ifelse(trim(genus)=='',"",genus)) %>%
+                                 dplyr::mutate(species = ifelse(trim(species)=='',"",species)) %>%
+                                 dplyr::mutate(subspecies = ifelse(trim(subspecies)=='',"",subspecies))
                               
                               occ[[source_data]] <- occ[[source_data]] %>%
                                  dplyr::mutate(family = word(family,1)) %>%
@@ -4633,7 +4483,7 @@ app_prepare <- function()
                                                                                 ifelse(is.na(subspecies) & !is.na(species) & !is.na(genus), 'SPECIES', 
                                                                                        ifelse(is.na(subspecies) & is.na(species) & !is.na(genus), 'GENUS', 
                                                                                               ifelse(is.na(subspecies) & is.na(species) & is.na(genus) & !is.na(family), 'GENUS', 
-                                                                                                     NA)))))),
+                                                                                                     "")))))),
                                                
                                                
                                                # scientificName = scientificname,
@@ -4643,7 +4493,7 @@ app_prepare <- function()
                                                                                      ifelse(is.na(subspecies) & !is.na(species) & !is.na(genus), paste0(word(genus,1),' ', word(species,1)), 
                                                                                             ifelse(is.na(subspecies) & is.na(species) & !is.na(genus), word(genus,1), 
                                                                                                    ifelse(is.na(subspecies) & is.na(species) & is.na(genus) & !is.na(family), word(family,1), 
-                                                                                                          NA)))))),
+                                                                                                          "")))))),
                                                
                                                institutionCode = institutioncode, 
                                                collectionCode = collectioncode,  
@@ -4656,7 +4506,7 @@ app_prepare <- function()
                                                typeStatus = typestatus, 
                                                recordNumber = collectornumber, # recordnumber, #'Número.da.Coleta', 
                                                recordedBy =  collector, #recordedby, # Coletor,
-                                               # fieldNumber = NA, 
+                                               # fieldNumber = "", 
                                                country =  country, # País, 
                                                stateProvince = stateprovince, #Estado, 
                                                municipality = county, #Município, 
@@ -4686,13 +4536,13 @@ app_prepare <- function()
                                                Ctrl_genus = genus,
                                                Ctrl_specificEpithet = species,
                                                Ctrl_infraspecificEpithet = subspecies,
-                                               Ctrl_scientificNameSearched = NA,
-                                               Ctrl_scientificNameReference = NA,
+                                               Ctrl_scientificNameSearched = "",
+                                               Ctrl_scientificNameReference = "",
                                                Ctrl_bibliographicCitation = 'splink',
-                                               Ctrl_downloadAsSynonym = NA,
+                                               Ctrl_downloadAsSynonym = "",
                                                Ctrl_taxonRank = taxonRank) %>%
                                  dplyr::mutate(CNCFlora_lastParsed = Sys.time(),
-                                               Ctrl_modified = NA, 
+                                               Ctrl_modified = "", 
                                                Ctrl_institutionCode = institutioncode, 
                                                Ctrl_collectionCode = collectioncode,  #'Herbário.de.Origem',
                                                Ctrl_catalogNumber =  catalognumber,#'Código.de.Barra',
@@ -4707,7 +4557,7 @@ app_prepare <- function()
                                                Ctrl_typeStatus = typestatus, 
                                                Ctrl_recordNumber = collectornumber, #'Número.da.Coleta', 
                                                Ctrl_recordedBy = collector, # Coletor,
-                                               Ctrl_fieldNumber = NA, 
+                                               Ctrl_fieldNumber = "", 
                                                Ctrl_country =  country, # País, 
                                                Ctrl_stateProvince = stateprovince, #Estado, 
                                                Ctrl_municipality = county, #Município, 
@@ -4718,7 +4568,7 @@ app_prepare <- function()
                                                Ctrl_decimalLatitude = latitude, 
                                                Ctrl_decimalLongitude = longitude, 
                                                Ctrl_occurrenceRemarks = notes,
-                                               Ctrl_comments = NA,
+                                               Ctrl_comments = "",
                                                
                                                
                                                # memória de registro
@@ -4850,11 +4700,11 @@ app_prepare <- function()
                                                Ctrl_specificEpithet = species,
                                                Ctrl_infraspecificEpithet = infraspecificEpithet,
                                                
-                                               Ctrl_scientificNameSearched = NA,
+                                               Ctrl_scientificNameSearched = "",
                                                # Ctrl_scientificNameReference = scientificNamewithoutAuthorship,
-                                               Ctrl_scientificNameReference = NA,
+                                               Ctrl_scientificNameReference = "",
                                                Ctrl_bibliographicCitation = 'gbif',
-                                               Ctrl_downloadAsSynonym = NA,
+                                               Ctrl_downloadAsSynonym = "",
                                                
                                                Ctrl_taxonRank = taxonRank) %>%
                                  # dplyr::mutate(dateIdentified = gsub(" 00:00:00","'" , dateIdentified %>% as.character(),ignore.case = TRUE)) %>%
@@ -4876,7 +4726,7 @@ app_prepare <- function()
                                     Ctrl_typeStatus = typeStatus,
                                     Ctrl_recordNumber = recordNumber, #'Número.da.Coleta', 
                                     Ctrl_recordedBy = recordedBy, # Coletor,
-                                    Ctrl_fieldNumber = NA, 
+                                    Ctrl_fieldNumber = "", 
                                     Ctrl_country =  ifelse(countryCode=="BR", "Brazil",countryCode), #occ[["gbif"]]$con
                                     Ctrl_stateProvince = stateProvince, #Estado, 
                                     # Ctrl_municipality =  ifelse(empty(county),municipality,county), #Município,
@@ -4889,7 +4739,7 @@ app_prepare <- function()
                                     Ctrl_decimalLongitude = decimalLongitude, 
                                     Ctrl_occurrenceRemarks = paste0(fieldNotes, ', ',occurrenceRemarks), 
                                     
-                                    Ctrl_comments = NA,
+                                    Ctrl_comments = "",
                                     # memória de registro
                                     # 18-10-2021
                                     
@@ -4928,6 +4778,334 @@ app_prepare <- function()
             }
          }
          
+         
+         # mergeOccurrencesCollectionCodeMainCollector
+         {
+            mergeOccurrencesCollectionCodeMainCollector <- eventReactive(input$mergeOccurrencesCollectionCodeMainCollectorBtn,
+                                                                         {
+                                                                            withProgress(message = 'Processing...', style = 'notification', value = 0.5, {
+                                                                               
+                                                                               if(NROW(occ[['all']])>0)
+                                                                               {
+                                                                                  r_tmp <- data.frame(idtmp=1:NROW(occ[['all']]))
+                                                                                  
+                                                                                  if(NROW(occ[['all_collectionCode']])==NROW(occ[['all']]))
+                                                                                  {
+                                                                                     r_tmp <- cbind(r_tmp,
+                                                                                                    occ[['all_collectionCode']] %>% 
+                                                                                                       dplyr::select(Ctrl_collectionCode_Standard,
+                                                                                                                     Ctrl_catalogNumber_Standard,
+                                                                                                                     Ctrl_key_collectionCode_catalogNumber))
+                                                                                  }
+                                                                                  
+                                                                                  
+                                                                                  if(NROW(occ[['all_mainCollectorLastName']])==NROW(occ[['all']]))
+                                                                                  {
+                                                                                     r_tmp <- cbind(r_tmp,
+                                                                                                    occ[['all_mainCollectorLastName']] %>% 
+                                                                                                       dplyr::select(Ctrl_nameRecordedBy_Standard,
+                                                                                                                     Ctrl_recordNumber_Standard,
+                                                                                                                     Ctrl_key_family_recordedBy_recordNumber,
+                                                                                                                     Ctrl_key_year_recordedBy_recordNumber))
+                                                                                  }
+                                                                                  
+                                                                                  if(NROW(occ[['occ_vc']])==NROW(occ[['all']]))
+                                                                                  {
+                                                                                     r_tmp <- cbind(r_tmp,
+                                                                                                    occ[['occ_vc']] %>% 
+                                                                                                       dplyr::select(verbatimNotes,
+                                                                                                                     temAnoColeta,
+                                                                                                                     temCodigoInstituicao,
+                                                                                                                     temNumeroCatalogo,
+                                                                                                                     temColetor,
+                                                                                                                     temNumeroColeta,
+                                                                                                                     temPais,
+                                                                                                                     temUF,
+                                                                                                                     temMunicipio,
+                                                                                                                     temLocalidade,
+                                                                                                                     temIdentificador,
+                                                                                                                     temDataIdentificacao
+                                                                                                                     # Ctrl_country_standardized,
+                                                                                                                     # Ctrl_municipality_standardized,
+                                                                                                                     # Ctrl_stateProvince_standardized,
+                                                                                                                     # Ctrl_locality_standardized,
+                                                                                                                     # Ctrl_lastParsed
+                                                                                                       ))
+                                                                                     
+                                                                                  }
+                                                                                  
+                                                                                  
+                                                                                  if(NROW(occ[['taxonomicAlignment']])==NROW(occ[['all']]))
+                                                                                  {
+                                                                                     r_tmp <- cbind(r_tmp,
+                                                                                                    occ[['taxonomicAlignment']] %>%
+                                                                                                       dplyr::select(
+                                                                                                          c(wcvp_kew_id,
+                                                                                                            wcvp_family,
+                                                                                                            wcvp_genus,
+                                                                                                            wcvp_species,
+                                                                                                            wcvp_infraspecies,
+                                                                                                            wcvp_taxon_name,
+                                                                                                            wcvp_authors,
+                                                                                                            wcvp_rank,
+                                                                                                            wcvp_taxonomic_status,
+                                                                                                            wcvp_accepted_kew_id ,
+                                                                                                            wcvp_accepted_name,
+                                                                                                            wcvp_accepted_authors,
+                                                                                                            wcvp_parent_kew_id,
+                                                                                                            wcvp_parent_name,
+                                                                                                            wcvp_parent_authors,
+                                                                                                            wcvp_reviewed,
+                                                                                                            wcvp_publication,
+                                                                                                            wcvp_original_name_id,
+                                                                                                            wcvp_TAXON_NAME_U,
+                                                                                                            wcvp_searchNotes,
+                                                                                                            wcvp_searchedName,
+                                                                                                            
+                                                                                                            ###
+                                                                                                            
+                                                                                                            fb2020_taxonID,
+                                                                                                            fb2020_acceptedNameUsageID,
+                                                                                                            fb2020_parentNameUsageID,
+                                                                                                            fb2020_originalNameUsageID,
+                                                                                                            fb2020_scientificName,
+                                                                                                            # fb2020_acceptedNameUsage,
+                                                                                                            # fb2020_parentNameUsage,
+                                                                                                            fb2020_namePublishedIn,                  
+                                                                                                            fb2020_namePublishedInYear,
+                                                                                                            fb2020_higherClassification,             
+                                                                                                            # fb2020_kingdom,
+                                                                                                            # fb2020_phylum,                           
+                                                                                                            # fb2020_class,
+                                                                                                            # fb2020_order,                            
+                                                                                                            fb2020_family,
+                                                                                                            # fb2020_genus,                            
+                                                                                                            fb2020_specificEpithet,
+                                                                                                            fb2020_infraspecificEpithet,             
+                                                                                                            fb2020_taxonRank,
+                                                                                                            fb2020_scientificNameAuthorship,
+                                                                                                            fb2020_taxonomicStatus,
+                                                                                                            fb2020_nomenclaturalStatus,              
+                                                                                                            fb2020_modified,
+                                                                                                            fb2020_bibliographicCitation,
+                                                                                                            fb2020_references,
+                                                                                                            fb2020_scientificNamewithoutAuthorship,  
+                                                                                                            fb2020_scientificNamewithoutAuthorship_U,
+                                                                                                            fb2020_searchNotes,
+                                                                                                            fb2020_searchedName)
+                                                                                                       ))
+                                                                                     
+                                                                                  }
+                                                                                  
+                                                                                  
+                                                                                  r_tmp <- cbind(r_tmp,
+                                                                                                 occ[['all']]) %>% 
+                                                                                     dplyr::select(-idtmp) %>%
+                                                                                     dplyr::mutate(Ctrl_voucherAmostra = FALSE,
+                                                                                                   Ctrl_amostraVerificada = FALSE,
+                                                                                                   Ctrl_naoPossivelVerificar = FALSE,
+                                                                                                   Ctrl_observacaoNaoPossivelVerificar = '',
+                                                                                                   
+                                                                                                   Ctrl_dataVerificacao = '',
+                                                                                                   Ctrl_verificadoPor = '',
+                                                                                                   Ctrl_emailVerificador = '',
+                                                                                                   Ctrl_scientificName_verified	= '',
+                                                                                                   Ctrl_family_verified = '',
+                                                                                                   
+                                                                                                   Ctrl_Record_ID_Review = 1:NROW(occ[['all']])
+                                                                                     )
+                                                                                  
+                                                                                  
+                                                                                  # updated occurrences CSV file: collection code and main collector's last name
+                                                                                  
+                                                                                  # source_data <- 'all_updated_collection_collector'
+                                                                                  # occ[[source_data]] <<- r_tmp
+                                                                                  
+                                                                                  source_data <- 'all_results'
+                                                                                  occ[[source_data]] <<- r_tmp
+                                                                                  
+                                                                               }
+                                                                               
+                                                                               
+                                                                               incProgress(100, detail = '100')
+                                                                            })
+                                                                            
+                                                                            
+                                                                            return(r_tmp)
+                                                                            # all_collectionCode
+                                                                            # all_mainCollectorLastName
+                                                                            # 
+                                                                            # mergeOccurrencesCollectionCodeMainCollectorBtn
+                                                                            # downloadDataMgeOccurrencesCollectionCodeMainCollector
+                                                                            # mergeOccurrencesCollectionCodeMainCollectorContents
+                                                                            # 
+                                                                            # Ctrl_collectionCode_Standard
+                                                                            # Ctrl_catalogNumber_Standard
+                                                                            # Ctrl_key_collectionCode_catalogNumber
+                                                                            # 
+                                                                            # Ctrl_nameRecordedBy_Standard
+                                                                            # Ctrl_recordNumber_Standard
+                                                                            # Ctrl_key_family_recordedBy_recordNumber
+                                                                            # Ctrl_key_year_recordedBy_recordNumber
+                                                                            
+                                                                            
+                                                                         })
+            
+            # output$mergeOccurrencesCollectionCodeMainCollectorContents <- DT::renderDataTable(options = list(scrollX = TRUE),
+            #                                                                                   {
+            #                                                                                      req(input$mergeOccurrencesCollectionCodeMainCollectorBtn)
+            #                                                                                      pega_dados()
+            #                                                                                      # mergeOccurrencesCollectionCodeMainCollector()
+            #                                                                                   })
+            pega_dados <- function(){
+               
+               x1 <- data.frame(hot_to_r(input$hot_mergeOccurrencesContents),
+                               stringsAsFactors = FALSE)
+               
+               x1$Incluir_Amostra <- ifelse(is.na(x1$Incluir_Amostra), FALSE, x1$Incluir_Amostra )
+               x1 <- x1 %>%
+                  dplyr::filter(Incluir_Amostra==TRUE) 
+               
+               
+               x2 <- occ[['all_results']]
+               
+               
+               x <- left_join(x1 %>% dplyr::select(Ctrl_Record_ID_Review), 
+                              x2,
+                              by = 'Ctrl_Record_ID_Review')
+               
+               return(x)
+            }
+            
+            
+            output$downloadDataMgeOccurrencesCollectionCodeMainCollector <- downloadHandler(
+               filename = function() {
+                  paste("Standardize_Updated_Occurrences_CollectionCode_MainCollector - ", Sys.Date(), ".csv", sep="")
+               },
+               content = function(file) {
+                  print('aqui')
+                  
+                  dt<- pega_dados()
+
+                  # write.csv(occ[['all_results']] %>% data.frame(stringsAsFactors = FALSE), file, row.names = FALSE, fileEncoding = "UTF-8", na = "")
+                  write.csv(dt, file, row.names = FALSE, fileEncoding = "UTF-8", na = "")
+               })
+            
+            
+            output$hot_mergeOccurrencesContents <- renderRHandsontable(
+               {
+                  shiny::validate(
+                     need(NROW(mergeOccurrencesCollectionCodeMainCollector())>0,  "..."))
+                  
+                  
+                  dt <- mergeOccurrencesCollectionCodeMainCollector()
+                  
+                  # dt <- occ[['all_results']]
+                  dt$Incluir_Amostra <- TRUE
+
+                  dt <- dt %>%
+                     dplyr::select(Incluir_Amostra,
+                                   Ctrl_locality, Ctrl_country, Ctrl_stateProvince, Ctrl_municipality,
+                                   Ctrl_family, Ctrl_scientificName, fb2020_family, fb2020_scientificName,
+                                   Ctrl_collectionCode, Ctrl_catalogNumber, Ctrl_key_family_recordedBy_recordNumber, Ctrl_recordNumber, Ctrl_recordedBy,
+                                   Ctrl_year, Ctrl_month, Ctrl_day,
+                                   Ctrl_Record_ID_Review) %>%
+                     arrange_at(.,c('Ctrl_locality', 'Ctrl_country', 'Ctrl_stateProvince', 'Ctrl_municipality') )
+                  
+                                    
+                  # dt <- dt %>%
+                  #    dplyr::select(Incluir_Amostra,
+                  #                  Ctrl_locality, Ctrl_country, Ctrl_stateProvince, Ctrl_municipality
+                  #                  # Ctrl_occurrenceID, Ctrl_bibliographicCitation, Ctrl_downloadAsSynonym, Ctrl_scientificNameSearched, Ctrl_scientificNameReference, Ctrl_acceptedNameUsage, Ctrl_scientificNameAuthorship, Ctrl_scientificName, Ctrl_scientificNameOriginalSource, Ctrl_family, Ctrl_genus, Ctrl_specificEpithet, Ctrl_infraspecificEpithet, Ctrl_modified, Ctrl_institutionCode, Ctrl_collectionCode, Ctrl_catalogNumber, Ctrl_identificationQualifier, Ctrl_identifiedBy, Ctrl_dateIdentified, Ctrl_typeStatus, Ctrl_recordNumber, Ctrl_recordedBy, Ctrl_fieldNumber, Ctrl_year, Ctrl_month, Ctrl_day, Ctrl_decimalLatitude, Ctrl_decimalLongitude, Ctrl_occurrenceRemarks, Ctrl_comments, Ctrl_taxonRank, 
+                  #                  # Ctrl_nameRecordedBy_Standard, Ctrl_recordNumber_Standard, Ctrl_key_family_recordedBy_recordNumber, Ctrl_key_year_recordedBy_recordNumber,
+                  #                  # # Ctrl_recordNumber_Standard, Ctrl_key_family_recordedBy_recordNumber, Ctrl_key_year_recordedBy_recordNumber, 
+                  #                  # wcvp_kew_id, wcvp_family, wcvp_genus, wcvp_species, wcvp_infraspecies, wcvp_taxon_name, wcvp_authors, wcvp_rank, wcvp_taxonomic_status, wcvp_accepted_kew_id, wcvp_accepted_name, wcvp_accepted_authors, wcvp_parent_kew_id, wcvp_parent_name, wcvp_parent_authors, wcvp_reviewed, wcvp_publication, wcvp_original_name_id, wcvp_TAXON_NAME_U, wcvp_searchNotes, wcvp_searchedName, 
+                  #                  # fb2020_taxonID, fb2020_acceptedNameUsageID, fb2020_parentNameUsageID, fb2020_originalNameUsageID, fb2020_scientificName, fb2020_namePublishedIn, fb2020_namePublishedInYear, fb2020_higherClassification, fb2020_family, fb2020_specificEpithet, fb2020_infraspecificEpithet, fb2020_taxonRank, fb2020_scientificNameAuthorship, fb2020_taxonomicStatus, fb2020_nomenclaturalStatus, fb2020_modified, fb2020_bibliographicCitation, fb2020_references, fb2020_scientificNamewithoutAuthorship, fb2020_scientificNamewithoutAuthorship_U, fb2020_searchNotes, fb2020_searchedName, 
+                  #                  # Ctrl_voucherAmostra, Ctrl_amostraVerificada, Ctrl_naoPossivelVerificar, Ctrl_observacaoNaoPossivelVerificar, Ctrl_dataVerificacao, Ctrl_verificadoPor, Ctrl_emailVerificador, Ctrl_scientificName_verified, Ctrl_family_verified, Ctrl_Record_ID_Review
+                  #                  ) %>%
+                  #    arrange_at(.,c('Ctrl_locality', 'Ctrl_country', 'Ctrl_stateProvince', 'Ctrl_municipality') )
+                  
+                  rhandsontable(dt, 
+                                
+                                # row_highlight = 1,
+                                
+                                width = '100%', height = 400,
+                                
+                                digits = 0,
+                                selectionMode = 'single',
+                                selectCallback = TRUE) %>%
+                     hot_table(highlightCol = TRUE, highlightRow = TRUE, readOnly = TRUE) %>%
+                     hot_col(col = c('Incluir_Amostra'), readOnly = FALSE, type='checkbox') 
+               })
+            
+            
+            # planilha modelo
+            output$download_ModeloCatalogo <- downloadHandler(
+               filename = function() {
+                  paste("Planilha_MODELO_Catalogo_de_Plantas_UCs_Brasil - ",input$Ctrl_verificadoPor_Input, ' - ', Sys.Date(), ".xls", sep="")
+               },
+               content = function(file) {
+                  
+                  # dt <- occ[['all_results']]
+                  
+                  dt<- pega_dados()
+                  
+
+                  bancodados <- stringr::str_sub(dt$Ctrl_occurrenceID, 
+                                                 1, 
+                                                 stringr::str_locate(dt$Ctrl_occurrenceID, '=')[,1]-1)
+                  
+                  bancodados <- paste0(toupper(str_sub(bancodados,1,1)),str_sub(bancodados, 2,nchar(bancodados)))
+                  
+                  barcode <- stringr::str_sub(dt$Ctrl_occurrenceID,
+                                              stringr::str_locate(dt$Ctrl_occurrenceID, '=')[,1]+1,
+                                              nchar(dt$Ctrl_occurrenceID))
+                  
+                  # x <- dt$Ctrl_scientificName_verified
+                  # x <- dt$fb2020_scientificName
+                  # 
+                  # sp_tmp <- paste0(word(x,1) ,' ',word(x,2), ' ')
+                  # autor <- rep('',NROW(x))
+                  # for(i in 1:NROW(x))
+                  # {
+                  #    autor[i] <- sub(sp_tmp[i], '', x[i])  
+                  # }  
+                  
+                  # print(colnames(dt))
+                  
+                  dt <- dt %>%
+                     dplyr::arrange_at(., c('fb2020_family','fb2020_scientificName','Ctrl_recordedBy','Ctrl_recordNumber'))
+                  
+                  
+                  data_imp <- data.frame(UC = rep('',NROW(dt)),
+                                         Grupos = rep('',NROW(dt)),
+                                         `Família`= dt$fb2020_family,
+                                         `Gênero` =  word(dt$fb2020_scientificName,1),
+                                         `Espécie` = word(dt$fb2020_scientificName,2),
+                                         Autor = dt$fb2020_scientificNameAuthorship,
+                                         `Táxon completo (segundo Flora & Funga do Brasil)` = dt$fb2020_scientificName,
+                                         `Barcode`	=  barcode,
+                                         `Banco de dados de origem`	= bancodados,
+                                         `Sigla Herbário` = dt$Ctrl_collectionCode,
+                                         `Coletor`	= dt$Ctrl_recordedBy,
+                                         `Número da Coleta`	= dt$Ctrl_recordNumber,
+                                         `Origem (segundo Flora e Funga do Brasil)` = rep('',NROW(dt)))
+                  
+                  # write.csv(data_imp %>% data.frame(stringsAsFactors = FALSE), file, row.names = FALSE, fileEncoding = "UTF-8", na = "")
+                  # write_excel_csv(data_imp %>% data.frame(stringsAsFactors = FALSE), file, na = "")
+                  
+                  writexl::write_xlsx(data_imp, 
+                                      file)
+                  # sheetName = 'Modelo', 
+                  # append = FALSE)
+                  
+                  
+               })
+            
+            
+         }
+         
+
    }
    
    
