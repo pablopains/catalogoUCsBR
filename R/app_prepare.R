@@ -2778,20 +2778,30 @@ app_prepare <- function()
                                                        ))
                                    )),
                           
-                          wellPanel(
-                             fluidRow(
-                                
-                                column(
-                                   width = 12,
-                                   helpText("Administrado pelo Instituto de Pesquisas Jardim Botânico do Rio de Janeiro "),
-                                   
-                                   helpText("Desenvolvido por: Melo, Pablo Hendrigo Alves de, Bochorny, Thuane & Forzza, Rafaela Campostrini"),
-                                   
-                                   helpText("Versão 1.0.0 de agosto/2024"),
-                                   
-                                ))
-                             
-                          )
+                          br(),
+                          br(),
+                          br(),
+                          
+                          fluidRow(
+                             column(width = 12,
+                                    box(title = 'Copyright ©',
+                                        status = "primary",
+                                        width = 12,
+                                        
+                                        wellPanel(
+                                           fluidRow(
+                                              
+                                              column(
+                                                 width = 12,
+                                                 helpText("Administrado pelo Instituto de Pesquisas Jardim Botânico do Rio de Janeiro "),
+                                                 
+                                                 helpText("Desenvolvido por: Melo, Pablo Hendrigo Alves de, Bochorny, Thuane & Forzza, Rafaela Campostrini"),
+                                                 
+                                                 helpText("Versão 1.0.0 de agosto/2024"),
+                                                 
+                                              ))
+                                           
+                                        ))))
                           
 
                           
