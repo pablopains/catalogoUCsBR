@@ -19,58 +19,8 @@ An R app for preparing species listings for the Plant Catalog of Units of Brazil
 Remover registros não informativos, sem coletor, numero de coleta, ano e informações de localidade
 
 An R app for preparing species listings for the Plant Catalog of Units of Brazilian Conservation.
-
-Remover registros não informativos, sem coletor, numero de coleta, ano e informações de localidade
 }
 \details{
-limpar memória
-
-direcionar memória para processamento temporário em disco
-
-carregar funcões para mensurar tempos de processamento
-
-inicar tempo de processamento
-
-carregar pacotes básicos
-
-cerregar funções desenvolvidas pelo CNCFLora
-
-baixar e tabela FB2020 IPT
-Rodar somente em atualizações do IPT, aproximadamente 6 horas de processamento.
-
-carregar tabela FB2020 IPT e funções de acesso
-conferência taxonômica
-carregar informações da espécie
-somente aqui encontramos dados de tipo de vegetação conforme FB2020
-
-carregar funções para acesso APIs FB2020 v1 e v2
-conferência taxonômica
-carregar informações da espécie
-
-carregar pacotes R e funções
-
-criar pasta para salvar raultados do dataset
-
-ultima versao
-
-taxon
-
-Transformação padrão GBIF de híbrido para wcvp
-
-finalizar tempo de processamento
-
-pano de fundo
-
-Tela junção de resultados
-
-standardize country names and iso 2 iso3 codes
-
-iso2ToIso3 para utilizar em coordinateCleaner
-
-centroids
-
-conferência textual
-
 limpar memória
 
 direcionar memória para processamento temporário em disco
@@ -121,67 +71,45 @@ conferência textual
 }
 \section{0 - Preparar ambiente R}{
 NA
-
-NA
 }
 
 \section{Limpeza}{
-NA
-
 NA
 }
 
 \section{Selecionar UC}{
 NA
-
-NA
 }
 
 \section{Install and load packeges to test}{
-NA
-
 NA
 }
 
 \section{Gerar centroides}{
 NA
-
-NA
 }
 
 \section{Preparaçao}{
-NA
-
 NA
 }
 
 \section{Tela APP--}{
 NA
-
-NA
 }
 
 \section{Server}{
-NA
-
 NA
 }
 
 \section{padronizar nome de paises e codigos iso2 e iso3}{
 NA
-
-NA
 }
 
 \section{coordinateCleaner and bdc}{
 NA
-
-NA
 }
 
 \section{Run the application}{
-NA
-
 NA
 }
 

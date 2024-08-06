@@ -36,24 +36,14 @@ app_prepare <- function()
 # app
 {
    {
-      #' @section 0 - Preparar ambiente R
+      # 0 - Preparar ambiente R
       {
-         #' @details limpar memória
+         # limpar memória
          rm(list = ls())
          
-         #' @details direcionar memória para processamento temporário em disco
-         { 
-            # if (!dir.exists("c:/R_temp")){dir.create("c:/R_temp")}
-            # tempdir <- function() "c:/R_temp"
             tempdir <- tempdir()
-            # unlockBinding("tempdir", baseenv()) 
-            # assignInNamespace("tempdir", tempdir, ns="base", envir=baseenv())
-            # assign("tempdir", tempdir, baseenv())
-            # lockBinding("tempdir", baseenv())
-            # tempdir()
-         }
-         
-         #' @details carregar funcões para mensurar tempos de processamento
+            
+         #' carregar funcões para mensurar tempos de processamento
          {
             tempo_processo <- data.frame(nome_processo="",
                                          tempo_processamento="")[-1,]
@@ -78,122 +68,48 @@ app_prepare <- function()
             }  
          }
          
-         #' @details inicar tempo de processamento
+         # inicar tempo de processamento
          tempo_processo_tmp <- inicia_tempo_processamento('Preparação do ambiente de trabalho em R',
                                                           tempo_processo)
-         #' @details carregar pacotes básicos
+         # carregar pacotes básicos
          {
-            library(writexl)
-            
-            # install.packages('plyr', dependencies = TRUE)
-            library(plyr) 
-            
-            # install.packages('readxl', dependencies = TRUE)
-            library(readxl) 
-            
-            # install.packages('dplyr', dependencies = TRUE)
-            library(dplyr)
-            
-            # install.packages('tidyr', dependencies = TRUE)
-            library(tidyr)
-            
-            # install.packages('biogeo', dependencies = TRUE)
-            # library(biogeo)
-            
-            # install.packages('readr', dependencies = TRUE)
-            library(readr)
-            
-            # install.packages('stringr', dependencies = TRUE)
-            library(stringr)
-            
-            # install.packages('devtools', dependencies = TRUE)
-            library(devtools)
-            
-            # devtools::install_github("ropensci/CoordinateCleaner")
-            library(CoordinateCleaner)
-            
-            # install.packages('dplyr', dependencies = TRUE)
-            library(dplyr)
-            
-            # install.packages('textclean', dependencies = TRUE)
-            library(textclean)
-            
-            # install.packages('googledrive', dependencies = TRUE)
-            # library(googledrive)
-            
-            # install.packages('rvest', dependencies = TRUE)
-            library(rvest)
-            
-            # install.packages('flora', dependencies = TRUE)
-            # library(flora)
-            
-            # install.packages('raster', dependencies = TRUE)
-            library(raster)
-            
-            # install.packages('sp', dependencies = TRUE)
-            library(sp)
-            
-            # install.packages('lubridate', dependencies = TRUE)
-            library(lubridate)
-            
-            # install.packages('rnaturalearthdata', dependencies = TRUE)
-            library(rnaturalearthdata)
-            
-            # install.packages('geobr', dependencies = TRUE)
-            # library(geobr) 
-            
-            # install.packages('monographaR', dependencies = TRUE)
-            # library(monographaR) 
-            
-            # install.packages('jsonlite', dependencies = TRUE)
-            library(jsonlite)
-            
-            # install.packages('sqldf', dependencies = TRUE)
-            library(sqldf) 
-            
-            # install.packages('rvest', dependencies = TRUE)
-            # install.packages("rvest")
-            library(rvest)
-            
-            # install.packages('shiny', dependencies = TRUE)
-            library(shiny) 
-            
-            library(shinydashboardPlus)
-            
-            library(shinydashboard)
-            
-            # install.packages('shinydashboard', dependencies = TRUE)
-            library(shinydashboard)
-            
-            # install.packages('mapview', dependencies = TRUE)
-            # library(mapview)
-            
-            # install.packages('DT', dependencies = TRUE)
-            library(DT)
-            
-            # install.packages('rhandsontable', dependencies = TRUE)
-            library(rhandsontable) # tabela editavel
-            
-            # install.packages('shinyWidgets', dependencies = TRUE)
-            library(shinyWidgets) # botoes
-            
-            # install.packages('measurements', dependencies = TRUE)
-            library(measurements)
-            
-            # install.packages('downloader', dependencies = TRUE)
-            library(downloader)
-            
             options(shiny.maxRequestSize=10000*1024^2) 
+            
+            # #require(CoordinateCleaner)
+            # #require(devtools)
+            # require(downloader)
+            # require(dplyr)
+            # require(DT)
+            # require(jsonlite)
+            # require(lubridate)
+            # require(measurements)
+            # #require(plyr)
+            # #require(raster)
+            # require(readr)
+            # require(readxl) 
+            # require(rhandsontable) # tabela editavel
+            # require(rnaturalearthdata)
+            # require(rvest)
+            # require(shiny) 
+            # require(shinydashboard)
+            # require(shinydashboardPlus)
+            # require(shinyWidgets) # botoes
+            # require(sqldf) 
+            # require(stringr)
+            # require(textclean)
+            # require(tidyr)
+            # require(writexl)
+            
             
          }
          
-         #' @details cerregar funções desenvolvidas pelo CNCFLora
+         # cerregar funções desenvolvidas pelo CNCFLora
          {
-            #' @details baixar e tabela FB2020 IPT 
+            # baixar e tabela FB2020 IPT 
             #' Rodar somente em atualizações do IPT, aproximadamente 6 horas de processamento.
             # source('./functions/FB2020_IPT_Get.R', encoding = "UTF-8")
             
-            #' @details carregar tabela FB2020 IPT e funções de acesso
+            # carregar tabela FB2020 IPT e funções de acesso
             #' conferência taxonômica 
             #' carregar informações da espécie
             #' somente aqui encontramos dados de tipo de vegetação conforme FB2020
@@ -201,7 +117,7 @@ app_prepare <- function()
             # source('./functions/FB2020_IPT_Use.R', encoding = "UTF-8")  # colnames(FloraBrasil2020) <- paste0(colnames(FloraBrasil2020),'_FB2020')
             # colnames(FloraBrasil2020) <- paste0(colnames(FloraBrasil2020),'_FB2020')
             
-            #' @details carregar funções para acesso APIs FB2020 v1 e v2
+            # carregar funções para acesso APIs FB2020 v1 e v2
             #' conferência taxonômica 
             #' carregar informações da espécie
             
@@ -231,7 +147,7 @@ app_prepare <- function()
                return(df$identificationQualifier)
             }  
             
-            #' @details carregar pacotes R e funções
+            # carregar pacotes R e funções
             {
                # source("C:/Dados/CNCFlora/shiny/cncflora/functions/verbatimCleaning_v3.R", encoding = "UTF-8")
                {
@@ -284,8 +200,8 @@ app_prepare <- function()
                                                   view_summary=FALSE)
                   {
                      
-                     #' @section Limpeza
-                     #' @description Remover registros não informativos, sem coletor, numero de coleta, ano e informações de localidade
+                     # Limpeza
+                     # Remover registros não informativos, sem coletor, numero de coleta, ano e informações de localidade
                      
                      
                      frase_saida_verbatim <- c('ano', 
@@ -1087,16 +1003,16 @@ app_prepare <- function()
                      require(dplyr)
                      require(downloader)
                      require(stringr)
-                     require(plyr)
+                     # require(plyr)
                      
-                     #' @details criar pasta para salvar raultados do dataset
+                     # criar pasta para salvar raultados do dataset
                      path_results <- paste0(path_results,'/FloraFungaBrasil')
                      if (!dir.exists(path_results)){dir.create(path_results)}
                      
                      destfile <- paste0(path_results,"/IPT_FloraFungaBrasil_.zip")
                      
                      
-                     #' @details ultima versao
+                     # ultima versao
                      # destfile <- paste0(path_results,"/",Sys.Date(),'.zip')
                      downloader::download(url = url_source, destfile = destfile, mode = "wb") 
                      utils::unzip(destfile, exdir = path_results) # descompactar e salvar dentro subpasta "ipt" na pasta principal
@@ -1108,7 +1024,7 @@ app_prepare <- function()
                      
                      
                      
-                     #' @details taxon
+                     # taxon
                      fb2020_taxon  <- readr::read_delim(taxon.file, delim = "\t", quote = "") %>% 
                         dplyr::select(-id)
                      
@@ -1182,7 +1098,7 @@ app_prepare <- function()
                      # str_squish(x)
                      # setdiff(vec1, vec2)
                      
-                     #' @details Transformação padrão GBIF de híbrido para wcvp 
+                     # Transformação padrão GBIF de híbrido para wcvp 
                      searchedName_raw <- searchedName
                      # searchedName <- gsub('×','x ',searchedName)
                      searchedName <- gsub('×','× ',searchedName)
@@ -1620,13 +1536,13 @@ app_prepare <- function()
             
          }
          
-         #' @details finalizar tempo de processamento
+         # finalizar tempo de processamento
          tempo_processo <- get_tempo_processamento(tempo_processo_tmp)
          
       }
       
       
-      #' @section Selecionar UC
+      # Selecionar UC
       {
          # 
          # nome_uc <- 'Serra das Lontras'
@@ -1922,40 +1838,40 @@ app_prepare <- function()
       }
       
       
-      # geo
-      #' @section Install and load packeges to test
-      {
-         
-         # install.packages("monochromeR")      
-         # library(monographaR)
-         
-         # library(remotes)
-         # options("install.lock"=FALSE)
-         # remotes::install_github("brunobrr/bdc")
-         library(bdc)
-         # # devtools::install_github("ropensci/rnaturalearthhires")
-         
-         # # devtools::install_github("ropensci/CoordinateCleaner")
-         # library(CoordinateCleaner)
-         
-         # if (!"occAssess" %in% installed.packages()) devtools::install_github("https://github.com/robboyd/occAssess")
-         # library(occAssess)   
-         
-         # # install.packages("countrycode")
-         library(countrycode)
-         
-         # install.packages("MazamaSpatialUtils")
-         library(MazamaSpatialUtils)
-         
-         # options("install.lock"=FALSE)
-         # install.packages("GADMTools")
-         # library(GADMTools)
-         
-         
-      }
+      #' # geo
+      #' # Install and load packeges to test
+      #' {
+      #'    
+      #'    # install.packages("monochromeR")      
+      #'    # require(monographaR)
+      #'    
+      #'    # require(remotes)
+      #'    # options("install.lock"=FALSE)
+      #'    # remotes::install_github("brunobrr/bdc")
+      #'    require(bdc)
+      #'    # # devtools::install_github("ropensci/rnaturalearthhires")
+      #'    
+      #'    # # devtools::install_github("ropensci/CoordinateCleaner")
+      #'    # require(CoordinateCleaner)
+      #'    
+      #'    # if (!"occAssess" %in% installed.packages()) devtools::install_github("https://github.com/robboyd/occAssess")
+      #'    # require(occAssess)   
+      #'    
+      #'    # # install.packages("countrycode")
+      #'    require(countrycode)
+      #'    
+      #'    # install.packages("MazamaSpatialUtils")
+      #'    require(MazamaSpatialUtils)
+      #'    
+      #'    # options("install.lock"=FALSE)
+      #'    # install.packages("GADMTools")
+      #'    # require(GADMTools)
+      #'    
+      #'    
+      #' }
       
       
-      #' @section Gerar centroides
+      # Gerar centroides
       {
          # path_data <<- 'C:\\Dados\\APP_GBOT\\data'
          
@@ -1966,10 +1882,10 @@ app_prepare <- function()
          # # file.centroids <- paste0(path_data,"\\centroids.csv")
          # 
          # # Load libraries
-         # # library('GADMTools')
-         # library('raster')
-         # library('geosphere')
-         # library('mapview') # incredible interactive map visualization in R
+         # # require('GADMTools')
+         # require('raster')
+         # require('geosphere')
+         # require('mapview') # incredible interactive map visualization in R
          # 
          # # Get SpatialPolygonsDataFrame object example
          # 
@@ -2075,21 +1991,21 @@ app_prepare <- function()
       }
       
       
-      #' @details pano de fundo  
-      {
-         world_path <- paste0(path_data,"\\countries_gadm36_sp.rds")
-         
-         # Reference data
-         if (file.exists(world_path))
-         {
-            world <- readRDS(world_path)
-         } else
-         {
-            world <- raster::getData("countries", path=path_data, download = TRUE)
-         }  
-         # Renaming the column in the mask to use in coordinateCleaner
-         names(world)[names(world) == "ISO"] <- "iso_a3_eh"
-      }
+      #' # pano de fundo  
+      #' {
+      #'    world_path <- paste0(path_data,"\\countries_gadm36_sp.rds")
+      #'    
+      #'    # Reference data
+      #'    if (file.exists(world_path))
+      #'    {
+      #'       world <- readRDS(world_path)
+      #'    } else
+      #'    {
+      #'       world <- raster::getData("countries", path=path_data, download = TRUE)
+      #'    }  
+      #'    # Renaming the column in the mask to use in coordinateCleaner
+      #'    names(world)[names(world) == "ISO"] <- "iso_a3_eh"
+      #' }
       
    }
    
@@ -2127,7 +2043,7 @@ app_prepare <- function()
    }
    
    
-   #' @section  Preparaçao
+   #  Preparaçao
    {
       occ_full_tmp <- {}
       occ_full <<- {}
@@ -2255,6 +2171,8 @@ app_prepare <- function()
       
       # file.name.sp <- './data/recordedBy/Padronizar_Coletores_CNCFlora.csv'
       file.name.sp <- 'https://raw.githubusercontent.com/pablopains/catalogoUCsBR/main/collectorDictionary/collectorDictionary.csv'
+      # file.name.sp <- 'Z:\\Kew\\data\\collectorDictionary\\CollectorsDictionary.csv'
+      
       coletoresDB <<- readr::read_csv(file.name.sp, 
                                       locale = readr::locale(encoding = "UTF-8"),
                                       show_col_types = FALSE) %>%
@@ -2292,7 +2210,7 @@ app_prepare <- function()
    }
    
    
-   #' @section Tela APP--
+   # Tela APP--
    ui <- 
       {
          dashboardPage(
@@ -2741,7 +2659,7 @@ app_prepare <- function()
                                               
                                    )),
                           
-                          #' @details Tela junção de resultados
+                          # Tela junção de resultados
                           tabPanel(icon("file-import"), 
                                    navbarPage("5 - Mesclar e salvar resultados",
                                               tabPanel(icon("file-import"), 
@@ -2753,15 +2671,22 @@ app_prepare <- function()
                                                            fluidRow(
                                                               column(width = 12,
                                                                      actionButton("mergeOccurrencesCollectionCodeMainCollectorBtn", "Mesclar resultados", icon = icon("play")),
-                                                                     downloadButton("downloadDataMgeOccurrencesCollectionCodeMainCollector", "Baixar arquivo CSV Completo")),
+                                                                     br()),
+                                                              
                                                            ),
                                                            
-                                                           br(),
+                                                           fluidRow(
+                                                              column(width = 12,
+                                                                     br(),
+                                                                     downloadButton("downloadDataMgeOccurrencesCollectionCodeMainCollector", "Baixar Planilha para Revisão Eletrônica (Modelo Aplicativo de Revisão)"),
+                                                                     br()),
+                                                           ),
                                                            
                                                            fluidRow(
                                                               column(
                                                                  width = 12,
-                                                                 downloadButton("download_ModeloCatalogo", "Baixar planilha Modelo Catálogo de Plantas das Unidades de Conservação do Brasil"),
+                                                                 br(),
+                                                                 downloadButton("download_ModeloCatalogo", "Baixar Planilha para Revisão Manual (Modelo Catálogo de Plantas das Unidades de Conservação do Brasil)"),
                                                               )),
                                                            
                                                            br(),
@@ -2811,7 +2736,7 @@ app_prepare <- function()
          )}
    
    
-   #' @section Server
+   # Server
       server <- function(input, output, session)
       {
          
@@ -2825,7 +2750,7 @@ app_prepare <- function()
                # downloadData_applyCollectionCodesPattern_NewCollectionCodesDictionary
                output$downloadData_applyTaxonomicAlignment <- downloadHandler(
                   filename = function() {
-                     paste("TaxonomicAlignment - ", Sys.Date(), ".csv", sep="")
+                     paste("Catalogo_Plantas_UCs_Brasil - Taxonomic_Alignment.csv", sep="")
                   },
                   content = function(file) {
                      
@@ -3268,20 +3193,20 @@ app_prepare <- function()
          {
             checkMapLocation <- eventReactive(input$checkMapLocationBtn,
                                               {
-                                                 #' @section padronizar nome de paises e codigos iso2 e iso3
+                                                 # padronizar nome de paises e codigos iso2 e iso3
                                                  withProgress(message = 'Processing...', style = 'notification', value = 0.25, {
                                                     occ_global <- occ[['all']] 
                                                     
                                                     if (NROW(occ_global)>0)
                                                     { 
-                                                       #' @details standardize country names and iso 2 iso3 codes
+                                                       # standardize country names and iso 2 iso3 codes
                                                        {
                                                           incProgress(0.51, detail = 'standardize country names and ISO2 and ISO3 codes...')
                                                           
                                                           
                                                           occ_global <- bdc::bdc_country_standardized(occ_global, country = "Ctrl_country")
                                                           
-                                                          #' @details iso2ToIso3 para utilizar em coordinateCleaner
+                                                          # iso2ToIso3 para utilizar em coordinateCleaner
                                                           index_1 <- !is.na(occ_global$countryCode)
                                                           occ_global$countryCode_ISO3[index_1==TRUE] <- MazamaSpatialUtils::iso2ToIso3(occ_global$countryCode[index_1==TRUE])
                                                           
@@ -3300,7 +3225,7 @@ app_prepare <- function()
                                                           incProgress(0.5, detail = '100')
                                                        }
                                                        
-                                                       #' @details centroids
+                                                       # centroids
                                                        {
                                                           # incProgress(0.51, detail = 'get centroids...')
                                                           # centroids_tmp <- get_centroids(countryCode_ISO3=occ_global$countryCode_ISO3 %>% unique())
@@ -3309,7 +3234,7 @@ app_prepare <- function()
                                                           # incProgress(0.75, detail = '100')
                                                        }
                                                        
-                                                       #' @section coordinateCleaner and bdc
+                                                       # coordinateCleaner and bdc
                                                        {
                                                           incProgress(0.76, detail = 'coordinateCleaner and bdc packages...')
                                                           occ_cc <- occ_global %>%
@@ -3454,7 +3379,13 @@ app_prepare <- function()
                                                                   withProgress(message = 'Processing...', style = 'notification', value = 0.5, {
                                                                      
                                                                      MainCollectorLastName_I <- hot_to_r(input$getMainCollectorLastNameContents) 
-                                                                     MainCollectorLastName_II <- hot_to_r(input$getMainCollectorLastNameContents_II) 
+                                                                     
+                                                                     
+                                                                     # MainCollectorLastName_II <- hot_to_r(input$getMainCollectorLastNameContents_II) 
+                                                                     
+                                                                     source_data <- 'mainCollectorLastName'
+                                                                     MainCollectorLastName_II <- occ[[source_data]]
+                                                                     
                                                                      
                                                                      if(NROW(MainCollectorLastName_I)>0)
                                                                      {MainCollectorLastName <- MainCollectorLastName_I}
@@ -3501,7 +3432,7 @@ app_prepare <- function()
             # downloadData_applyCollectionCodesPattern_Summary
             output$downloadData_applyMainCollectorLastName_Summary <- downloadHandler(
                filename = function() {
-                  paste("Main_CollectorLast_Name_Summary - ", Sys.Date(), ".csv", sep="")
+                  paste("Catalogo_Plantas_UCs_Brasil - Main_CollectorLast_Name_Summary.csv", sep="")
                },
                content = function(file) {
                   write.csv(occ[['mainCollectorLastNameSummary']] %>% data.frame(stringsAsFactors = FALSE), file, row.names = FALSE, fileEncoding = "UTF-8", na = "")
@@ -3510,7 +3441,7 @@ app_prepare <- function()
             # downloadData_applyCollectionCodesPattern_NewCollectionCodesDictionary
             output$downloadData_applyMainCollectorLastName_NewMainCollectorLastName_Dictionary <- downloadHandler(
                filename = function() {
-                  paste("New_Main_CollectorLast_Name_Dictionary - ", Sys.Date(), ".csv", sep="")
+                  paste("Catalogo_Plantas_UCs_Brasil - New_Main_CollectorLast_Name_Dictionary.csv", sep="")
                },
                content = function(file) {
                   write.csv(occ[['mainCollectorLastNameNew']] %>% data.frame(stringsAsFactors = FALSE), file, row.names = FALSE, fileEncoding = "UTF-8", na = "")
@@ -3568,7 +3499,7 @@ app_prepare <- function()
             # downloadData_applyCollectionCodesPattern_Summary
             output$downloadData_applyCollectionCodesPattern_Summary <- downloadHandler(
                filename = function() {
-                  paste("Collection_Codes_Summary - ", Sys.Date(), ".csv", sep="")
+                  paste("Catalogo_Plantas_UCs_Brasil - Collection_Codes_Summary.csv", sep="")
                },
                content = function(file) {
                   write.csv(occ[['collectionCodeSummary']] %>% data.frame(stringsAsFactors = FALSE), file, row.names = FALSE, fileEncoding = "UTF-8", na = "")
@@ -3577,7 +3508,7 @@ app_prepare <- function()
             # downloadData_applyCollectionCodesPattern_NewCollectionCodesDictionary
             output$downloadData_applyCollectionCodesPattern_NewCollectionCodesDictionary <- downloadHandler(
                filename = function() {
-                  paste("New_Collection_Codes_Dictionary - ", Sys.Date(), ".csv", sep="")
+                  paste("Catalogo_Plantas_UCs_Brasil - New_Collection_Codes_Dictionary.csv", sep="")
                },
                content = function(file) {
                   write.csv(occ[['collectionCodeNew']] %>% data.frame(stringsAsFactors = FALSE), file, row.names = FALSE, fileEncoding = "UTF-8", na = "")
@@ -3624,7 +3555,7 @@ app_prepare <- function()
             
             output$getMainCollectorLastNameContents_II <- renderRHandsontable({
                rhandsontable(loadMainCollectorLastName(), 
-                             # width = 1300, height = 300,
+                             width = '100%', height = 500,
                              selectCallback = FALSE,
                              selectionMode = 'single') %>%
                   hot_table(highlightCol = TRUE, highlightRow = TRUE, readOnly = TRUE) %>%
@@ -3635,7 +3566,7 @@ app_prepare <- function()
             
             output$II_getMainCollectorLastNameContents <-renderRHandsontable({
                rhandsontable(loadMainCollectorLastName(), 
-                             # width = 1300, height = 300,
+                             width = '100%', height = 500,
                              selectCallback = FALSE,
                              selectionMode = 'single') %>%
                   hot_table(highlightCol = TRUE, highlightRow = TRUE, readOnly = TRUE) %>%
@@ -3649,7 +3580,7 @@ app_prepare <- function()
             
             output$downloadDataMainCollectorLastName <- downloadHandler(
                filename = function() {
-                  paste("Standardize_Main_Collector_Last_Name - ", Sys.Date(), ".csv", sep="")
+                  paste("Catalogo_Plantas_UCs_Brasil - Main_Collector_Last_Name.csv", sep="")
                },
                content = function(file) {
                   write.csv(hot_to_r(input$getMainCollectorLastNameContents) %>% data.frame(stringsAsFactors = FALSE), file, row.names = FALSE, fileEncoding = "UTF-8", na = "")
@@ -3727,7 +3658,7 @@ app_prepare <- function()
                
                output$downloadDataCollectionsCode <- downloadHandler(
                   filename = function() {
-                     paste("Standardize_Collections_Code - ", Sys.Date(), ".csv", sep="")
+                     paste("Catalogo_Plantas_UCs_Brasil - Collections_Code.csv", sep="")
                   },
                   content = function(file) {
                      write.csv(hot_to_r(input$getUniqueCollectionsCodeContents) %>% data.frame(stringsAsFactors = FALSE), file, row.names = FALSE, fileEncoding = "UTF-8", na = "")
@@ -3820,7 +3751,7 @@ app_prepare <- function()
                                                               #                                                  tempo_processo)
                                                               print('Conferir informações textuais')
                                                               
-                                                              #' @details conferência textual
+                                                              # conferência textual
                                                               {
                                                                  occ_tmp_3 <- verbatimCleaning_v2(occ[['all']], view_summary=FALSE)
                                                                  
@@ -3889,7 +3820,7 @@ app_prepare <- function()
             {
                output$downloadData <- downloadHandler(
                   filename = function() {
-                     paste("Standardize_Join_Occurrences_Darwin_Corre_Terms - ", Sys.Date(), ".csv", sep="")
+                     paste("Catalogo_Plantas_UCs_Brasil - Juncao_Ocorrencia_Darwin_Corre_Terms.csv", sep="")
                   },
                   content = function(file) {
                      
@@ -4990,10 +4921,10 @@ app_prepare <- function()
             
             output$downloadDataMgeOccurrencesCollectionCodeMainCollector <- downloadHandler(
                filename = function() {
-                  paste("Standardize_Updated_Occurrences_CollectionCode_MainCollector - ", Sys.Date(), ".csv", sep="")
+                  paste("Catalogo_Plantas_UCs_Brasil - Planilha para Revisao Eletronica.csv", sep="")
                },
                content = function(file) {
-                  print('aqui')
+                  # print('aqui')
                   
                   dt<- pega_dados()
 
@@ -5052,7 +4983,7 @@ app_prepare <- function()
             # planilha modelo
             output$download_ModeloCatalogo <- downloadHandler(
                filename = function() {
-                  paste("Planilha_MODELO_Catalogo_de_Plantas_UCs_Brasil - ",input$Ctrl_verificadoPor_Input, ' - ', Sys.Date(), ".xls", sep="")
+                  paste("Catalogo_Plantas_UCs_Brasil - Planilha para Revisao Manual.xls", sep="")
                },
                content = function(file) {
                   
@@ -5084,16 +5015,17 @@ app_prepare <- function()
                   # print(colnames(dt))
                   
                   dt <- dt %>%
-                     dplyr::arrange_at(., c('fb2020_family','fb2020_scientificName','Ctrl_recordedBy','Ctrl_recordNumber'))
+                     dplyr::arrange_at(., c('Ctrl_family','Ctrl_scientificName','Ctrl_recordedBy','Ctrl_recordNumber'))
                   
                   
                   data_imp <- data.frame(UC = rep('',NROW(dt)),
                                          Grupos = rep('',NROW(dt)),
-                                         `Família`= dt$fb2020_family,
-                                         `Gênero` =  word(dt$fb2020_scientificName,1),
-                                         `Espécie` = word(dt$fb2020_scientificName,2),
-                                         Autor = dt$fb2020_scientificNameAuthorship,
-                                         `Táxon completo (segundo Flora & Funga do Brasil)` = dt$fb2020_scientificName,
+                                         `Táxon completo (segundo ficha herbário)` = paste0(dt$Ctrl_family, ' ',dt$Ctrl_scientificName),
+                                         `Família (segundo Flora & Funga do Brasil)`= dt$fb2020_family,
+                                         `Gênero (segundo Flora & Funga do Brasil)` =  word(dt$fb2020_scientificName,1),
+                                         `Espécie (segundo Flora & Funga do Brasil)` = word(dt$fb2020_scientificName,2),
+                                         `Autor (segundo Flora & Funga do Brasil)` = dt$fb2020_scientificNameAuthorship,
+                                         `Táxon completo (segundo Flora & Funga do Brasil)` = paste0(dt$fb2020_family, ' ',dt$fb2020_scientificName),
                                          `Barcode`	=  barcode,
                                          `Banco de dados de origem`	= bancodados,
                                          `Sigla Herbário` = dt$Ctrl_collectionCode,
@@ -5119,7 +5051,7 @@ app_prepare <- function()
    }
    
    
-   #' @section Run the application 
+   # Run the application 
    # shinyApp(ui = ui, server = server)
    
    shinyApp(ui = ui, server = server, options = list(launch.browser = TRUE))
@@ -5127,4 +5059,4 @@ app_prepare <- function()
    }
 }
 
-# app_prepare()
+ app_prepare()

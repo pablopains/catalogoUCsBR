@@ -31,350 +31,225 @@
 #' @export
 app_review <- function()
 {
-  # require(dplyr)
-  # require(tidyr)
-  # require(readr)
-  # require(stringr)
-  # require(lubridate)
-  # require(jsonlite)
-  # require(sqldf)
-  # require(rvest)
-  # require(shiny)
-  # require(shinydashboard)
-  # require(rhandsontable)
-  # require(DT)
-  # require(rhandsontable)
-  # require(shinyWidgets)
-  # require(measurements)
-  # require(downloader)
-  
-   #  0 - Preparar ambiente R
+   # require(dplyr)
+   # require(tidyr)
+   # require(readr)
+   # require(stringr)
+   # require(lubridate)
+   # require(jsonlite)
+   # require(sqldf)
+   # require(rvest)
+   # require(shiny)
+   # require(shinydashboard)
+   # require(rhandsontable)
+   # require(DT)
+   # require(rhandsontable)
+   # require(shinyWidgets)
+   # require(measurements)
+   # require(downloader)
+   # require(app_publication)
+   # require(writexl)
+   
+   # source('functions.R')
    {
-      
-      
-      
-      #  carregar pacotes básicos
+      check_identificationQualifier <- function(txt_search='',
+                                                keyword = c(' aff.', ' cf.'))
       {
-         # # 
-         # # # install.packages('plyr', dependencies = TRUE)
-         # # library(plyr) 
-         # # 
-         # # # install.packages('readxl', dependencies = TRUE)
-         # # library(readxl) 
-         # 
-         # # install.packages('dplyr', dependencies = TRUE)
-         # library(dplyr)
-         # 
-         # # install.packages('tidyr', dependencies = TRUE)
-         # library(tidyr)
-         # 
-         # # # install.packages('biogeo', dependencies = TRUE)
-         # # library(biogeo)
-         # 
-         # # install.packages('readr', dependencies = TRUE)
-         # library(readr)
-         # 
-         # # install.packages('stringr', dependencies = TRUE)
-         # library(stringr)
-         # 
-         # # # install.packages('devtools', dependencies = TRUE)
-         # # library(devtools)
-         # # 
-         # # # devtools::install_github("ropensci/CoordinateCleaner")
-         # # library(CoordinateCleaner)
-         # # 
-         # # # install.packages('dplyr', dependencies = TRUE)
-         # # library(dplyr)
-         # # 
-         # # # install.packages('textclean', dependencies = TRUE)
-         # # library(textclean)
-         # # 
-         # # # install.packages('googledrive', dependencies = TRUE)
-         # # library(googledrive)
-         # # 
-         # # # install.packages('rvest', dependencies = TRUE)
-         # # library(rvest)
-         # # 
-         # # # # install.packages('flora', dependencies = TRUE)
-         # # # library(flora)
-         # # 
-         # # # install.packages('raster', dependencies = TRUE)
-         # # library(raster)
-         # # 
-         # # # install.packages('sp', dependencies = TRUE)
-         # # library(sp)
-         # 
-         # # install.packages('lubridate', dependencies = TRUE)
-         # library(lubridate)
-         # 
-         # # # install.packages('rnaturalearthdata', dependencies = TRUE)
-         # # library(rnaturalearthdata)
-         # # 
-         # # # # install.packages('geobr', dependencies = TRUE)
-         # # # library(geobr) 
-         # # 
-         # # # # install.packages('monographaR', dependencies = TRUE)
-         # # # library(monographaR) 
-         # 
-         # # install.packages('jsonlite', dependencies = TRUE)
-         # library(jsonlite)
-         # 
-         # # install.packages('sqldf', dependencies = TRUE)
-         # library(sqldf) 
-         # 
-         # # install.packages('rvest', dependencies = TRUE)
-         # # install.packages("rvest")
-         # library(rvest)
-         # 
-         # # install.packages('shiny', dependencies = TRUE)
-         # library(shiny) 
-         # 
-         # # # install.packages('shiny', dependencies = TRUE)
-         # # library(shinydashboardPlus)
-         # 
-         # # install.packages('shinydashboard', dependencies = TRUE)
-         # library(shinydashboard)
-         # 
-         # # install.packages('rhandsontable', dependencies = TRUE)
-         # library(rhandsontable)
-         # 
-         # 
-         # # # install.packages('mapview', dependencies = TRUE)
-         # # library(mapview)
-         # 
-         # # install.packages('DT', dependencies = TRUE)
-         # library(DT)
-         # 
-         # # install.packages('rhandsontable', dependencies = TRUE)
-         # library(rhandsontable) # tabela editavel
-         # 
-         # # install.packages('shinyWidgets', dependencies = TRUE)
-         # library(shinyWidgets) # botoes
-         # 
-         # # install.packages('measurements', dependencies = TRUE)
-         # library(measurements)
-         # 
-         # # install.packages('downloader', dependencies = TRUE)
-         # library(downloader)
+         df <- data.frame(txt_search=txt_search, stringsAsFactors = FALSE)
+         df$identificationQualifier <- '' 
          
-         
-         
-         options(shiny.maxRequestSize=10000*1024^2) 
-         
-      }
+         for(kw in keyword)
+         {
+            index <- grepl(kw, txt_search, 
+                           ignore.case = TRUE,
+                           fixed = TRUE)
+            
+            if (any(index)==TRUE) 
+               # { df$identificationQualifier[index==TRUE] <- rep(gsub('\\\\<|\\\\>','',kw),count(index==TRUE)[2,2]) }
+            { df$identificationQualifier[index==TRUE] <- rep(gsub('\\\\<|\\\\>','',kw),sum(index==TRUE)) }
+            
+            df$txt_search[index==TRUE]
+         }
+         return(df$identificationQualifier)
+      }  
       
-      #  cerregar funções desenvolvidas pelo CNCFLora
+      # get_link_source_record
+      # occurrenceID = 'splink=MO:3234022'
+      # bibliographicCitation = 'splink'
+      # scientificNameReference = 'Rudgea interrupta'
+      get_link_source_record <- function(occurrenceID,
+                                         bibliographicCitation,
+                                         scientificNameReference)
       {
          
-         #  carregar pacotes R e funções
+         x <- data.frame(link=rep('',NROW(bibliographicCitation)), stringsAsFactors = FALSE)
+         
+         bibliographicCitation <- bibliographicCitation %>% tolower()
+         
+         for(i in 1:NROW(bibliographicCitation))
          {
             
-            check_identificationQualifier <- function(txt_search='',
-                                                      keyword = c(' aff.', ' cf.'))
+            if (bibliographicCitation[i] == "reflora")
             {
-               df <- data.frame(txt_search=txt_search, stringsAsFactors = FALSE)
-               df$identificationQualifier <- '' 
+               barcode <- gsub(paste0(tolower(bibliographicCitation[i]),"=" ), '',occurrenceID[i] )
                
-               for(kw in keyword)
-               {
-                  index <- grepl(kw, txt_search, 
-                                 ignore.case = TRUE,
-                                 fixed = TRUE)
-                  
-                  if (any(index)==TRUE) 
-                     # { df$identificationQualifier[index==TRUE] <- rep(gsub('\\\\<|\\\\>','',kw),count(index==TRUE)[2,2]) }
-                  { df$identificationQualifier[index==TRUE] <- rep(gsub('\\\\<|\\\\>','',kw),sum(index==TRUE)) }
-                  
-                  df$txt_search[index==TRUE]
-               }
-               return(df$identificationQualifier)
-            }  
+               base_url <- "http://reflora.jbrj.gov.br/reflora/herbarioVirtual/ConsultaPublicoHVUC/BemVindoConsultaPublicaHVConsultar.do?modoConsulta=LISTAGEM&quantidadeResultado=20&codigoBarra=%s"
+               url <- sprintf(base_url, barcode)
+               url
+               
+               x$link[i] <- paste0("<a href='", url, "'target='_blank'>", occurrenceID[i],"</a>")
+            }
             
-            # source("get_floraFungaBrasil_online.R", encoding = "UTF-8")
-            get_floraFungaBrasil <- function(url_source = "http://ipt.jbrj.gov.br/jbrj/archive.do?r=lista_especies_flora_brasil",
-                                             path_results = NA,
-                                             full=FALSE) # if NULL
+            
+            # jabotRB
+            if (bibliographicCitation[i] == 'jabotrb')
+            {
                
-            {  
+               # occurrenceID = 'jabotRB=RB01031072'
                
-               destfile <- paste0(path_results,"/IPT_FloraFungaBrasil_",Sys.Date(),'.zip')
-               downloader::download(url = url_source, destfile = destfile, mode = "wb") 
-               utils::unzip(destfile, exdir = path_results) # descompactar e salvar dentro subpasta "ipt" na pasta principal
+               barcode <- gsub(paste0(bibliographicCitation[i],"=" ), '',occurrenceID[i], ignore.case = TRUE)
+               barcode <- gsub('RB', '',barcode, ignore.case = TRUE)
                
+               base_url <- 'http://rb.jbrj.gov.br/v2/regua/visualizador.php?r=true&colbot=rb&codtestemunho='
+               url <- paste0(base_url,barcode)
                
-               #  taxon
-               fb2020_taxon  <- readr::read_delim(paste0(path_results,'/taxon.txt'), delim = "\t", quote = "") %>% 
-                  dplyr::select(-id)
+               x$link[i] <- paste0("<a href='", url, "'target='_blank'> ", occurrenceID[i],"</a>")
+            }
+            
+            
+            # jabot
+            if (bibliographicCitation[i] == "jabot")
+            {
+               occurrenceID_tmp <- gsub(paste0(tolower(bibliographicCitation[i]),"=" ), '',occurrenceID[i], ignore.case = TRUE )
                
-               index = fb2020_taxon$taxonRank %in% c("ESPECIE",
-                                                     "SUB_ESPECIE",
-                                                     "VARIEDADE",
-                                                     "FORMA")
+               occurrenceID_tmp2 <- str_split(occurrenceID_tmp,':')
                
-               fb2020_taxon  <- fb2020_taxon[index==TRUE,] 
+               col <- occurrenceID_tmp2[[1]][1]
                
-               index = fb2020_taxon$taxonRank %in% c("ESPECIE",
-                                                     "SUB_ESPECIE",
-                                                     "VARIEDADE",
-                                                     "FORMA")
+               cat <- occurrenceID_tmp2[[1]][2]
+               cat <- gsub(col, '',cat )
                
-               scientificName_tmp <- fb2020_taxon$scientificName %>% stringr::str_split(.,pattern = ' ', simplify = TRUE)
+               base_url <- "http://rb.jbrj.gov.br/v2/regua/visualizador.php?r=true&colbot=%s&codtestemunho=%s"
+               url <- sprintf(base_url, col, cat)
                
-               # carregando especie sem autor
-               scientificName <- rep('',nrow(fb2020_taxon))
-               
-               scientificName[index==TRUE] <- scientificName_tmp[index==TRUE,1] %>% trimws(.,'right')
-               
-               index = fb2020_taxon$taxonRank %in% c("ESPECIE")
-               
-               scientificName[index==TRUE] <-  paste0(scientificName_tmp[index==TRUE,1], ' ', scientificName_tmp[index==TRUE,2]) #%>% trimws(.,'right')
-               
-               index = fb2020_taxon$taxonRank %in% c("VARIEDADE")
-               scientificName[index==TRUE] <-  paste0(fb2020_taxon$genus[index==TRUE], ' ', fb2020_taxon$specificEpithet[index==TRUE], ' var. ', fb2020_taxon$infraspecificEpithet[index==TRUE])# %>% trimws(.,'right')
-               
-               index = fb2020_taxon$taxonRank %in% c("SUB_ESPECIE")
-               scientificName[index==TRUE] <-  paste0(fb2020_taxon$genus[index==TRUE], ' ', fb2020_taxon$specificEpithet[index==TRUE], ' subsp. ', fb2020_taxon$infraspecificEpithet[index==TRUE])# %>% trimws(.,'right')
-               
-               index = fb2020_taxon$taxonRank %in% c("FORMA")
-               scientificName[index==TRUE] <-  paste0(fb2020_taxon$genus[index==TRUE], ' ', fb2020_taxon$specificEpithet[index==TRUE], ' form. ', fb2020_taxon$infraspecificEpithet[index==TRUE])# %>% trimws(.,'right')
-               
-               fb2020_taxon$scientificNamewithoutAuthorship = scientificName
-               fb2020_taxon$scientificNamewithoutAuthorship_U = toupper(scientificName)
-               
-               
-               return(fb2020_taxon)
+               # link <- paste0("<a href='", url, "> ", occurrenceID,"</a>")
+               x$link[i] <- paste0("<a href='", url, "'target='_blank'> ", occurrenceID[i],"</a>")
                
             }
             
             
-            # occurrenceID = 'splink=MO:3234022'
-            # bibliographicCitation = 'splink'
-            # scientificNameReference = 'Rudgea interrupta'
-            # i=1
             
-            get_link_source_record <- function(occurrenceID,
-                                               bibliographicCitation,
-                                               scientificNameReference)
+            if (bibliographicCitation[i] == 'splink')
             {
                
-               x <- data.frame(link=rep('',NROW(bibliographicCitation)), stringsAsFactors = FALSE)
+               # com barcode
                
-               bibliographicCitation <- bibliographicCitation %>% tolower()
-               
-               for(i in 1:NROW(bibliographicCitation))
+               if (!is.na(str_locate(occurrenceID[i],':')[[1]]))
                {
                   
-                  if (bibliographicCitation[i] == "reflora")
-                  {
-                     barcode <- gsub(paste0(tolower(bibliographicCitation[i]),"=" ), '',occurrenceID[i] )
-                     
-                     base_url <- "http://reflora.jbrj.gov.br/reflora/herbarioVirtual/ConsultaPublicoHVUC/BemVindoConsultaPublicaHVConsultar.do?modoConsulta=LISTAGEM&quantidadeResultado=20&codigoBarra=%s"
-                     url <- sprintf(base_url, barcode)
-                     url
-                     
-                     x$link[i] <- paste0("<a href='", url, "'target='_blank'>", occurrenceID[i],"</a>")
-                  }
+                  occurrenceID_tmp <- gsub(paste0(tolower(bibliographicCitation[i]),"=" ), '',occurrenceID[i] )
+                  occurrenceID_tmp <- str_split(occurrenceID_tmp,':')
+                  col <- occurrenceID_tmp[[1]][1]
+                  cat <- occurrenceID_tmp[[1]][2]
+                  # url <- 'https://specieslink.net/search/'
+                  url <- paste0('https://specieslink.net/search/records/catalognumber/',cat,'/collectionCode/',col)
+                  x$link[i] <- paste0("<a href='", url, "'target='_blank'>", occurrenceID[i],"</a>")
                   
+               }else  
+               {
+                  barcode <- gsub(paste0(tolower(bibliographicCitation[i]),"=" ), '',occurrenceID[i] )
                   
-                  # jabotRB
-                  if (bibliographicCitation[i] == 'jabotrb')
-                  {
-                     
-                     # occurrenceID = 'jabotRB=RB01031072'
-                     
-                     barcode <- gsub(paste0(bibliographicCitation[i],"=" ), '',occurrenceID[i], ignore.case = TRUE)
-                     barcode <- gsub('RB', '',barcode, ignore.case = TRUE)
-                     
-                     base_url <- 'http://rb.jbrj.gov.br/v2/regua/visualizador.php?r=true&colbot=rb&codtestemunho='
-                     url <- paste0(base_url,barcode)
-                     
-                     x$link[i] <- paste0("<a href='", url, "'target='_blank'> ", occurrenceID[i],"</a>")
-                  }
+                  # https://specieslink.net/search/records/barcode/MO0101458866
+                  base_url <- "https://specieslink.net/search/records/barcode/%s"
+                  url <- sprintf(base_url, barcode)
                   
-                  
-                  # jabot
-                  if (bibliographicCitation[i] == "jabot")
-                  {
-                     occurrenceID_tmp <- gsub(paste0(tolower(bibliographicCitation[i]),"=" ), '',occurrenceID[i], ignore.case = TRUE )
-                     
-                     occurrenceID_tmp2 <- str_split(occurrenceID_tmp,':')
-                     
-                     col <- occurrenceID_tmp2[[1]][1]
-                     
-                     cat <- occurrenceID_tmp2[[1]][2]
-                     cat <- gsub(col, '',cat )
-                     
-                     base_url <- "http://rb.jbrj.gov.br/v2/regua/visualizador.php?r=true&colbot=%s&codtestemunho=%s"
-                     url <- sprintf(base_url, col, cat)
-                     
-                     # link <- paste0("<a href='", url, "> ", occurrenceID,"</a>")
-                     x$link[i] <- paste0("<a href='", url, "'target='_blank'> ", occurrenceID[i],"</a>")
-                     
-                  }
-                  
-                  
-                  
-                  if (bibliographicCitation[i] == 'splink')
-                  {
-                     
-                     # com barcode
-                     
-                     if (!is.na(str_locate(occurrenceID[i],':')[[1]]))
-                     {
-                        
-                        occurrenceID_tmp <- gsub(paste0(tolower(bibliographicCitation[i]),"=" ), '',occurrenceID[i] )
-                        occurrenceID_tmp <- str_split(occurrenceID_tmp,':')
-                        col <- occurrenceID_tmp[[1]][1]
-                        cat <- occurrenceID_tmp[[1]][2]
-                        # url <- 'https://specieslink.net/search/'
-                        url <- paste0('https://specieslink.net/search/records/catalognumber/',cat,'/collectionCode/',col)
-                        x$link[i] <- paste0("<a href='", url, "'target='_blank'>", occurrenceID[i],"</a>")
-                        
-                     }else  
-                     {
-                        barcode <- gsub(paste0(tolower(bibliographicCitation[i]),"=" ), '',occurrenceID[i] )
-                        
-                        # https://specieslink.net/search/records/barcode/MO0101458866
-                        base_url <- "https://specieslink.net/search/records/barcode/%s"
-                        url <- sprintf(base_url, barcode)
-                        
-                        x$link[i] <- paste0("<a href='", url, "'target='_blank'>", occurrenceID[i],"</a>")
-                     }
-                     
-                     
-                     
-                  }
-                  
-                  
-                  if(bibliographicCitation[i]=='gbif')
-                  {
-                     
-                     occurrenceID_tmp <- gsub(paste0(tolower(bibliographicCitation),"=" ), '',occurrenceID )
-                     
-                     base_url <- "https://www.gbif.org/occurrence/search?occurrence_id=%s&advanced=1&occurrence_status=present"
-                     
-                     # url <- sprintf(base_url,occurrenceID_tmp)
-                     
-                     url <- paste0("https://www.gbif.org/occurrence/search?occurrence_id=",occurrenceID_tmp,"&advanced=1&occurrence_status=present")
-                     
-                     x$link <- paste0("<a href='", url, "'target='_blank'>", occurrenceID,"</a>")
-                     
-                  }
+                  x$link[i] <- paste0("<a href='", url, "'target='_blank'>", occurrenceID[i],"</a>")
                }
                
-               return(x)
+               
                
             }
             
             
+            if(bibliographicCitation[i]=='gbif')
+            {
+               
+               occurrenceID_tmp <- gsub(paste0(tolower(bibliographicCitation),"=" ), '',occurrenceID )
+               
+               base_url <- "https://www.gbif.org/occurrence/search?occurrence_id=%s&advanced=1&occurrence_status=present"
+               
+               # url <- sprintf(base_url,occurrenceID_tmp)
+               
+               url <- paste0("https://www.gbif.org/occurrence/search?occurrence_id=",occurrenceID_tmp,"&advanced=1&occurrence_status=present")
+               
+               x$link <- paste0("<a href='", url, "'target='_blank'>", occurrenceID,"</a>")
+               
+            }
          }
          
+         return(x)
+         
       }
-   }
-   
-   #  Selecionar UC
-   {
       
+      get_floraFungaBrasil <- function(url_source = "http://ipt.jbrj.gov.br/jbrj/archive.do?r=lista_especies_flora_brasil",
+                                       path_results = NA,
+                                       full=FALSE) # if NULL
+         
+      {  
+         
+         destfile <- paste0(path_results,"/IPT_FloraFungaBrasil_",Sys.Date(),'.zip')
+         downloader::download(url = url_source, destfile = destfile, mode = "wb") 
+         utils::unzip(destfile, exdir = path_results) # descompactar e salvar dentro subpasta "ipt" na pasta principal
+         
+         
+         #  taxon
+         fb2020_taxon  <- readr::read_delim(paste0(path_results,'/taxon.txt'), delim = "\t", quote = "") %>% 
+            dplyr::select(-id)
+         
+         index = fb2020_taxon$taxonRank %in% c("ESPECIE",
+                                               "SUB_ESPECIE",
+                                               "VARIEDADE",
+                                               "FORMA")
+         
+         fb2020_taxon  <- fb2020_taxon[index==TRUE,] 
+         
+         index = fb2020_taxon$taxonRank %in% c("ESPECIE",
+                                               "SUB_ESPECIE",
+                                               "VARIEDADE",
+                                               "FORMA")
+         
+         scientificName_tmp <- fb2020_taxon$scientificName %>% stringr::str_split(.,pattern = ' ', simplify = TRUE)
+         
+         # carregando especie sem autor
+         scientificName <- rep('',nrow(fb2020_taxon))
+         
+         scientificName[index==TRUE] <- scientificName_tmp[index==TRUE,1] %>% trimws(.,'right')
+         
+         index = fb2020_taxon$taxonRank %in% c("ESPECIE")
+         
+         scientificName[index==TRUE] <-  paste0(scientificName_tmp[index==TRUE,1], ' ', scientificName_tmp[index==TRUE,2]) #%>% trimws(.,'right')
+         
+         index = fb2020_taxon$taxonRank %in% c("VARIEDADE")
+         scientificName[index==TRUE] <-  paste0(fb2020_taxon$genus[index==TRUE], ' ', fb2020_taxon$specificEpithet[index==TRUE], ' var. ', fb2020_taxon$infraspecificEpithet[index==TRUE])# %>% trimws(.,'right')
+         
+         index = fb2020_taxon$taxonRank %in% c("SUB_ESPECIE")
+         scientificName[index==TRUE] <-  paste0(fb2020_taxon$genus[index==TRUE], ' ', fb2020_taxon$specificEpithet[index==TRUE], ' subsp. ', fb2020_taxon$infraspecificEpithet[index==TRUE])# %>% trimws(.,'right')
+         
+         index = fb2020_taxon$taxonRank %in% c("FORMA")
+         scientificName[index==TRUE] <-  paste0(fb2020_taxon$genus[index==TRUE], ' ', fb2020_taxon$specificEpithet[index==TRUE], ' form. ', fb2020_taxon$infraspecificEpithet[index==TRUE])# %>% trimws(.,'right')
+         
+         fb2020_taxon$scientificNamewithoutAuthorship = scientificName
+         fb2020_taxon$scientificNamewithoutAuthorship_U = toupper(scientificName)
+         
+         
+         return(fb2020_taxon)
+         
+      }
+      
+   }   
+   options(shiny.maxRequestSize=10000*1024^2) 
+   
+   {
       # colunas_ctrl_dwc
       {
          colunas_wcvp_sel <<- c("wcvp_kew_id",
@@ -504,6 +379,7 @@ app_review <- function()
          
       }
       
+      # calunas fb2020/wcvp e resultados
       {
          fb2020_names <- data.frame(stringsAsFactors = FALSE,
                                     
@@ -633,65 +509,85 @@ app_review <- function()
                                                   Ctrl_collectionCode_Standard = NA,
                                                   Ctrl_catalogNumber_Standard = NA)
          
+         # fb2020
+         {
+            columns_FB2020 <<- c('taxonRank',
+                                 'taxonomicStatus')
+            # ,
+            #                      'nomenclaturalStatus')
+            # 
+            
+            colSearch_fb2020 <<- {}
+            
+            # fb2020_taxon$taxonRank %>% unique() %>% sort()
+            
+            taxonRank_fb2020 <- c(
+               "ESPECIE",
+               "SUB_ESPECIE",
+               "VARIEDADE",
+               "FORMA")
+            colSearch_fb2020[['taxonRank']] <- as.list(taxonRank_fb2020)
+            
+            # fb2020_taxon$taxonomicStatus %>% unique() %>% sort()
+            taxonomicStatus_fb2020_ <- c("NOME_ACEITO",
+                                         "SINONIMO")
+            
+            colSearch_fb2020[['taxonomicStatus']] <- as.list(taxonomicStatus_fb2020_)
+            
+            # nomenclaturalStatus_fb2020 <<-c("NOME_APLICACAO_INCERTA",
+            #                                 "NOME_CORRETO",
+            #                                 "NOME_CORRETO_VIA_CONSERVACAO",
+            #                                 "NOME_ILEGITIMO",
+            #                                 "NOME_LEGITIMO_MAS_INCORRETO",
+            #                                 "NOME_MAL_APLICADO",
+            #                                 "NOME_NAO_EFETIVAMENTE_PUBLICADO",
+            #                                 "NOME_NAO_VALIDAMENTE_PUBLICADO" ,
+            #                                 "NOME_REJEITADO",
+            #                                 "VARIANTE_ORTOGRAFICA")
+            # colSearch_fb2020[['nomenclaturalStatus']] <- as.list(nomenclaturalStatus_fb2020)
+         }
+         
+         # wcvp
+         {
+            columns_wcvp <<- c('rank',
+                               'taxonomic_status')
+            
+            
+            colSearch_wcvp <<- {}
+            
+            # wcvp$rank %>% unique() %>% sort()
+            
+            taxonRank_wcvp <- c( "Form",
+                                 "InfraspecificName",
+                                 "SPECIES",
+                                 "Subform",
+                                 "SUBSPECIES",
+                                 "Subvariety",
+                                 "VARIETY"  )
+            colSearch_wcvp[['rank']] <- as.list(taxonRank_wcvp)
+            
+            # wcvp$taxonomic_status %>% unique() %>% sort()
+            taxonomicStatus_wcvp <- c("Accepted",
+                                      "Artificial Hybrid",
+                                      "Homotypic_Synonym",
+                                      "Synonym",
+                                      "Unplaced")
+            colSearch_wcvp[['taxonomic_status']] <- as.list(taxonomicStatus_wcvp)
+         }
+         
          
       }
-      
       
       occ_result <<- list(
          fb2020_names = fb2020_names,
          wcvp_names = wcvp_names,
          join_dwc = join_dwc)
-      
-      
    }
    
    # app
    {
-      # global
+      # variaveis
       {
-         Ctrl_dateIdentified <<- Sys.Date()
-         Ctrl_identifiedBy <<- ''
-         Ctrl_emailVerificador <<- ''
-         Ctrl_familyList <<- ''
-         Ctrl_scientificNameList <<- ''
-         
-         # Ctrl_typeCheckIdentification <- ''
-         
-         
-         
-         # Ctrl_voucherAmostra = 'Não validado',
-         # Ctrl_amostraVerificada = FALSE,
-         Ctrl_naoPossivelVerificar <<- FALSE
-         Ctrl_observacaoNaoPossivelVerificar <<- ''
-         
-         
-         Ctrl_dataVerificacao <<- Sys.Date()
-         # Ctrl_verificadoPor <<- ''
-         
-         # Ctrl_scientificName_verified <<- ''
-         
-         # Ctrl_family_new_family <<- ''
-         
-         Ctrl_scientificName_new_family  <<- ''
-         
-         # atualizar_tabela_identificacao <<- FALSE
-         atualizar_tabela_identificacao <<- TRUE
-         
-         spp_sel <<- ''
-         
-         
-         ### NOVO
-         # Ctrl_new_familyList <<- ''
-         Ctrl_FB2020_familyList <<- ''
-         Ctrl_new_specieList <<- ''
-         
-         ###
-         
-      }
-      
-      #   Preparaçao
-      {
-         
          Ctrl_observacaoNaoPossivelVerificar_list <- c('Não se aplica',
                                                        'Espécimes estão danificados e/ou em condições não adequadas para verificação',
                                                        'Espécimes não possuem imagens digitalizadas',
@@ -700,10 +596,23 @@ app_review <- function()
                                                        'Outra Família',
                                                        'Outros motivos')
          
-         
-         occ_full_tmp <- {}
+         Ctrl_dateIdentified <<- Sys.Date()
+         Ctrl_identifiedBy <<- ''
+         Ctrl_emailVerificador <<- ''
+         Ctrl_familyList <<- ''
+         Ctrl_scientificNameList <<- ''
+         Ctrl_naoPossivelVerificar <<- FALSE
+         Ctrl_observacaoNaoPossivelVerificar <<- ''
+         Ctrl_dataVerificacao <<- Sys.Date()
+         Ctrl_scientificName_new_family  <<- ''
+         atualizar_tabela_identificacao <<- TRUE
+         spp_sel <<- ''
+         Ctrl_FB2020_familyList <<- ''
+         Ctrl_new_specieList <<- ''
          occ_full <<- {}
          key_list <<- {}
+         
+         occ_full_tmp <- {}
          
          occ <<- list(reflora=data.frame(),
                       janot=data.frame(),
@@ -743,77 +652,6 @@ app_review <- function()
                       all_cc = data.frame(),
                       
                       scientificName_list <- data.frame())
-         
-         # colunas de busca na taxon
-         {
-            # fb2020
-            {
-               columns_FB2020 <<- c('taxonRank',
-                                    'taxonomicStatus')
-               # ,
-               #                      'nomenclaturalStatus')
-               # 
-               
-               colSearch_fb2020 <<- {}
-               
-               # fb2020_taxon$taxonRank %>% unique() %>% sort()
-               
-               taxonRank_fb2020 <- c(
-                  "ESPECIE",
-                  "SUB_ESPECIE",
-                  "VARIEDADE",
-                  "FORMA")
-               colSearch_fb2020[['taxonRank']] <- as.list(taxonRank_fb2020)
-               
-               # fb2020_taxon$taxonomicStatus %>% unique() %>% sort()
-               taxonomicStatus_fb2020_ <- c("NOME_ACEITO",
-                                            "SINONIMO")
-               
-               colSearch_fb2020[['taxonomicStatus']] <- as.list(taxonomicStatus_fb2020_)
-               
-               # nomenclaturalStatus_fb2020 <<-c("NOME_APLICACAO_INCERTA",
-               #                                 "NOME_CORRETO",
-               #                                 "NOME_CORRETO_VIA_CONSERVACAO",
-               #                                 "NOME_ILEGITIMO",
-               #                                 "NOME_LEGITIMO_MAS_INCORRETO",
-               #                                 "NOME_MAL_APLICADO",
-               #                                 "NOME_NAO_EFETIVAMENTE_PUBLICADO",
-               #                                 "NOME_NAO_VALIDAMENTE_PUBLICADO" ,
-               #                                 "NOME_REJEITADO",
-               #                                 "VARIANTE_ORTOGRAFICA")
-               # colSearch_fb2020[['nomenclaturalStatus']] <- as.list(nomenclaturalStatus_fb2020)
-            }
-            
-            # wcvp
-            {
-               columns_wcvp <<- c('rank',
-                                  'taxonomic_status')
-               
-               
-               colSearch_wcvp <<- {}
-               
-               # wcvp$rank %>% unique() %>% sort()
-               
-               taxonRank_wcvp <- c( "Form",
-                                    "InfraspecificName",
-                                    "SPECIES",
-                                    "Subform",
-                                    "SUBSPECIES",
-                                    "Subvariety",
-                                    "VARIETY"  )
-               colSearch_wcvp[['rank']] <- as.list(taxonRank_wcvp)
-               
-               # wcvp$taxonomic_status %>% unique() %>% sort()
-               taxonomicStatus_wcvp <- c("Accepted",
-                                         "Artificial Hybrid",
-                                         "Homotypic_Synonym",
-                                         "Synonym",
-                                         "Unplaced")
-               colSearch_wcvp[['taxonomic_status']] <- as.list(taxonomicStatus_wcvp)
-            }
-            
-         }
-         
       }
       
       #  Tela APP--
@@ -2044,7 +1882,7 @@ get_current_slice_key <- reactive(
                        scientificName_verified,
                        
                        family_verified,
-
+                       
                        naoPossivelVerificar,
                        observacaoNaoPossivelVerificar,
                        
@@ -2698,8 +2536,6 @@ output$hot_details_key <- renderRHandsontable(
       }
       
    }
-   
-
    
    #  Run the application 
    # shinyApp(ui = ui, server = server)
