@@ -1,3 +1,4 @@
+
 #' @title Prepare Plant Catalog of Units of Brazilian Conservation App
 #' @name app_prepare
 #' @description An R app for preparing species listings for the Plant Catalog of Units of Brazilian Conservation.
@@ -8,6 +9,8 @@
 #'        
 #' @seealso \code{\link[utils]{download.file}}, \code{\link[utils]{aspell}}
 #' 
+#' @import devtools
+#' @import plyr
 #' @import dplyr
 #' @import tidyr
 #' @import readr
@@ -24,6 +27,8 @@
 #' @import shinyWidgets
 #' @import measurements
 #' @import downloader
+#' @import glue
+#' @import tidyverse
 #' 
 #' @examples
 #' \donttest{
@@ -75,31 +80,32 @@ app_prepare <- function()
          {
             options(shiny.maxRequestSize=10000*1024^2) 
             
-            # #require(CoordinateCleaner)
-            # #require(devtools)
-            # require(downloader)
-            # require(dplyr)
-            # require(DT)
-            # require(jsonlite)
-            # require(lubridate)
-            # require(measurements)
-            # #require(plyr)
-            # #require(raster)
-            # require(readr)
-            # require(readxl) 
-            # require(rhandsontable) # tabela editavel
-            # require(rnaturalearthdata)
-            # require(rvest)
-            # require(shiny) 
-            # require(shinydashboard)
-            # require(shinydashboardPlus)
-            # require(shinyWidgets) # botoes
-            # require(sqldf) 
-            # require(stringr)
-            # require(textclean)
-            # require(tidyr)
-            # require(writexl)
-            
+            #require(CoordinateCleaner)
+            require(devtools)
+            require(downloader)
+            require(dplyr)
+            require(DT)
+            require(jsonlite)
+            require(lubridate)
+            require(measurements)
+            require(plyr)
+            #require(raster)
+            require(readr)
+            require(readxl)
+            require(rhandsontable) # tabela editavel
+            require(rnaturalearthdata)
+            require(rvest)
+            require(shiny)
+            require(shinydashboard)
+            require(shinydashboardPlus)
+            require(shinyWidgets) # botoes
+            require(sqldf)
+            require(stringr)
+            require(textclean)
+            require(tidyr)
+            require(writexl)
+            library(glue)
+            library(tidyverse)
             
          }
          
@@ -4325,7 +4331,7 @@ app_prepare <- function()
                   tryCatch(
                      {
                         
-                        # files_tmp <- 'C:\\Dados\\CNCFlora\\shiny\\cncflora\\scriptsAdd\\Lista_Erioucalaceae_GO_DF\\data\\splink\\speciesLink-20221211190741-0011975.txt'
+                        # files_tmp <- 'C:\\catalogoUCsBR - github.com\\doc 2024\\dados_serra das lontras\\speciesLink_Serra_das_Lontras.txt'
                         files_tmp <- input$splinkFile$datapath
                         nf <- length(files_tmp)
                         occ_tmp <- data.frame({})
@@ -4347,6 +4353,7 @@ app_prepare <- function()
                               occ_tmp <- rbind.data.frame(occ_tmp, occ_tmp_1)   
                            }
                         }
+                        
                         
                         occ_tmp <- occ_tmp %>% dplyr::filter(kingdom=='Plantae')
                         
@@ -4398,11 +4405,12 @@ app_prepare <- function()
                                  dplyr::mutate(subspecies = gsub('var. |subsp. |form. |f. ','',
                                                                  subspecies,
                                                                  ignore.case = TRUE))  
+                              
                               occ[[source_data]] <- occ[[source_data]] %>%
-                                 dplyr::mutate(family = ifelse(trim(family)=='',"",family)) %>%
-                                 dplyr::mutate(genus = ifelse(trim(genus)=='',"",genus)) %>%
-                                 dplyr::mutate(species = ifelse(trim(species)=='',"",species)) %>%
-                                 dplyr::mutate(subspecies = ifelse(trim(subspecies)=='',"",subspecies))
+                                 dplyr::mutate(family = ifelse(glue::trim(family)=='',"",family)) %>%
+                                 dplyr::mutate(genus = ifelse(glue::trim(genus)=='',"",genus)) %>%
+                                 dplyr::mutate(species = ifelse(glue::trim(species)=='',"",species)) %>%
+                                 dplyr::mutate(subspecies = ifelse(glue::trim(subspecies)=='',"",subspecies))
                               
                               occ[[source_data]] <- occ[[source_data]] %>%
                                  dplyr::mutate(family = word(family,1)) %>%
@@ -4996,7 +5004,7 @@ app_prepare <- function()
                                                  1, 
                                                  stringr::str_locate(dt$Ctrl_occurrenceID, '=')[,1]-1)
                   
-                  bancodados <- paste0(toupper(str_sub(bancodados,1,1)),str_sub(bancodados, 2,nchar(bancodados)))
+                  bancodados <- paste0(toupper(stringr::str_sub(bancodados,1,1)),stringr::str_sub(bancodados, 2,nchar(bancodados)))
                   
                   barcode <- stringr::str_sub(dt$Ctrl_occurrenceID,
                                               stringr::str_locate(dt$Ctrl_occurrenceID, '=')[,1]+1,
@@ -5015,7 +5023,7 @@ app_prepare <- function()
                   # print(colnames(dt))
                   
                   dt <- dt %>%
-                     dplyr::arrange_at(., c('Ctrl_family','Ctrl_scientificName','Ctrl_recordedBy','Ctrl_recordNumber'))
+                     dplyr::arrange_at(., c('Ctrl_family','Ctrl_scientificName','Ctrl_nameRecordedBy_Standard','Ctrl_recordNumber_Standard'))
                   
                   
                   data_imp <- data.frame(UC = rep('',NROW(dt)),
@@ -5031,12 +5039,35 @@ app_prepare <- function()
                                          `Sigla Herbário` = dt$Ctrl_collectionCode,
                                          `Coletor`	= dt$Ctrl_recordedBy,
                                          `Número da Coleta`	= dt$Ctrl_recordNumber,
-                                         `Origem (segundo Flora e Funga do Brasil)` = rep('',NROW(dt)))
+                                         `Origem (segundo Flora e Funga do Brasil)` = rep('',NROW(dt)),
+                                         `Determinador` = dt$Ctrl_identifiedBy,
+                                         `Data Determinação` = dt$Ctrl_dateIdentified,
+                                         `Data Coleta` = paste0(dt$Ctrl_day,'/',dt$Ctrl_month, '/',dt$Ctrl_year),
+                                         `País` = dt$Ctrl_country,
+                                         `UF` = dt$Ctrl_stateProvince,
+                                         `Município` = dt$Ctrl_municipality,
+                                         `Localidade` = dt$Ctrl_locality,
+                                         `Longitude` = dt$Ctrl_decimalLongitude,
+                                         `Latitude` = dt$Ctrl_decimalLatitude
+                                         )
                   
                   # write.csv(data_imp %>% data.frame(stringsAsFactors = FALSE), file, row.names = FALSE, fileEncoding = "UTF-8", na = "")
                   # write_excel_csv(data_imp %>% data.frame(stringsAsFactors = FALSE), file, na = "")
                   
-                  writexl::write_xlsx(data_imp, 
+                  
+                  # setting the threshold for the maximum number of characters to be preserved
+                  n_char_to_truncate_threshold <- 32767
+                  
+                  # tidyverse
+                  # adjusted data.frame where the character columns are truncated so that they do not exceed the threshold of 32767 characters
+                  df2 <- map_df(data_imp, ~ifelse(is.character(.x) & nchar(.x) > n_char_to_truncate_threshold,  str_sub(.x, 1, n_char_to_truncate_threshold), .x))
+                  
+                  # checking the result to make sure it is truncated
+                  # you can also use it beforehand to see which columns are the ones causing problems
+                  map_df(df2, ~ifelse(is.character(.x), nchar(.x), NA) )
+                  
+                  
+                  writexl::write_xlsx(df2, 
                                       file)
                   # sheetName = 'Modelo', 
                   # append = FALSE)
@@ -5059,4 +5090,4 @@ app_prepare <- function()
    }
 }
 
- app_prepare()
+# app_prepare()

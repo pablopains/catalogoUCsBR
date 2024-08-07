@@ -23,6 +23,7 @@
 #' @import measurements
 #' @import downloader
 #' @import writexl
+#' @import tidyverse
 #' 
 #' @examples
 #' \donttest{

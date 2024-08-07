@@ -23,6 +23,8 @@
 #' @import measurements
 #' @import downloader
 #' @import writexl
+#' @import jsonlite
+#' #' @import tidyverse
 #' 
 #' @examples
 #' \donttest{
@@ -31,24 +33,26 @@
 #' @export
 app_review <- function()
 {
-   # require(dplyr)
-   # require(tidyr)
-   # require(readr)
-   # require(stringr)
-   # require(lubridate)
-   # require(jsonlite)
-   # require(sqldf)
-   # require(rvest)
-   # require(shiny)
-   # require(shinydashboard)
-   # require(rhandsontable)
-   # require(DT)
-   # require(rhandsontable)
-   # require(shinyWidgets)
-   # require(measurements)
-   # require(downloader)
-   # require(app_publication)
-   # require(writexl)
+   require(dplyr)
+   require(tidyr)
+   require(readr)
+   require(stringr)
+   require(lubridate)
+   require(jsonlite)
+   require(sqldf)
+   require(rvest)
+   require(shiny)
+   require(shinydashboard)
+   require(rhandsontable)
+   require(DT)
+   require(rhandsontable)
+   require(shinyWidgets)
+   require(measurements)
+   require(downloader)
+   require(app_publication)
+   require(writexl)
+   library(tidyverse)
+   require(jsonlite)
    
    # source('functions.R')
    {
@@ -1048,8 +1052,8 @@ app_review <- function()
                autor[i] <- sub(sp_tmp[i], '', x[i])  
             }  
             
-            dt <- dt %>% 
-               dplyr::arrange_at(., c('Ctrl_family_verified','Ctrl_scientificName_verified','Ctrl_recordedBy','Ctrl_recordNumber'))
+            dt <- dt %>%
+               dplyr::arrange_at(., c('Ctrl_family_verified','Ctrl_scientificName_verified','Ctrl_nameRecordedBy_Standard','Ctrl_recordNumber_Standard'))
             
             data_imp <- data.frame(UC = rep('',NROW(dt)),
                                    Grupos = rep('',NROW(dt)),
@@ -1063,11 +1067,31 @@ app_review <- function()
                                    `Sigla Herbário` = dt$Ctrl_collectionCode,
                                    `Coletor`	= dt$Ctrl_recordedBy,
                                    `Número da Coleta`	= dt$Ctrl_recordNumber,
-                                   `Origem (segundo Flora e Funga do Brasil)` = rep('',NROW(dt)))
+                                   `Origem (segundo Flora e Funga do Brasil)` = rep('',NROW(dt)),
+                                   `Táxon completo (segundo ficha herbário)` = paste0(dt$Ctrl_family, ' ',dt$Ctrl_scientificName),
+                                   `Determinador` = dt$Ctrl_identifiedBy,
+                                   `Data Determinação` = dt$Ctrl_dateIdentified,
+                                   `Data Coleta` = paste0(dt$Ctrl_day,'/',dt$Ctrl_month, '/',dt$Ctrl_year),
+                                   `País` = dt$Ctrl_country,
+                                   `UF` = dt$Ctrl_stateProvince,
+                                   `Município` = dt$Ctrl_municipality,
+                                   `Localidade` = dt$Ctrl_locality,
+                                   `Longitude` = dt$Ctrl_decimalLongitude,
+                                   `Latitude` = dt$Ctrl_decimalLatitude)
             
-            # write.csv(data_imp %>% data.frame(stringsAsFactors = FALSE), file, row.names = FALSE, fileEncoding = "UTF-8", na = "")
-            # write_excel_csv(data_imp %>% data.frame(stringsAsFactors = FALSE), file, na = "")
-            writexl::write_xlsx(data_imp, 
+            # setting the threshold for the maximum number of characters to be preserved
+            n_char_to_truncate_threshold <- 32767
+            
+            # tidyverse
+            # adjusted data.frame where the character columns are truncated so that they do not exceed the threshold of 32767 characters
+            df2 <- map_df(data_imp, ~ifelse(is.character(.x) & nchar(.x) > n_char_to_truncate_threshold,  str_sub(.x, 1, n_char_to_truncate_threshold), .x))
+            
+            # checking the result to make sure it is truncated
+            # you can also use it beforehand to see which columns are the ones causing problems
+            map_df(df2, ~ifelse(is.character(.x), nchar(.x), NA) )
+            
+            
+            writexl::write_xlsx(df2, 
                                 file)
             
             
