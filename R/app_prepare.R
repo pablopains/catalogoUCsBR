@@ -132,6 +132,122 @@ app_prepare <- function()
             
             # txt_search <- occ[[source_data]]$scientificname
             
+            get_link_source_record_url <- function(occurrenceID,
+                                               bibliographicCitation,
+                                               scientificNameReference)
+            {
+               
+               x <- data.frame(link=rep('',NROW(bibliographicCitation)), stringsAsFactors = FALSE)
+               url <- ''
+               
+               bibliographicCitation <- bibliographicCitation %>% tolower()
+               
+               for(i in 1:NROW(bibliographicCitation))
+               {
+                  
+                  if (bibliographicCitation[i] == "reflora")
+                  {
+                     barcode <- gsub(paste0(tolower(bibliographicCitation[i]),"=" ), '',occurrenceID[i] )
+                     
+                     base_url <- "http://reflora.jbrj.gov.br/reflora/herbarioVirtual/ConsultaPublicoHVUC/BemVindoConsultaPublicaHVConsultar.do?modoConsulta=LISTAGEM&quantidadeResultado=20&codigoBarra=%s"
+                     url <- sprintf(base_url, barcode)
+                     url
+                     
+                     x$link[i] <- paste0("<a href='", url, "'target='_blank'>", occurrenceID[i],"</a>")
+                  }
+                  
+                  
+                  # jabotRB
+                  if (bibliographicCitation[i] == 'jabotrb')
+                  {
+                     
+                     # occurrenceID = 'jabotRB=RB01031072'
+                     
+                     barcode <- gsub(paste0(bibliographicCitation[i],"=" ), '',occurrenceID[i], ignore.case = TRUE)
+                     barcode <- gsub('RB', '',barcode, ignore.case = TRUE)
+                     
+                     base_url <- 'http://rb.jbrj.gov.br/v2/regua/visualizador.php?r=true&colbot=rb&codtestemunho='
+                     url <- paste0(base_url,barcode)
+                     
+                     x$link[i] <- paste0("<a href='", url, "'target='_blank'> ", occurrenceID[i],"</a>")
+                  }
+                  
+                  
+                  # jabot
+                  if (bibliographicCitation[i] == "jabot")
+                  {
+                     occurrenceID_tmp <- gsub(paste0(tolower(bibliographicCitation[i]),"=" ), '',occurrenceID[i], ignore.case = TRUE )
+                     
+                     occurrenceID_tmp2 <- str_split(occurrenceID_tmp,':')
+                     
+                     col <- occurrenceID_tmp2[[1]][1]
+                     
+                     cat <- occurrenceID_tmp2[[1]][2]
+                     cat <- gsub(col, '',cat )
+                     
+                     base_url <- "http://rb.jbrj.gov.br/v2/regua/visualizador.php?r=true&colbot=%s&codtestemunho=%s"
+                     url <- sprintf(base_url, col, cat)
+                     
+                     # link <- paste0("<a href='", url, "> ", occurrenceID,"</a>")
+                     x$link[i] <- paste0("<a href='", url, "'target='_blank'> ", occurrenceID[i],"</a>")
+                     
+                  }
+                  
+                  
+                  
+                  if (bibliographicCitation[i] == 'splink')
+                  {
+                     
+                     # com barcode
+                     
+                     if (!is.na(str_locate(occurrenceID[i],':')[[1]]))
+                     {
+                        
+                        occurrenceID_tmp <- gsub(paste0(tolower(bibliographicCitation[i]),"=" ), '',occurrenceID[i] )
+                        occurrenceID_tmp <- str_split(occurrenceID_tmp,':')
+                        col <- occurrenceID_tmp[[1]][1]
+                        cat <- occurrenceID_tmp[[1]][2]
+                        # url <- 'https://specieslink.net/search/'
+                        url <- paste0('https://specieslink.net/search/records/catalognumber/',cat,'/collectionCode/',col)
+                        x$link[i] <- paste0("<a href='", url, "'target='_blank'>", occurrenceID[i],"</a>")
+                        
+                     }else  
+                     {
+                        barcode <- gsub(paste0(tolower(bibliographicCitation[i]),"=" ), '',occurrenceID[i] )
+                        
+                        # https://specieslink.net/search/records/barcode/MO0101458866
+                        base_url <- "https://specieslink.net/search/records/barcode/%s"
+                        url <- sprintf(base_url, barcode)
+                        
+                        x$link[i] <- paste0("<a href='", url, "'target='_blank'>", occurrenceID[i],"</a>")
+                     }
+                     
+                     
+                     
+                  }
+                  
+                  
+                  if(bibliographicCitation[i]=='gbif')
+                  {
+                     
+                     occurrenceID_tmp <- gsub(paste0(tolower(bibliographicCitation),"=" ), '',occurrenceID )
+                     
+                     base_url <- "https://www.gbif.org/occurrence/search?occurrence_id=%s&advanced=1&occurrence_status=present"
+                     
+                     # url <- sprintf(base_url,occurrenceID_tmp)
+                     
+                     url <- paste0("https://www.gbif.org/occurrence/search?occurrence_id=",occurrenceID_tmp,"&advanced=1&occurrence_status=present")
+                     
+                     x$link <- paste0("<a href='", url, "'target='_blank'>", occurrenceID,"</a>")
+                     
+                  }
+               }
+               
+               return(url)
+               
+            }
+            
+            
             check_identificationQualifier <- function(txt_search='',
                                                       keyword = c(' aff.', ' cf.'))
             {
@@ -4866,9 +4982,25 @@ app_prepare <- function()
                                                                                   
                                                                                   
                                                                                   # updated occurrences CSV file: collection code and main collector's last name
-                                                                                  
+
                                                                                   # source_data <- 'all_updated_collection_collector'
                                                                                   # occ[[source_data]] <<- r_tmp
+
+
+                                                                                  print('gerar link amostras....')
+
+                                                                                  r_tmp$link_imagem_amostra <- rep('',NROW(r_tmp))
+                                                                                  i=1
+                                                                                  for(i in 1:NROW(r_tmp))
+                                                                                  {
+                                                                                     print(paste0(i, ' ', NROW(r_tmp)))
+                                                                                     r_tmp$link_imagem_amostra[i] <- get_link_source_record(r_tmp$Ctrl_occurrenceI[i],
+                                                                                                                 r_tmp$Ctrl_bibliographicCitation[i],
+                                                                                                                 r_tmp$Ctrl_scientificName[i]) #%>% data.frame(stringsAsFactors = FALSE)
+
+                                                                                     print(r_tmp$link_imagem_amostra[i])
+                                                                                  }
+                                                                                  
                                                                                   
                                                                                   source_data <- 'all_results'
                                                                                   occ[[source_data]] <<- r_tmp
@@ -4958,6 +5090,7 @@ app_prepare <- function()
                                    Ctrl_family, Ctrl_scientificName, fb2020_family, fb2020_scientificName,
                                    Ctrl_collectionCode, Ctrl_catalogNumber, Ctrl_key_family_recordedBy_recordNumber, Ctrl_recordNumber, Ctrl_recordedBy,
                                    Ctrl_year, Ctrl_month, Ctrl_day,
+                                   link_imagem_amostra,
                                    Ctrl_Record_ID_Review) %>%
                      arrange_at(.,c('Ctrl_locality', 'Ctrl_country', 'Ctrl_stateProvince', 'Ctrl_municipality') )
                   
@@ -5039,6 +5172,7 @@ app_prepare <- function()
                                          `Sigla Herbário` = dt$Ctrl_collectionCode,
                                          `Coletor`	= dt$Ctrl_recordedBy,
                                          `Número da Coleta`	= dt$Ctrl_recordNumber,
+                                         `link para imagem da amostra` = dt$link_imagem_amostra,
                                          `Origem (segundo Flora e Funga do Brasil)` = rep('',NROW(dt)),
                                          `Determinador` = dt$Ctrl_identifiedBy,
                                          `Data Determinação` = dt$Ctrl_dateIdentified,
