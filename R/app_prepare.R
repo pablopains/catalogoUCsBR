@@ -40,6 +40,8 @@ app_prepare <- function()
 
 # app
 {
+  
+  {
    {
       # 0 - Preparar ambiente R
       {
@@ -109,9 +111,8 @@ app_prepare <- function()
             
          }
          
-         # cerregar funções desenvolvidas pelo CNCFLora
-         {
-            # baixar e tabela FB2020 IPT 
+         # cerregar funções 
+         {            # baixar e tabela FB2020 IPT 
             #' Rodar somente em atualizações do IPT, aproximadamente 6 horas de processamento.
             # source('./functions/FB2020_IPT_Get.R', encoding = "UTF-8")
             
@@ -269,8 +270,7 @@ app_prepare <- function()
                return(df$identificationQualifier)
             }  
             
-            # carregar pacotes R e funções
-            {
+
                # source("C:/Dados/CNCFlora/shiny/cncflora/functions/verbatimCleaning_v3.R", encoding = "UTF-8")
                {
                   substituir_siglas <- function(x)
@@ -1656,7 +1656,7 @@ app_prepare <- function()
             
             
             
-         }
+         
          
          # finalizar tempo de processamento
          tempo_processo <- get_tempo_processamento(tempo_processo_tmp)
@@ -2330,7 +2330,7 @@ app_prepare <- function()
       # occ[[source_data]]$Ctrl_recordedBy
       
    }
-   
+}
    
    # Tela APP--
    ui <- 
@@ -4994,11 +4994,9 @@ app_prepare <- function()
                                                                                   for(i in 1:NROW(r_tmp))
                                                                                   {
                                                                                      print(paste0(i, ' ', NROW(r_tmp)))
-                                                                                     r_tmp$link_imagem_amostra[i] <- get_link_source_record(r_tmp$Ctrl_occurrenceI[i],
+                                                                                     r_tmp$link_imagem_amostra[i] <- get_link_source_record_url(r_tmp$Ctrl_occurrenceI[i],
                                                                                                                  r_tmp$Ctrl_bibliographicCitation[i],
                                                                                                                  r_tmp$Ctrl_scientificName[i]) #%>% data.frame(stringsAsFactors = FALSE)
-
-                                                                                     print(r_tmp$link_imagem_amostra[i])
                                                                                   }
                                                                                   
                                                                                   
@@ -5133,28 +5131,26 @@ app_prepare <- function()
                   dt<- pega_dados()
                   
 
-                  bancodados <- stringr::str_sub(dt$Ctrl_occurrenceID, 
-                                                 1, 
-                                                 stringr::str_locate(dt$Ctrl_occurrenceID, '=')[,1]-1)
+                  dt$bancodados <- rep('',NROW(dt))
+                  dt$barcode <- rep('',NROW(dt)) 
+                  for(ii in 1:NROW(dt))
+                  {
+                    bancodados <- stringr::str_sub(dt$Ctrl_occurrenceID[ii], 
+                                                   1, 
+                                                   stringr::str_locate(dt$Ctrl_occurrenceID[ii], '=')[,1]-1)
+                    
+                    
+                    bancodados <- paste0(toupper(stringr::str_sub(bancodados,1,1)),stringr::str_sub(bancodados, 2,nchar(bancodados)))
+                    
+                    barcode <- stringr::str_sub(dt$Ctrl_occurrenceID[ii],
+                                                stringr::str_locate(dt$Ctrl_occurrenceID[ii], '=')[,1]+1,
+                                                nchar(dt$Ctrl_occurrenceID[ii]))
+                    
+                    dt$bancodados[ii] <- bancodados
+                    dt$barcode[ii] <- barcode
+                  }
                   
-                  bancodados <- paste0(toupper(stringr::str_sub(bancodados,1,1)),stringr::str_sub(bancodados, 2,nchar(bancodados)))
-                  
-                  barcode <- stringr::str_sub(dt$Ctrl_occurrenceID,
-                                              stringr::str_locate(dt$Ctrl_occurrenceID, '=')[,1]+1,
-                                              nchar(dt$Ctrl_occurrenceID))
-                  
-                  # x <- dt$Ctrl_scientificName_verified
-                  # x <- dt$fb2020_scientificName
-                  # 
-                  # sp_tmp <- paste0(word(x,1) ,' ',word(x,2), ' ')
-                  # autor <- rep('',NROW(x))
-                  # for(i in 1:NROW(x))
-                  # {
-                  #    autor[i] <- sub(sp_tmp[i], '', x[i])  
-                  # }  
-                  
-                  # print(colnames(dt))
-                  
+
                   dt <- dt %>%
                      dplyr::arrange_at(., c('Ctrl_family','Ctrl_scientificName','Ctrl_nameRecordedBy_Standard','Ctrl_recordNumber_Standard'))
                   
@@ -5167,8 +5163,8 @@ app_prepare <- function()
                                          `Espécie (segundo Flora & Funga do Brasil)` = word(dt$fb2020_scientificName,2),
                                          `Autor (segundo Flora & Funga do Brasil)` = dt$fb2020_scientificNameAuthorship,
                                          `Táxon completo (segundo Flora & Funga do Brasil)` = paste0(dt$fb2020_family, ' ',dt$fb2020_scientificName),
-                                         `Barcode`	=  barcode,
-                                         `Banco de dados de origem`	= bancodados,
+                                         `Barcode`	=  dt$barcode,
+                                         `Banco de dados de origem`	= dt$bancodados,
                                          `Sigla Herbário` = dt$Ctrl_collectionCode,
                                          `Coletor`	= dt$Ctrl_recordedBy,
                                          `Número da Coleta`	= dt$Ctrl_recordNumber,

@@ -1034,15 +1034,24 @@ app_review <- function()
             
             dt <- dt[index_res==TRUE,] 
             
-            bancodados <- stringr::str_sub(dt$Ctrl_occurrenceID, 
-                                           1, 
-                                           stringr::str_locate(dt$Ctrl_occurrenceID, '=')[,1]-1)
-            
-            bancodados <- paste0(toupper(str_sub(bancodados,1,1)),str_sub(bancodados, 2,nchar(bancodados)))
-            
-            barcode <- stringr::str_sub(dt$Ctrl_occurrenceID,
-                                        stringr::str_locate(dt$Ctrl_occurrenceID, '=')[,1]+1,
-                                        nchar(dt$Ctrl_occurrenceID))
+            dt$bancodados <- rep('',NROW(dt))
+            dt$barcode <- rep('',NROW(dt)) 
+            for(ii in 1:NROW(dt))
+            {
+              bancodados <- stringr::str_sub(dt$Ctrl_occurrenceID[ii], 
+                                             1, 
+                                             stringr::str_locate(dt$Ctrl_occurrenceID[ii], '=')[,1]-1)
+              
+              
+              bancodados <- paste0(toupper(stringr::str_sub(bancodados,1,1)),stringr::str_sub(bancodados, 2,nchar(bancodados)))
+              
+              barcode <- stringr::str_sub(dt$Ctrl_occurrenceID[ii],
+                                          stringr::str_locate(dt$Ctrl_occurrenceID[ii], '=')[,1]+1,
+                                          nchar(dt$Ctrl_occurrenceID[ii]))
+              
+              dt$bancodados[ii] <- bancodados
+              dt$barcode[ii] <- barcode
+            }
             
             x <- dt$Ctrl_scientificName_verified
             sp_tmp <- paste0(word(x,1) ,' ',word(x,2), ' ')
@@ -1062,8 +1071,8 @@ app_review <- function()
                                    `Espécie` = word(dt$Ctrl_scientificName_verified,2),
                                    Autor = autor,
                                    `Táxon completo (segundo Flora & Funga do Brasil)` = dt$Ctrl_scientificName_verified,
-                                   `Barcode`	=  barcode,
-                                   `Banco de dados de origem`	= bancodados,
+                                   `Barcode`	=  dt$barcode,
+                                   `Banco de dados de origem`	= dt$bancodados,
                                    `Sigla Herbário` = dt$Ctrl_collectionCode,
                                    `Coletor`	= dt$Ctrl_recordedBy,
                                    `Número da Coleta`	= dt$Ctrl_recordNumber,
