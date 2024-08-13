@@ -24,7 +24,7 @@
 #' @import downloader
 #' @import writexl
 #' @import jsonlite
-#' #' @import tidyverse
+#' @import tidyverse
 #' 
 #' @examples
 #' \donttest{
@@ -49,7 +49,6 @@ app_review <- function()
    require(shinyWidgets)
    require(measurements)
    require(downloader)
-   require(app_publication)
    require(writexl)
    library(tidyverse)
    require(jsonlite)

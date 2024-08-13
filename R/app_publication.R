@@ -24,6 +24,7 @@
 #' @import downloader
 #' @import writexl
 #' @import tidyverse
+#' @import purrr
 #' 
 #' @examples
 #' \donttest{
@@ -32,245 +33,294 @@
 #' @export
 app_publication <- function()
 {
-   require(dplyr)
-   require(tidyr)
-   require(readr)
-   require(stringr)
-   require(lubridate)
-   require(jsonlite)
-   require(sqldf)
-   require(rvest)
-   require(shiny)
-   require(shinydashboard)
-   require(rhandsontable)
-   require(DT)
-   require(rhandsontable)
-   require(shinyWidgets)
-   require(measurements)
-   require(downloader)
-   require(app_publication)
-   require(writexl)
-   
-   # source('functions.R')
-   {
-      # get_link_source_record
-      # occurrenceID = 'splink=MO:3234022'
-      # bibliographicCitation = 'splink'
-      # scientificNameReference = 'Rudgea interrupta'
+  {
+    options(shiny.maxRequestSize=10000*1024^2) 
+    
+    require(dplyr)
+    require(tidyr)
+    require(readr)
+    require(stringr)
+    require(lubridate)
+    require(jsonlite)
+    require(sqldf)
+    require(rvest)
+    require(shiny)
+    require(shinydashboard)
+    require(rhandsontable)
+    require(DT)
+    require(rhandsontable)
+    require(shinyWidgets)
+    require(measurements)
+    require(downloader)
+    require(app_publication)
+    require(writexl)
+    require(tidyverse)
+    require(purrr)
+    
+    # source('functions.R')
+    {
+      
+
+      get_floraAmeacadaBR <- function(url_source = "https://ipt.jbrj.gov.br/jbrj/archive.do?r=lista_oficial_ameacadas_portaria_443",
+                                      path_results = NA)
+        
+      {  
+        
+        destfile <- paste0(path_results,"/IPT_floraAmeacadaBR_",Sys.Date(),'.zip')
+        downloader::download(url = url_source, destfile = destfile, mode = "wb") 
+        utils::unzip(destfile, exdir = path_results) # descompactar e salvar dentro subpasta "ipt" na pasta principal
+        
+        
+        #  taxon
+        taxon  <- readr::read_delim(paste0(path_results,'/taxon.txt'), delim = "\t", quote = "") 
+        
+        
+        taxon$scientificName_U = toupper(taxon$scientificName)
+        
+        distribution.file <- paste0(path_results,"/distribution.txt")
+        distribution <- read_delim(distribution.file, delim = "\t", quote = "") 
+        
+        taXON <- dplyr::left_join(taxon, distribution %>% dplyr::select(id,threatStatus),
+                                  by = c('id'))
+        
+        return(taXON)
+        
+      }     
+      
+      categoria_ameaca_flora_Portaria_443 <- function(scientificName_search=c('Justicia ramulosa','Aphelandra margaritae'), 
+                                                      floraAmeacadaBR=NA)
+      {
+        x <- data.frame(categoria_ameaca_flora_Portaria_443=rep('',NROW(scientificName_search)))
+        
+        for(i in 1:NROW(scientificName_search))
+        {
+          index <- floraAmeacadaBR$scientificName %in% scientificName_search[i]
+          
+          if(sum(index)>0){
+            x$categoria_ameaca_flora_Portaria_443[i] <- floraAmeacadaBR$threatStatus[index==TRUE]
+          }
+        }
+        
+        return(x$categoria_ameaca_flora_Portaria_443)
+        
+      }
+      
+
       get_link_source_record <- function(occurrenceID,
                                          bibliographicCitation,
                                          scientificNameReference)
       {
-         
-         x <- data.frame(link=rep('',NROW(bibliographicCitation)), stringsAsFactors = FALSE)
-         
-         bibliographicCitation <- bibliographicCitation %>% tolower()
-         
-         for(i in 1:NROW(bibliographicCitation))
-         {
+        
+        x <- data.frame(link=rep('',NROW(bibliographicCitation)), stringsAsFactors = FALSE)
+        
+        bibliographicCitation <- bibliographicCitation %>% tolower()
+        
+        for(i in 1:NROW(bibliographicCitation))
+        {
+          
+          if (bibliographicCitation[i] == "reflora")
+          {
+            barcode <- gsub(paste0(tolower(bibliographicCitation[i]),"=" ), '',occurrenceID[i] )
             
-            if (bibliographicCitation[i] == "reflora")
+            base_url <- "http://reflora.jbrj.gov.br/reflora/herbarioVirtual/ConsultaPublicoHVUC/BemVindoConsultaPublicaHVConsultar.do?modoConsulta=LISTAGEM&quantidadeResultado=20&codigoBarra=%s"
+            url <- sprintf(base_url, barcode)
+            url
+            
+            x$link[i] <- paste0("<a href='", url, "'target='_blank'>", occurrenceID[i],"</a>")
+          }
+          
+          
+          # jabotRB
+          if (bibliographicCitation[i] == 'jabotrb')
+          {
+            
+            # occurrenceID = 'jabotRB=RB01031072'
+            
+            barcode <- gsub(paste0(bibliographicCitation[i],"=" ), '',occurrenceID[i], ignore.case = TRUE)
+            barcode <- gsub('RB', '',barcode, ignore.case = TRUE)
+            
+            base_url <- 'http://rb.jbrj.gov.br/v2/regua/visualizador.php?r=true&colbot=rb&codtestemunho='
+            url <- paste0(base_url,barcode)
+            
+            x$link[i] <- paste0("<a href='", url, "'target='_blank'> ", occurrenceID[i],"</a>")
+          }
+          
+          
+          # jabot
+          if (bibliographicCitation[i] == "jabot")
+          {
+            occurrenceID_tmp <- gsub(paste0(tolower(bibliographicCitation[i]),"=" ), '',occurrenceID[i], ignore.case = TRUE )
+            
+            occurrenceID_tmp2 <- str_split(occurrenceID_tmp,':')
+            
+            col <- occurrenceID_tmp2[[1]][1]
+            
+            cat <- occurrenceID_tmp2[[1]][2]
+            cat <- gsub(col, '',cat )
+            
+            base_url <- "http://rb.jbrj.gov.br/v2/regua/visualizador.php?r=true&colbot=%s&codtestemunho=%s"
+            url <- sprintf(base_url, col, cat)
+            
+            # link <- paste0("<a href='", url, "> ", occurrenceID,"</a>")
+            x$link[i] <- paste0("<a href='", url, "'target='_blank'> ", occurrenceID[i],"</a>")
+            
+          }
+          
+          
+          
+          if (bibliographicCitation[i] == 'splink')
+          {
+            
+            # com barcode
+            
+            if (!is.na(str_locate(occurrenceID[i],':')[[1]]))
             {
-               barcode <- gsub(paste0(tolower(bibliographicCitation[i]),"=" ), '',occurrenceID[i] )
-               
-               base_url <- "http://reflora.jbrj.gov.br/reflora/herbarioVirtual/ConsultaPublicoHVUC/BemVindoConsultaPublicaHVConsultar.do?modoConsulta=LISTAGEM&quantidadeResultado=20&codigoBarra=%s"
-               url <- sprintf(base_url, barcode)
-               url
-               
-               x$link[i] <- paste0("<a href='", url, "'target='_blank'>", occurrenceID[i],"</a>")
+              
+              occurrenceID_tmp <- gsub(paste0(tolower(bibliographicCitation[i]),"=" ), '',occurrenceID[i] )
+              occurrenceID_tmp <- str_split(occurrenceID_tmp,':')
+              col <- occurrenceID_tmp[[1]][1]
+              cat <- occurrenceID_tmp[[1]][2]
+              # url <- 'https://specieslink.net/search/'
+              url <- paste0('https://specieslink.net/search/records/catalognumber/',cat,'/collectionCode/',col)
+              x$link[i] <- paste0("<a href='", url, "'target='_blank'>", occurrenceID[i],"</a>")
+              
+            }else  
+            {
+              barcode <- gsub(paste0(tolower(bibliographicCitation[i]),"=" ), '',occurrenceID[i] )
+              
+              # https://specieslink.net/search/records/barcode/MO0101458866
+              base_url <- "https://specieslink.net/search/records/barcode/%s"
+              url <- sprintf(base_url, barcode)
+              
+              x$link[i] <- paste0("<a href='", url, "'target='_blank'>", occurrenceID[i],"</a>")
             }
             
             
-            # jabotRB
-            if (bibliographicCitation[i] == 'jabotrb')
-            {
-               
-               # occurrenceID = 'jabotRB=RB01031072'
-               
-               barcode <- gsub(paste0(bibliographicCitation[i],"=" ), '',occurrenceID[i], ignore.case = TRUE)
-               barcode <- gsub('RB', '',barcode, ignore.case = TRUE)
-               
-               base_url <- 'http://rb.jbrj.gov.br/v2/regua/visualizador.php?r=true&colbot=rb&codtestemunho='
-               url <- paste0(base_url,barcode)
-               
-               x$link[i] <- paste0("<a href='", url, "'target='_blank'> ", occurrenceID[i],"</a>")
-            }
             
+          }
+          
+          
+          if(bibliographicCitation[i]=='gbif')
+          {
             
-            # jabot
-            if (bibliographicCitation[i] == "jabot")
-            {
-               occurrenceID_tmp <- gsub(paste0(tolower(bibliographicCitation[i]),"=" ), '',occurrenceID[i], ignore.case = TRUE )
-               
-               occurrenceID_tmp2 <- str_split(occurrenceID_tmp,':')
-               
-               col <- occurrenceID_tmp2[[1]][1]
-               
-               cat <- occurrenceID_tmp2[[1]][2]
-               cat <- gsub(col, '',cat )
-               
-               base_url <- "http://rb.jbrj.gov.br/v2/regua/visualizador.php?r=true&colbot=%s&codtestemunho=%s"
-               url <- sprintf(base_url, col, cat)
-               
-               # link <- paste0("<a href='", url, "> ", occurrenceID,"</a>")
-               x$link[i] <- paste0("<a href='", url, "'target='_blank'> ", occurrenceID[i],"</a>")
-               
-            }
+            occurrenceID_tmp <- gsub(paste0(tolower(bibliographicCitation),"=" ), '',occurrenceID )
             
+            base_url <- "https://www.gbif.org/occurrence/search?occurrence_id=%s&advanced=1&occurrence_status=present"
             
+            # url <- sprintf(base_url,occurrenceID_tmp)
             
-            if (bibliographicCitation[i] == 'splink')
-            {
-               
-               # com barcode
-               
-               if (!is.na(str_locate(occurrenceID[i],':')[[1]]))
-               {
-                  
-                  occurrenceID_tmp <- gsub(paste0(tolower(bibliographicCitation[i]),"=" ), '',occurrenceID[i] )
-                  occurrenceID_tmp <- str_split(occurrenceID_tmp,':')
-                  col <- occurrenceID_tmp[[1]][1]
-                  cat <- occurrenceID_tmp[[1]][2]
-                  # url <- 'https://specieslink.net/search/'
-                  url <- paste0('https://specieslink.net/search/records/catalognumber/',cat,'/collectionCode/',col)
-                  x$link[i] <- paste0("<a href='", url, "'target='_blank'>", occurrenceID[i],"</a>")
-                  
-               }else  
-               {
-                  barcode <- gsub(paste0(tolower(bibliographicCitation[i]),"=" ), '',occurrenceID[i] )
-                  
-                  # https://specieslink.net/search/records/barcode/MO0101458866
-                  base_url <- "https://specieslink.net/search/records/barcode/%s"
-                  url <- sprintf(base_url, barcode)
-                  
-                  x$link[i] <- paste0("<a href='", url, "'target='_blank'>", occurrenceID[i],"</a>")
-               }
-               
-               
-               
-            }
+            url <- paste0("https://www.gbif.org/occurrence/search?occurrence_id=",occurrenceID_tmp,"&advanced=1&occurrence_status=present")
             
+            x$link <- paste0("<a href='", url, "'target='_blank'>", occurrenceID,"</a>")
             
-            if(bibliographicCitation[i]=='gbif')
-            {
-               
-               occurrenceID_tmp <- gsub(paste0(tolower(bibliographicCitation),"=" ), '',occurrenceID )
-               
-               base_url <- "https://www.gbif.org/occurrence/search?occurrence_id=%s&advanced=1&occurrence_status=present"
-               
-               # url <- sprintf(base_url,occurrenceID_tmp)
-               
-               url <- paste0("https://www.gbif.org/occurrence/search?occurrence_id=",occurrenceID_tmp,"&advanced=1&occurrence_status=present")
-               
-               x$link <- paste0("<a href='", url, "'target='_blank'>", occurrenceID,"</a>")
-               
-            }
-         }
-         
-         return(x)
-         
+          }
+        }
+        
+        return(x)
+        
       }
       
       get_floraFungaBrasil_v3 <- function(url_source = "http://ipt.jbrj.gov.br/jbrj/archive.do?r=lista_especies_flora_brasil",
-                                       path_results = NA,
-                                       full=FALSE) # if NULL
-         
+                                          path_results = NA,
+                                          full=FALSE) # if NULL
+        
       {  
-         
-         destfile <- paste0(path_results,"/IPT_FloraFungaBrasil_",Sys.Date(),'.zip')
-         downloader::download(url = url_source, destfile = destfile, mode = "wb") 
-         utils::unzip(destfile, exdir = path_results) # descompactar e salvar dentro subpasta "ipt" na pasta principal
-         
-         
-         #  taxon
-         fb2020_taxon  <- readr::read_delim(paste0(path_results,'/taxon.txt'), delim = "\t", quote = "") %>% 
-            dplyr::select(-id)
-         
-         index = fb2020_taxon$taxonRank %in% c("ESPECIE",
-                                               "SUB_ESPECIE",
-                                               "VARIEDADE",
-                                               "FORMA")
-         
-         fb2020_taxon  <- fb2020_taxon[index==TRUE,] 
-         
-         index = fb2020_taxon$taxonRank %in% c("ESPECIE",
-                                               "SUB_ESPECIE",
-                                               "VARIEDADE",
-                                               "FORMA")
-         
-         scientificName_tmp <- fb2020_taxon$scientificName %>% stringr::str_split(.,pattern = ' ', simplify = TRUE)
-         
-         # carregando especie sem autor
-         scientificName <- rep('',nrow(fb2020_taxon))
-         
-         scientificName[index==TRUE] <- scientificName_tmp[index==TRUE,1] %>% trimws(.,'right')
-         
-         index = fb2020_taxon$taxonRank %in% c("ESPECIE")
-         
-         scientificName[index==TRUE] <-  paste0(scientificName_tmp[index==TRUE,1], ' ', scientificName_tmp[index==TRUE,2]) #%>% trimws(.,'right')
-         
-         index = fb2020_taxon$taxonRank %in% c("VARIEDADE")
-         scientificName[index==TRUE] <-  paste0(fb2020_taxon$genus[index==TRUE], ' ', fb2020_taxon$specificEpithet[index==TRUE], ' var. ', fb2020_taxon$infraspecificEpithet[index==TRUE])# %>% trimws(.,'right')
-         
-         index = fb2020_taxon$taxonRank %in% c("SUB_ESPECIE")
-         scientificName[index==TRUE] <-  paste0(fb2020_taxon$genus[index==TRUE], ' ', fb2020_taxon$specificEpithet[index==TRUE], ' subsp. ', fb2020_taxon$infraspecificEpithet[index==TRUE])# %>% trimws(.,'right')
-         
-         index = fb2020_taxon$taxonRank %in% c("FORMA")
-         scientificName[index==TRUE] <-  paste0(fb2020_taxon$genus[index==TRUE], ' ', fb2020_taxon$specificEpithet[index==TRUE], ' form. ', fb2020_taxon$infraspecificEpithet[index==TRUE])# %>% trimws(.,'right')
-         
-         fb2020_taxon$scientificNamewithoutAuthorship = scientificName
-         fb2020_taxon$scientificNamewithoutAuthorship_U = toupper(scientificName)
-         
+        
+        destfile <- paste0(path_results,"/IPT_FloraFungaBrasil_",Sys.Date(),'.zip')
+        downloader::download(url = url_source, destfile = destfile, mode = "wb") 
+        utils::unzip(destfile, exdir = path_results) # descompactar e salvar dentro subpasta "ipt" na pasta principal
+        
+        
+        #  taxon
+        fb2020_taxon  <- readr::read_delim(paste0(path_results,'/taxon.txt'), delim = "\t", quote = "") %>% 
+          dplyr::select(-id)
+        
+        index = fb2020_taxon$taxonRank %in% c("ESPECIE",
+                                              "SUB_ESPECIE",
+                                              "VARIEDADE",
+                                              "FORMA")
+        
+        fb2020_taxon  <- fb2020_taxon[index==TRUE,] 
+        
+        index = fb2020_taxon$taxonRank %in% c("ESPECIE",
+                                              "SUB_ESPECIE",
+                                              "VARIEDADE",
+                                              "FORMA")
+        
+        scientificName_tmp <- fb2020_taxon$scientificName %>% stringr::str_split(.,pattern = ' ', simplify = TRUE)
+        
+        # carregando especie sem autor
+        scientificName <- rep('',nrow(fb2020_taxon))
+        
+        scientificName[index==TRUE] <- scientificName_tmp[index==TRUE,1] %>% trimws(.,'right')
+        
+        index = fb2020_taxon$taxonRank %in% c("ESPECIE")
+        
+        scientificName[index==TRUE] <-  paste0(scientificName_tmp[index==TRUE,1], ' ', scientificName_tmp[index==TRUE,2]) #%>% trimws(.,'right')
+        
+        index = fb2020_taxon$taxonRank %in% c("VARIEDADE")
+        scientificName[index==TRUE] <-  paste0(fb2020_taxon$genus[index==TRUE], ' ', fb2020_taxon$specificEpithet[index==TRUE], ' var. ', fb2020_taxon$infraspecificEpithet[index==TRUE])# %>% trimws(.,'right')
+        
+        index = fb2020_taxon$taxonRank %in% c("SUB_ESPECIE")
+        scientificName[index==TRUE] <-  paste0(fb2020_taxon$genus[index==TRUE], ' ', fb2020_taxon$specificEpithet[index==TRUE], ' subsp. ', fb2020_taxon$infraspecificEpithet[index==TRUE])# %>% trimws(.,'right')
+        
+        index = fb2020_taxon$taxonRank %in% c("FORMA")
+        scientificName[index==TRUE] <-  paste0(fb2020_taxon$genus[index==TRUE], ' ', fb2020_taxon$specificEpithet[index==TRUE], ' form. ', fb2020_taxon$infraspecificEpithet[index==TRUE])# %>% trimws(.,'right')
+        
+        fb2020_taxon$scientificNamewithoutAuthorship = scientificName
+        fb2020_taxon$scientificNamewithoutAuthorship_U = toupper(scientificName)
+        
         # fb2020_taxon$group <- str_split(fb2020_taxon$higherClassification,';',simplify = TRUE)[,2]
- 
-         distribution.file <- paste0(path_results,"/distribution.txt")
-         distribution <- read_delim(distribution.file, delim = "\t", quote = "") 
-         
-         distribution <- distribution %>%
-            dplyr::select(id, establishmentMeans)
-         
-         return(list(fb2020_taxon=fb2020_taxon,
-                     fb2020_distribution=distribution))
-         
+        
+        distribution.file <- paste0(path_results,"/distribution.txt")
+        distribution <- read_delim(distribution.file, delim = "\t", quote = "") 
+        
+        distribution <- distribution %>%
+          dplyr::select(id, establishmentMeans)
+        
+        return(list(fb2020_taxon=fb2020_taxon,
+                    fb2020_distribution=distribution))
+        
       }
-      
+
       
       FB2020_get_group <- function(x)
       {
-         if (is.na(x))
-         {return('')}
-         # higherClassification <- floraFB$higherClassification[999] %>% as_tibble()
-         x <- x %>% as_tibble()
-         group <- x$value %>% str_split(.,pattern = ';', simplify = TRUE)
-         group <- group[2]
-         return(group)
+        if (is.na(x))
+        {return('')}
+        # higherClassification <- floraFB$higherClassification[999] %>% as_tibble()
+        x <- x %>% as_tibble()
+        group <- x$value %>% str_split(.,pattern = ';', simplify = TRUE)
+        group <- group[2]
+        return(group)
       }
+      
       
       pega_autor <- function(x)
       {
-         autor <- rep('',length(x))
-         for(i in 1:length(x))
-         {
-            x1 <- x[i]
-            x2 <- paste0(word(x1,1) ,' ',word(x1,2),' ')
-            
-            x3 <- sub(x2, '', x1)
-            autor[i] <- x3
-         }
-         return(autor)
+        autor <- rep('',length(x))
+        for(i in 1:length(x))
+        {
+          x1 <- x[i]
+          x2 <- paste0(word(x1,1) ,' ',word(x1,2),' ')
+          
+          x3 <- sub(x2, '', x1)
+          autor[i] <- x3
+        }
+        return(autor)
       }
       
-
-   }   
-   options(shiny.maxRequestSize=10000*1024^2) 
-   
-   # variaveis
-   {
+      
+    }   
+    
+    # variaveis
+    {
       
       UC_Input <<- ""
       fb2020 <<-{}
       occ_full <<- {}
       distribution <<- {}
+      floraAmeacadaBR <<- {}
       
       Ctrl_observacaoNaoPossivelVerificar_list <- c('Não se aplica',
                                                     'Espécimes estão danificados e/ou em condições não adequadas para verificação',
@@ -336,9 +386,9 @@ app_publication <- function()
                    all_cc = data.frame(),
                    
                    scientificName_list <- data.frame())
-   }
-   
-   #  Tela APP--
+    }
+  }
+  #  Tela APP--
    ui <- 
       {
          shinydashboard::dashboardPage(
@@ -453,9 +503,17 @@ app_publication <- function()
                                            br(),
                                            
                                            fluidRow(
+                                             column(
+                                               width = 12,
+                                               downloadButton("download_problemas", "Baixar planilha com amostras com algum problema na identificação"),
+                                             )),
+                                           
+                                           br(),
+                                           
+                                           fluidRow(
                                               column(
                                                  width = 12,
-                                                 downloadButton("downloadVerificacaoAmostra", "Baixar planilha completa"),
+                                                 downloadButton("download_sem_voucher", "Baixar planilha com amostras sem verificação"),
                                               ))
                                         )),
                                         
@@ -531,7 +589,11 @@ app_publication <- function()
                         
                      fb2020 <- fb2020[index==TRUE,]
                      
-                     incProgress(0.2, detail = 'groups...')
+                     incProgress(0.1, detail = 'CNCFlora - Lista Oficial de Espécies Ameaçadas - Portaria 443...')
+                     
+                     floraAmeacadaBR <<- get_floraAmeacadaBR(path_results = tempdir())
+                     
+                     incProgress(0.1, detail = 'groups...')
                      group1 <- lapply(fb2020$higherClassification, FB2020_get_group)
                      group <- plyr::ldply(group1, data.frame) 
                      colnames(group) <- 'group'
@@ -659,34 +721,58 @@ app_publication <- function()
             index_res <- (dt$Incluir_Amostra == TRUE) 
             
             dt <- dt[index_res==TRUE,]
+
+            autor <- pega_autor(dt$Ctrl_scientificName_verified)
             
-            # dt <- left_join(dt %>% dplyr::select(Ctrl_Record_ID_Review2),
-            #                 occ_full,
-            #                 by = 'Ctrl_Record_ID_Review2')
-
+            dt$bancodados <- rep('',NROW(dt))
+            dt$barcode <- rep('',NROW(dt)) 
+            dt$sp <- rep('',NROW(dt)) 
+            dt$categoria_Ameaca_Portaria_443 <- rep('',NROW(dt)) 
             
-      bancodados <- stringr::str_sub(dt$Ctrl_occurrenceID,
-                                     1,
-                                     stringr::str_locate(dt$Ctrl_occurrenceID, '=')[,1]-1)
+            for(ii in 1:NROW(dt))
+            {
+              bancodados <- stringr::str_sub(dt$Ctrl_occurrenceID[ii], 
+                                             1, 
+                                             stringr::str_locate(dt$Ctrl_occurrenceID[ii], '=')[,1]-1)
+              
+              
+              bancodados <- paste0(toupper(stringr::str_sub(bancodados,1,1)),stringr::str_sub(bancodados, 2,nchar(bancodados)))
+              
+              barcode <- stringr::str_sub(dt$Ctrl_occurrenceID[ii],
+                                          stringr::str_locate(dt$Ctrl_occurrenceID[ii], '=')[,1]+1,
+                                          nchar(dt$Ctrl_occurrenceID[ii]))
+              
+              dt$bancodados[ii] <- bancodados
+              dt$barcode[ii] <- barcode
+              
+              
+              
+              # sub(paste0('\\','(Nees) Hook.'), "", 'Aphelandra blanchetiana (Nees) Hook.')
+              
+              dt$sp[ii] <- sub(paste0('\\',autor[ii]), "", dt$Ctrl_scientificName_verified[ii], ignore.case = TRUE)
+              
+              dt$sp[ii] <-str_sub(dt$sp[ii],1, nchar(dt$sp[ii])-1)
+              
+              print(dt$sp[ii])
+            }
 
-      bancodados <- paste0(toupper(str_sub(bancodados,1,1)),str_sub(bancodados, 2,nchar(bancodados)))
+            x <- categoria_ameaca_flora_Portaria_443(dt$sp,
+                                                     floraAmeacadaBR=floraAmeacadaBR)
+            dt$categoria_Ameaca_Portaria_443 <- x
+            
+            
 
-      barcode <- stringr::str_sub(dt$Ctrl_occurrenceID,
-                                  stringr::str_locate(dt$Ctrl_occurrenceID, '=')[,1]+1,
-                                  nchar(dt$Ctrl_occurrenceID))
-      
-      autor <- pega_autor(dt$Ctrl_scientificName_verified)
-      
-      
-      data_imp <- data.frame(UC = rep('',NROW(dt)),
+      data_imp <- data.frame( sp = dt$sp,
+                                `categoria Ameaça Portaria 443` = dt$categoria_Ameaca_Portaria_443,
+                              UC = rep(input$UC_Input,NROW(dt)),
                              Grupos = dt$group,
                              `Família`= dt$Ctrl_family_verified,
                              `Gênero` =  word(dt$Ctrl_scientificName_verified,1),
                              `Espécie` = word(dt$Ctrl_scientificName_verified,2),
                              Autor = autor,
                              `Táxon completo (segundo Flora & Funga do Brasil)` = dt$Ctrl_scientificName_verified,
-                             `Barcode`	=  barcode,
-                             `Banco de dados de origem` = bancodados,
+                             `Barcode`	=  dt$barcode,
+                             `Banco de dados de origem` = dt$bancodados,
                              `Sigla Herbário` = dt$Ctrl_collectionCode,
                              `Coletor`	= dt$Ctrl_recordedBy,
                              `Número da Coleta`	= dt$Ctrl_recordNumber,
@@ -760,17 +846,84 @@ app_publication <- function()
                hot_table(highlightCol = TRUE, highlightRow = TRUE, readOnly = TRUE)
             })
       
+      output$download_ModeloCatalogo <- downloadHandler(
+        filename = function() {
+          paste("Planilha_MODELO_Catalogo_de_Plantas_UCs_Brasil_Publicacao.xls", sep="")
+        },
+        content = function(file) {
+  
+      dt <- hot_to_r(input$hot_modelo)
+        
+      # setting the threshold for the maximum number of characters to be preserved
+      n_char_to_truncate_threshold <- 32767
+      
+      # tidyverse
+      # adjusted data.frame where the character columns are truncated so that they do not exceed the threshold of 32767 characters
+      df2 <- purrr::map_df(dt, ~ifelse(is.character(.x) & nchar(.x) > n_char_to_truncate_threshold,  str_sub(.x, 1, n_char_to_truncate_threshold), .x))
+      
+      # checking the result to make sure it is truncated
+      # you can also use it beforehand to see which columns are the ones causing problems
+      purrr::map_df(df2, ~ifelse(is.character(.x), nchar(.x), NA) )
+
+      writexl::write_xlsx(df2, 
+                          file)
+        })
+      
+      output$download_problemas <- downloadHandler(
+        filename = function() {
+          paste("Planilha_MODELO_Catalogo_de_Plantas_UCs_Brasil_Problemas.xls", sep="")
+        },
+        content = function(file) {
+          
+          dt <- hot_to_r(input$hot_problemas)
+          
+          # setting the threshold for the maximum number of characters to be preserved
+          n_char_to_truncate_threshold <- 32767
+          
+          # tidyverse
+          # adjusted data.frame where the character columns are truncated so that they do not exceed the threshold of 32767 characters
+          df2 <- purrr::map_df(dt, ~ifelse(is.character(.x) & nchar(.x) > n_char_to_truncate_threshold,  str_sub(.x, 1, n_char_to_truncate_threshold), .x))
+          
+          # checking the result to make sure it is truncated
+          # you can also use it beforehand to see which columns are the ones causing problems
+          purrr::map_df(df2, ~ifelse(is.character(.x), nchar(.x), NA) )
+          
+          writexl::write_xlsx(df2, 
+                              file)
+        })
       
       
-      
-      
+      output$download_sem_voucher <- downloadHandler(
+        filename = function() {
+          paste("Planilha_MODELO_Catalogo_de_Plantas_UCs_Brasil_Amostras_Sem_Verificacao.xls", sep="")
+        },
+        content = function(file) {
+          
+          dt <- hot_to_r(input$hot_sem_voucher)
+          
+          # setting the threshold for the maximum number of characters to be preserved
+          n_char_to_truncate_threshold <- 32767
+          
+          # tidyverse
+          # adjusted data.frame where the character columns are truncated so that they do not exceed the threshold of 32767 characters
+          df2 <- purrr::map_df(dt, ~ifelse(is.character(.x) & nchar(.x) > n_char_to_truncate_threshold,  str_sub(.x, 1, n_char_to_truncate_threshold), .x))
+          
+          # checking the result to make sure it is truncated
+          # you can also use it beforehand to see which columns are the ones causing problems
+          purrr::map_df(df2, ~ifelse(is.character(.x), nchar(.x), NA) )
+          
+          writexl::write_xlsx(df2, 
+                              file)
+        })
+
    }
    
    #  Run the application 
-   # shinyApp(ui = ui, server = server)
+   shinyApp(ui = ui, server = server)
    
    # shinyApp(ui = ui, server = server, options = list(launch.browser = TRUE))
-   shinyApp(ui = ui, server = server, options = list(launch.browser = TRUE))
+   
+   # shinyApp(ui = ui, server = server, options = list(launch.browser = TRUE))
    
 }
 

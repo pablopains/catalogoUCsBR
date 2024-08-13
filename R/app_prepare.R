@@ -2351,6 +2351,9 @@ app_prepare <- function()
                                                            status = "primary",
                                                            width = 12,
                                                            
+                                                           shiny::tags$a('Manual de instruções para download CatalogoUCsBR', href = 'https://github.com/pablopains/catalogoUCsBR/blob/main/Manual%20de%20instru%C3%A7%C3%B5es%20para%20download_CatalogoUCsBR.pdf'),
+                                                           
+                                                           
                                                            fluidRow(
                                                               column(width = 12,
                                                                      shiny::tags$a('REFLORA', href = 'reflora.jbrj.gov.br/reflora/herbarioVirtual/ConsultaPublicoHVUC/ResultadoDaConsultaNovaConsulta.do'),
@@ -2389,6 +2392,9 @@ app_prepare <- function()
                                                            status = "primary",
                                                            width = 12,
                                                            
+                                                           shiny::tags$a('Manual de instruções para download CatalogoUCsBR', href = 'https://github.com/pablopains/catalogoUCsBR/blob/main/Manual%20de%20instru%C3%A7%C3%B5es%20para%20download_CatalogoUCsBR.pdf'),
+                                                           
+                                                           
                                                            fluidRow(
                                                               column(width = 12,
                                                                      shiny::tags$a('Jabot Geral', href = 'http://jabot.jbrj.gov.br/v3/consulta.php'),
@@ -2408,6 +2414,9 @@ app_prepare <- function()
                                                            status = "primary",
                                                            width = 12,
                                                            
+                                                           shiny::tags$a('Manual de instruções para download CatalogoUCsBR', href = 'https://github.com/pablopains/catalogoUCsBR/blob/main/Manual%20de%20instru%C3%A7%C3%B5es%20para%20download_CatalogoUCsBR.pdf'),
+                                                           
+                                                           
                                                            fluidRow(
                                                               column(width = 12,
                                                                      shiny::tags$a('SpeciesLink', href = 'https://specieslink.net/search/'),
@@ -2426,6 +2435,8 @@ app_prepare <- function()
                                                        shinydashboard::box(title = "Arquivos .TXT, em formato Darwin Core, com ocorrência de espécies.",
                                                            status = "primary",
                                                            width = 12,
+                                                           
+                                                           shiny::tags$a('Manual de instruções para download CatalogoUCsBR', href = 'https://github.com/pablopains/catalogoUCsBR/blob/main/Manual%20de%20instru%C3%A7%C3%B5es%20para%20download_CatalogoUCsBR.pdf'),
                                                            
                                                            fluidRow(
                                                               column(width = 12,
