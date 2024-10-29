@@ -1829,7 +1829,7 @@ app_prepare <- function()
                                        # fb2020_acceptedNameUsage = "",
                                        # fb2020_parentNameUsage = "",
                                        fb2020_namePublishedIn = "",                  
-                                       fb2020_namePublishedInYear = 0,
+                                       fb2020_namePublishedInYear = "",
                                        fb2020_higherClassification = "",             
                                        # fb2020_kingdom = "",
                                        # fb2020_phylum = "",                           
@@ -2356,7 +2356,7 @@ app_prepare <- function()
                                                            
                                                            fluidRow(
                                                               column(width = 12,
-                                                                     shiny::tags$a('REFLORA', href = 'reflora.jbrj.gov.br/reflora/herbarioVirtual/ConsultaPublicoHVUC/ResultadoDaConsultaNovaConsulta.do'),
+                                                                     shiny::tags$a('REFLORA', href = 'http://reflora.jbrj.gov.br/reflora/herbarioVirtual/ConsultaPublicoHVUC/ResultadoDaConsultaNovaConsulta.do'),
                                                                      fileInput(inputId = "refloraFile", 
                                                                                label = "Carregar arquivo(s) XLS REFLORA XLS",
                                                                                multiple = TRUE))),
@@ -2991,7 +2991,7 @@ app_prepare <- function()
                                                        # fb2020_acceptedNameUsage = "",
                                                        # fb2020_parentNameUsage = "",
                                                        fb2020_namePublishedIn = "",
-                                                       fb2020_namePublishedInYear = 0,
+                                                       fb2020_namePublishedInYear = "",
                                                        fb2020_higherClassification = "",             
                                                        # fb2020_kingdom = "",
                                                        # fb2020_phylum = "",                     
@@ -3043,7 +3043,7 @@ app_prepare <- function()
                                                               # fb2020_acceptedNameUsage = "",
                                                               # fb2020_parentNameUsage = "",
                                                               fb2020_namePublishedIn = "",
-                                                              fb2020_namePublishedInYear = 0,
+                                                              fb2020_namePublishedInYear = "",
                                                               fb2020_higherClassification = "",             
                                                               # fb2020_kingdom = "",
                                                               # fb2020_phylum = "",                     
@@ -3953,7 +3953,7 @@ app_prepare <- function()
             {
                output$downloadData <- downloadHandler(
                   filename = function() {
-                     paste("Catalogo_Plantas_UCs_Brasil - Juncao_Ocorrencia_Darwin_Corre_Terms.csv", sep="")
+                     paste("Catalogo_Plantas_UCs_Brasil - Join_occurrence_Darwin_Corre_Terms.csv", sep="")
                   },
                   content = function(file) {
                      

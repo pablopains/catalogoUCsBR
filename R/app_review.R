@@ -940,7 +940,7 @@ app_review <- function()
                                               fluidRow(
                                                  column(
                                                     width = 12,
-                                                    downloadButton("downloadVerificacaoAmostra", "Baixar planilha completa"),
+                                                    downloadButton("downloadVerificacaoAmostra", "Baixar Planilha Completa para Revisão Eletrônica"),
                                                  ))
                                            ),
                                            
@@ -1013,7 +1013,7 @@ app_review <- function()
             
             output$downloadVerificacaoAmostra <- downloadHandler(
                filename = function() {
-                  paste("Planilha_COMPLETA_Catalogo_de_Plantas_UCs_Brasil - ",input$Ctrl_verificadoPor_Input, ' - ', Sys.Date(), ".csv", sep="")
+                  paste("Catalogo_Plantas_UCs_Brasil - Planilha para Revisao Eletronica - ",input$Ctrl_verificadoPor_Input, ' - ', Sys.Date(), ".csv", sep="")
                },
                content = function(file) {
                   write.csv(occ_full %>% data.frame(stringsAsFactors = FALSE), file, row.names = FALSE, fileEncoding = "UTF-8", na = "")
@@ -1022,7 +1022,7 @@ app_review <- function()
             
             output$download_ModeloCatalogo <- downloadHandler(
                filename = function() {
-                  paste("Planilha_MODELO_Catalogo_de_Plantas_UCs_Brasil - ",input$Ctrl_verificadoPor_Input, ' - ', Sys.Date(), ".xls", sep="")
+                  paste("Catalogo_Plantas_UCs_Brasil - Planilha Modelo - ",input$Ctrl_verificadoPor_Input, ' - ', Sys.Date(), ".xls", sep="")
                },
                content = function(file) {
                   
@@ -1069,7 +1069,7 @@ app_review <- function()
                                    `Gênero` =  word(dt$Ctrl_scientificName_verified,1),
                                    `Espécie` = word(dt$Ctrl_scientificName_verified,2),
                                    Autor = autor,
-                                   `Táxon completo (segundo Flora & Funga do Brasil)` = dt$Ctrl_scientificName_verified,
+                                   `Táxon completo (segundo Flora & Funga do Brasil)` = paste0(dt$Ctrl_family_verified, ' ', dt$Ctrl_scientificName_verified),
                                    `Barcode`	=  dt$barcode,
                                    `Banco de dados de origem`	= dt$bancodados,
                                    `Sigla Herbário` = dt$Ctrl_collectionCode,
@@ -1172,7 +1172,7 @@ if(sum(index_res)>0)
                           `Gênero` =  word(dt$Ctrl_scientificName_verified,1),
                           `Espécie` = word(dt$Ctrl_scientificName_verified,2),
                           Autor = autor,
-                          `Táxon completo (segundo Flora & Funga do Brasil)` = dt$Ctrl_scientificName_verified, #paste0(dt$Ctrl_family_verified, ' - ', dt$Ctrl_scientificName_verified),
+                          `Táxon completo (segundo Flora & Funga do Brasil)` = paste0(dt$Ctrl_family_verified, ' ', dt$Ctrl_scientificName_verified),
                           `Barcode`	=  barcode,
                           `Banco de dados de origem`	= bancodados,
                           `Sigla Herbário` = dt$Ctrl_collectionCode,

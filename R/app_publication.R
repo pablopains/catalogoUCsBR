@@ -770,7 +770,7 @@ app_publication <- function()
                              `Gênero` =  word(dt$Ctrl_scientificName_verified,1),
                              `Espécie` = word(dt$Ctrl_scientificName_verified,2),
                              Autor = autor,
-                             `Táxon completo (segundo Flora & Funga do Brasil)` = dt$Ctrl_scientificName_verified,
+                             `Táxon completo (segundo Flora & Funga do Brasil)` = paste0(dt$Ctrl_family_verified, ' ', dt$Ctrl_scientificName_verified),
                              `Barcode`	=  dt$barcode,
                              `Banco de dados de origem` = dt$bancodados,
                              `Sigla Herbário` = dt$Ctrl_collectionCode,
@@ -848,7 +848,7 @@ app_publication <- function()
       
       output$download_ModeloCatalogo <- downloadHandler(
         filename = function() {
-          paste("Planilha_MODELO_Catalogo_de_Plantas_UCs_Brasil_Publicacao.xls", sep="")
+          paste("Catalogo_Plantas_UCs_Brasil - Planilha Modelo - Publicacao.xls", sep="")
         },
         content = function(file) {
   
@@ -871,7 +871,7 @@ app_publication <- function()
       
       output$download_problemas <- downloadHandler(
         filename = function() {
-          paste("Planilha_MODELO_Catalogo_de_Plantas_UCs_Brasil_Problemas.xls", sep="")
+          paste("Catalogo_Plantas_UCs_Brasil - Amostras com Problemas.xls", sep="")
         },
         content = function(file) {
           
@@ -895,7 +895,7 @@ app_publication <- function()
       
       output$download_sem_voucher <- downloadHandler(
         filename = function() {
-          paste("Planilha_MODELO_Catalogo_de_Plantas_UCs_Brasil_Amostras_Sem_Verificacao.xls", sep="")
+          paste("Catalogo_Plantas_UCs_Brasil - Amostras Sem Verificacao.xls", sep="")
         },
         content = function(file) {
           
