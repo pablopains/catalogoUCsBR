@@ -3,6 +3,9 @@
 \name{app_prepare}
 \alias{app_prepare}
 \title{Prepare Plant Catalog of Units of Brazilian Conservation App}
+\usage{
+app_prepare()
+}
 \value{
 CSV files
 }

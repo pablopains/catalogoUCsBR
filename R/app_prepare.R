@@ -34,7 +34,8 @@
 #' app_prepare()
 #' }
 #' 
-#' @export app_prepare <- function()
+#' @export
+app_prepare <- function()
 {
   tempdir <- tempdir()
   
@@ -70,28 +71,8 @@
   }
   
   # cerregar funções 
-  {            # baixar e tabela FB2020 IPT 
-    #' Rodar somente em atualizações do IPT, aproximadamente 6 horas de processamento.
-    # source('./functions/FB2020_IPT_Get.R', encoding = "UTF-8")
-    
-    # carregar tabela FB2020 IPT e funções de acesso
-    #' conferência taxonômica 
-    #' carregar informações da espécie
-    #' somente aqui encontramos dados de tipo de vegetação conforme FB2020
-    
-    # source('./functions/FB2020_IPT_Use.R', encoding = "UTF-8")  # colnames(FloraBrasil2020) <- paste0(colnames(FloraBrasil2020),'_FB2020')
-    # colnames(FloraBrasil2020) <- paste0(colnames(FloraBrasil2020),'_FB2020')
-    
-    # carregar funções para acesso APIs FB2020 v1 e v2
-    #' conferência taxonômica 
-    #' carregar informações da espécie
-    
-    # source("./functions/FB2020_get_taxon_scientificname_from_API.R", encoding = "UTF-8") 
-    # source("C:/ENB_fluxo_processamento/functions/FB2020_get_taxon_scientificname_from_API.R", encoding = "UTF-8") 
-    
-    # txt_search <- occ[[source_data]]$scientificname
-    
-    get_link_source_record_url <- function(occurrenceID,
+  { 
+  get_link_source_record_url <- function(occurrenceID,
                                            bibliographicCitation,
                                            scientificNameReference)
     {
