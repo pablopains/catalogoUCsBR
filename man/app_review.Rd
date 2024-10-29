@@ -14,7 +14,7 @@ An R app for preparing species listings for the Plant Catalog of Units of Brazil
 }
 \examples{
 \donttest{
-load_app_data_review()
+app_review()
 }
 }
 \seealso{

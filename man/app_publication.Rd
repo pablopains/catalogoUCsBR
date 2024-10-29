@@ -16,6 +16,7 @@ An R app for preparing species listings for the Plant Catalog of Units of Brazil
 \donttest{
 app_publication()
 }
+
 }
 \seealso{
 \code{\link[utils]{download.file}}, \code{\link[utils]{aspell}}

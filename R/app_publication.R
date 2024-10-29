@@ -30,6 +30,7 @@
 #' \donttest{
 #' app_publication()
 #' }
+#' 
 #' @export
 app_publication <- function()
 {
@@ -927,5 +928,5 @@ app_publication <- function()
    
 }
 
-
-app_publication()
+# 
+# app_publication()

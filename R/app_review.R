@@ -28,7 +28,7 @@
 #' 
 #' @examples
 #' \donttest{
-#' load_app_data_review()
+#' app_review()
 #' }
 #' @export
 app_review <- function()

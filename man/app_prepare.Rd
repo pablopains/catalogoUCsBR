@@ -3,9 +3,6 @@
 \name{app_prepare}
 \alias{app_prepare}
 \title{Prepare Plant Catalog of Units of Brazilian Conservation App}
-\usage{
-app_prepare()
-}
 \value{
 CSV files
 }
@@ -16,6 +13,7 @@ An R app for preparing species listings for the Plant Catalog of Units of Brazil
 \donttest{
 app_prepare()
 }
+
 }
 \seealso{
 \code{\link[utils]{download.file}}, \code{\link[utils]{aspell}}
