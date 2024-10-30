@@ -63,7 +63,12 @@ catalogoUCsBR::app_review()
 [publication app on-line](https://pablopains.shinyapps.io/catalogoUCsBR_publication/)
 
 
-## **Consult the [catalogoUCsBR Manual](https://github.com/pablopains/catalogoUCsBR/blob/main/catalogoUCsBR_1.0.4.pdf) for a case study with a complete and replicable workflow**
+## **Consult the [Instruction manual for data download](https://github.com/pablopains/catalogoUCsBR/blob/main/Manual%20de%20instru%C3%A7%C3%B5es%20para%20download_CatalogoUCsBR.pdf)**
+
+
+## **Consult the [catalogoUCsBR Manual](https://github.com/pablopains/catalogoUCsBR/blob/main/catalogoUCsBR_1.0.0.pdf) for a case study with a complete and replicable workflow**
+
+
 
 Please site catalogoUCsBR as:
 
