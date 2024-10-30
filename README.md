@@ -39,12 +39,29 @@ devtools::install_github("pablopains/catalogoUCsBR", dependencies = TRUE)
 ``` r
 catalogoUCsBR::app_prepare()
 ```
+## **Use the prepare app online**
+
+[prepare app on-line](https://pablopains.shinyapps.io/catalogoUCsBR_prepare/)
 
 ## **Use the review app locally in RStudio**
 
 ``` r
 catalogoUCsBR::app_review()
 ```
+## **Use the review app on-line**
+
+[review app on-line](https://pablopains.shinyapps.io/catalogoUCsBR_review/)
+
+
+## **Use the publication app locally in RStudio**
+
+``` r
+catalogoUCsBR::app_review()
+```
+## **Use the publication app on-line**
+
+[publication app on-line](https://pablopains.shinyapps.io/catalogoUCsBR_publication/)
+
 
 ## **Consult the [catalogoUCsBR Manual](https://github.com/pablopains/catalogoUCsBR/blob/main/catalogoUCsBR_1.0.4.pdf) for a case study with a complete and replicable workflow**
 
