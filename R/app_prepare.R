@@ -2082,7 +2082,7 @@ app_prepare <- function()
                                                                       status = "primary",
                                                                       width = 12,
                                                                       
-                                                                      shiny::tags$a('Manual de instruções para download CatalogoUCsBR', href = 'https://github.com/pablopains/catalogoUCsBR/blob/main/Manual%20de%20instru%C3%A7%C3%B5es%20para%20download_CatalogoUCsBR.pdf'),
+                                                                      shiny::tags$a('Manual de instruções para download CatalogoUCsBR', href = 'https://github.com/pablopains/catalogoUCsBR/blob/main/Manual_download_CatalogoUCsBR.pdf'),
                                                                       
                                                                       
                                                                       fluidRow(
@@ -2123,7 +2123,7 @@ app_prepare <- function()
                                                                       status = "primary",
                                                                       width = 12,
                                                                       
-                                                                      shiny::tags$a('Manual de instruções para download CatalogoUCsBR', href = 'https://github.com/pablopains/catalogoUCsBR/blob/main/Manual%20de%20instru%C3%A7%C3%B5es%20para%20download_CatalogoUCsBR.pdf'),
+                                                                      shiny::tags$a('Manual de instruções para download CatalogoUCsBR', href = 'https://github.com/pablopains/catalogoUCsBR/blob/main/Manual_download_CatalogoUCsBR.pdf'),
                                                                       
                                                                       
                                                                       fluidRow(
@@ -2145,7 +2145,7 @@ app_prepare <- function()
                                                                       status = "primary",
                                                                       width = 12,
                                                                       
-                                                                      shiny::tags$a('Manual de instruções para download CatalogoUCsBR', href = 'https://github.com/pablopains/catalogoUCsBR/blob/main/Manual%20de%20instru%C3%A7%C3%B5es%20para%20download_CatalogoUCsBR.pdf'),
+                                                                      shiny::tags$a('Manual de instruções para download CatalogoUCsBR', href = 'https://github.com/pablopains/catalogoUCsBR/blob/main/Manual_download_CatalogoUCsBR.pdf'),
                                                                       
                                                                       
                                                                       fluidRow(
@@ -2167,7 +2167,7 @@ app_prepare <- function()
                                                                       status = "primary",
                                                                       width = 12,
                                                                       
-                                                                      shiny::tags$a('Manual de instruções para download CatalogoUCsBR', href = 'https://github.com/pablopains/catalogoUCsBR/blob/main/Manual%20de%20instru%C3%A7%C3%B5es%20para%20download_CatalogoUCsBR.pdf'),
+                                                                      shiny::tags$a('Manual de instruções para download CatalogoUCsBR', href = 'https://github.com/pablopains/catalogoUCsBR/blob/main/Manual_download_CatalogoUCsBR.pdf'),
                                                                       
                                                                       fluidRow(
                                                                         column(width = 12,
