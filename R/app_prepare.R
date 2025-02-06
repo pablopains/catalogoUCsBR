@@ -50,7 +50,6 @@ app_prepare <- function()
           
           tempdir <- tempdir()
           
-          #' carregar funcões para mensurar tempos de processamento
           {
             tempo_processo <- data.frame(nome_processo="",
                                          tempo_processamento="")[-1,]
@@ -112,26 +111,7 @@ app_prepare <- function()
           }
           
           # cerregar funções 
-          {            # baixar e tabela FB2020 IPT 
-            #' Rodar somente em atualizações do IPT, aproximadamente 6 horas de processamento.
-            # source('./functions/FB2020_IPT_Get.R', encoding = "UTF-8")
-            
-            # carregar tabela FB2020 IPT e funções de acesso
-            #' conferência taxonômica 
-            #' carregar informações da espécie
-            #' somente aqui encontramos dados de tipo de vegetação conforme FB2020
-            
-            # source('./functions/FB2020_IPT_Use.R', encoding = "UTF-8")  # colnames(FloraBrasil2020) <- paste0(colnames(FloraBrasil2020),'_FB2020')
-            # colnames(FloraBrasil2020) <- paste0(colnames(FloraBrasil2020),'_FB2020')
-            
-            # carregar funções para acesso APIs FB2020 v1 e v2
-            #' conferência taxonômica 
-            #' carregar informações da espécie
-            
-            # source("./functions/FB2020_get_taxon_scientificname_from_API.R", encoding = "UTF-8") 
-            # source("C:/ENB_fluxo_processamento/functions/FB2020_get_taxon_scientificname_from_API.R", encoding = "UTF-8") 
-            
-            # txt_search <- occ[[source_data]]$scientificname
+          {
             
             get_link_source_record_url <- function(occurrenceID,
                                                    bibliographicCitation,
@@ -433,23 +413,23 @@ app_prepare <- function()
                                                                    'BRA' ,'')) %>%
                   
                   dplyr::mutate(verbatimNotes = ifelse(temAnoColeta==FALSE,
-                                                       paste(verbatimNotes, frase_saida_verbatim[1] , sep = ' - '), #'ano de coleta'
+                                                       paste(verbatimNotes, frase_saida_verbatim[1] , sep = ' - '), # ano de coleta'
                                                        verbatimNotes)) %>%
                   
                   dplyr::mutate(verbatimNotes = ifelse(temCodigoInstituicao==FALSE,
-                                                       paste(verbatimNotes, frase_saida_verbatim[2], sep = ' - '), #'código de instituição'
+                                                       paste(verbatimNotes, frase_saida_verbatim[2], sep = ' - '), # código de instituição'
                                                        verbatimNotes)) %>%
                   
                   dplyr::mutate(verbatimNotes = ifelse(temNumeroCatalogo==FALSE,
-                                                       paste(verbatimNotes, frase_saida_verbatim[3] , sep = ' - '), #'número de catálogo'
+                                                       paste(verbatimNotes, frase_saida_verbatim[3] , sep = ' - '), # número de catálogo'
                                                        verbatimNotes)) %>%
                   
                   dplyr::mutate(verbatimNotes = ifelse(temColetor==FALSE,
-                                                       paste(verbatimNotes, frase_saida_verbatim[4], sep = ' - '), #'coletor'
+                                                       paste(verbatimNotes, frase_saida_verbatim[4], sep = ' - '), # coletor'
                                                        verbatimNotes)) %>%
                   
                   dplyr::mutate(verbatimNotes = ifelse(temNumeroColeta==FALSE,
-                                                       paste(verbatimNotes, frase_saida_verbatim[5], sep = ' - '), #'número de coleta'
+                                                       paste(verbatimNotes, frase_saida_verbatim[5], sep = ' - '), # número de coleta'
                                                        verbatimNotes)) %>%
                   
                   dplyr::mutate(verbatimNotes = ifelse(temPais==FALSE,
@@ -1118,7 +1098,7 @@ app_prepare <- function()
             # source("C:/Dados/APP_GBOT/functions/get_floraFungaBrasil_v2.R", encoding = "UTF-8")
             {
               get_floraFungaBrasil_v2 <- function(url_source = "http://ipt.jbrj.gov.br/jbrj/archive.do?r=lista_especies_flora_brasil",
-                                                  path_results = tempdir)#'C:\\Dados\\APP_GBOT\\data') # if NULL
+                                                  path_results = tempdir)# C:\\Dados\\APP_GBOT\\data') # if NULL
                 
               {  
                 
@@ -1960,37 +1940,37 @@ app_prepare <- function()
         }
         
         
-        #' # geo
-        #' # Install and load packeges to test
-        #' {
-        #'    
-        #'    # install.packages("monochromeR")      
-        #'    # require(monographaR)
-        #'    
-        #'    # require(remotes)
-        #'    # options("install.lock"=FALSE)
-        #'    # remotes::install_github("brunobrr/bdc")
-        #'    require(bdc)
-        #'    # # devtools::install_github("ropensci/rnaturalearthhires")
-        #'    
-        #'    # # devtools::install_github("ropensci/CoordinateCleaner")
-        #'    # require(CoordinateCleaner)
-        #'    
-        #'    # if (!"occAssess" %in% installed.packages()) devtools::install_github("https://github.com/robboyd/occAssess")
-        #'    # require(occAssess)   
-        #'    
-        #'    # # install.packages("countrycode")
-        #'    require(countrycode)
-        #'    
-        #'    # install.packages("MazamaSpatialUtils")
-        #'    require(MazamaSpatialUtils)
-        #'    
-        #'    # options("install.lock"=FALSE)
-        #'    # install.packages("GADMTools")
-        #'    # require(GADMTools)
-        #'    
-        #'    
-        #' }
+        #  # geo
+        #  # Install and load packeges to test
+        #  {
+        #     
+        #     # install.packages("monochromeR")      
+        #     # require(monographaR)
+        #     
+        #     # require(remotes)
+        #     # options("install.lock"=FALSE)
+        #     # remotes::install_github("brunobrr/bdc")
+        #     require(bdc)
+        #     # # devtools::install_github("ropensci/rnaturalearthhires")
+        #     
+        #     # # devtools::install_github("ropensci/CoordinateCleaner")
+        #     # require(CoordinateCleaner)
+        #     
+        #     # if (!"occAssess" %in% installed.packages()) devtools::install_github("https://github.com/robboyd/occAssess")
+        #     # require(occAssess)   
+        #     
+        #     # # install.packages("countrycode")
+        #     require(countrycode)
+        #     
+        #     # install.packages("MazamaSpatialUtils")
+        #     require(MazamaSpatialUtils)
+        #     
+        #     # options("install.lock"=FALSE)
+        #     # install.packages("GADMTools")
+        #     # require(GADMTools)
+        #     
+        #     
+        #  }
         
         
         # Gerar centroides
@@ -2113,21 +2093,21 @@ app_prepare <- function()
         }
         
         
-        #' # pano de fundo  
-        #' {
-        #'    world_path <- paste0(path_data,"\\countries_gadm36_sp.rds")
-        #'    
-        #'    # Reference data
-        #'    if (file.exists(world_path))
-        #'    {
-        #'       world <- readRDS(world_path)
-        #'    } else
-        #'    {
-        #'       world <- raster::getData("countries", path=path_data, download = TRUE)
-        #'    }  
-        #'    # Renaming the column in the mask to use in coordinateCleaner
-        #'    names(world)[names(world) == "ISO"] <- "iso_a3_eh"
-        #' }
+        #  # pano de fundo  
+        #  {
+        #     world_path <- paste0(path_data,"\\countries_gadm36_sp.rds")
+        #     
+        #     # Reference data
+        #     if (file.exists(world_path))
+        #     {
+        #        world <- readRDS(world_path)
+        #     } else
+        #     {
+        #        world <- raster::getData("countries", path=path_data, download = TRUE)
+        #     }  
+        #     # Renaming the column in the mask to use in coordinateCleaner
+        #     names(world)[names(world) == "ISO"] <- "iso_a3_eh"
+        #  }
         
       }
       
@@ -2331,6 +2311,7 @@ app_prepare <- function()
         
       }
     }
+    
     
     # Tela APP--
     ui <- 
@@ -4192,19 +4173,19 @@ app_prepare <- function()
                       dplyr::mutate(CNCFlora_lastParsed = Sys.time(),
                                     Ctrl_modified = "",
                                     Ctrl_institutionCode = institutionCode,
-                                    Ctrl_collectionCode = collectionCode,  #'Herbário.de.Origem',
-                                    Ctrl_catalogNumber =  catalogNumber,#'Código.de.Barra',
+                                    Ctrl_collectionCode = collectionCode,  # Herbário.de.Origem',
+                                    Ctrl_catalogNumber =  catalogNumber,# Código.de.Barra',
                                     Ctrl_identificationQualifier = identificationQualifier,
                                     Ctrl_identifiedBy = identifiedBy, #Determinador
                                     Ctrl_dateIdentified = gsub('s. d.','',dateIdentified),
                                     Ctrl_typeStatus = typeStatus,
-                                    Ctrl_recordNumber = recordNumber, #'Número.da.Coleta',
+                                    Ctrl_recordNumber = recordNumber, # Número.da.Coleta',
                                     Ctrl_recordedBy = recordedBy, # Coletor,
                                     Ctrl_fieldNumber = "",
                                     Ctrl_country =  country, # País,
                                     Ctrl_stateProvince = stateProvince, #Estado,
                                     Ctrl_municipality = municipality, #Município,
-                                    Ctrl_locality = locality,  #'Descrição.da.Localidade'
+                                    Ctrl_locality = locality,  # Descrição.da.Localidade'
                                     
                                     Ctrl_year = year,# lubridate::year(lubridate::dmy(eventdate)),# lubridate::year(lubridate::dmy(gsub("--/--/","",occ[['reflora']]$eventdate)))[889]
                                     Ctrl_month = month,# lubridate::month(lubridate::dmy(eventdate)),
@@ -4332,8 +4313,8 @@ app_prepare <- function()
                         # CNCFlora_lastParsed = Sys.time(),
                         Ctrl_modified = modified, # modified_incomplete,# modified, 
                         Ctrl_institutionCode = institutionCode, 
-                        Ctrl_collectionCode = collectionCode,  #'Herbário.de.Origem',
-                        Ctrl_catalogNumber =  catalogNumber,#'Código.de.Barra',
+                        Ctrl_collectionCode = collectionCode,  # Herbário.de.Origem',
+                        Ctrl_catalogNumber =  catalogNumber,# Código.de.Barra',
                         
                         # Ctrl_identificationQualifier = check_identificationQualifier(scientificName),
                         Ctrl_identificationQualifier = identificationQualifier,
@@ -4343,13 +4324,13 @@ app_prepare <- function()
                         Ctrl_dateIdentified = dateIdentified,#str_sub(dateIdentified,1,10),  
                         # Ctrl_dateIdentified =  lubridate::year(dateIdentified),
                         Ctrl_typeStatus = typeStatus, 
-                        Ctrl_recordNumber = recordNumber, #'Número.da.Coleta', 
+                        Ctrl_recordNumber = recordNumber, # Número.da.Coleta', 
                         Ctrl_recordedBy = recordedBy, # Coletor,
                         Ctrl_fieldNumber = "", 
                         Ctrl_country =  country, # País, 
                         Ctrl_stateProvince = stateProvince, #Estado, 
                         Ctrl_municipality =  municipality , #county, #Município, 
-                        Ctrl_locality = locality,  #'Descrição.da.Localidade'
+                        Ctrl_locality = locality,  # Descrição.da.Localidade'
                         Ctrl_year = year, 
                         Ctrl_month = month, 
                         Ctrl_day = day,
@@ -4480,8 +4461,8 @@ app_prepare <- function()
                         # CNCFlora_lastParsed = Sys.time(),
                         Ctrl_modified = modified_incomplete,# modified, 
                         Ctrl_institutionCode = institutionCode, 
-                        Ctrl_collectionCode = collectionCode,  #'Herbário.de.Origem',
-                        Ctrl_catalogNumber =  catalogNumber,#'Código.de.Barra',
+                        Ctrl_collectionCode = collectionCode,  # Herbário.de.Origem',
+                        Ctrl_catalogNumber =  catalogNumber,# Código.de.Barra',
                         
                         # Ctrl_identificationQualifier = check_identificationQualifier(scientificName),
                         Ctrl_identificationQualifier = identificationQualifier,
@@ -4491,13 +4472,13 @@ app_prepare <- function()
                         Ctrl_dateIdentified = dateIdentified,#str_sub(dateIdentified,1,10),  
                         # Ctrl_dateIdentified =  lubridate::year(dateIdentified),
                         Ctrl_typeStatus = typeStatus, 
-                        Ctrl_recordNumber = recordNumber, #'Número.da.Coleta', 
+                        Ctrl_recordNumber = recordNumber, # Número.da.Coleta', 
                         Ctrl_recordedBy = recordedBy, # Coletor,
                         Ctrl_fieldNumber = "", 
                         Ctrl_country =  country, # País, 
                         Ctrl_stateProvince = stateProvince, #Estado, 
                         Ctrl_municipality =  municipality , #county, #Município, 
-                        Ctrl_locality = locality,  #'Descrição.da.Localidade'
+                        Ctrl_locality = locality,  # Descrição.da.Localidade'
                         Ctrl_year = year, 
                         Ctrl_month = month, 
                         Ctrl_day = day,
@@ -4666,13 +4647,13 @@ app_prepare <- function()
                                     
                                     dateIdentified =  yearidentified,  
                                     typeStatus = typestatus, 
-                                    recordNumber = collectornumber, # recordnumber, #'Número.da.Coleta', 
+                                    recordNumber = collectornumber, # recordnumber, # Número.da.Coleta', 
                                     recordedBy =  collector, #recordedby, # Coletor,
                                     # fieldNumber = "", 
                                     country =  country, # País, 
                                     stateProvince = stateprovince, #Estado, 
                                     municipality = county, #Município, 
-                                    locality = locality,  #'Descrição.da.Localidade'
+                                    locality = locality,  # Descrição.da.Localidade'
                                     year = yearcollected, 
                                     month = monthcollected, 
                                     day = daycollected,
@@ -4706,8 +4687,8 @@ app_prepare <- function()
                       dplyr::mutate(CNCFlora_lastParsed = Sys.time(),
                                     Ctrl_modified = "", 
                                     Ctrl_institutionCode = institutioncode, 
-                                    Ctrl_collectionCode = collectioncode,  #'Herbário.de.Origem',
-                                    Ctrl_catalogNumber =  catalognumber,#'Código.de.Barra',
+                                    Ctrl_collectionCode = collectioncode,  # Herbário.de.Origem',
+                                    Ctrl_catalogNumber =  catalognumber,# Código.de.Barra',
                                     
                                     # Ctrl_identificationQualifier = check_identificationQualifier(scientificName),
                                     Ctrl_identificationQualifier = '',
@@ -4717,13 +4698,13 @@ app_prepare <- function()
                                     Ctrl_dateIdentified =  yearidentified,  
                                     # Ctrl_dateIdentified =  lubridate::year(yearIdentified),  
                                     Ctrl_typeStatus = typestatus, 
-                                    Ctrl_recordNumber = collectornumber, #'Número.da.Coleta', 
+                                    Ctrl_recordNumber = collectornumber, # Número.da.Coleta', 
                                     Ctrl_recordedBy = collector, # Coletor,
                                     Ctrl_fieldNumber = "", 
                                     Ctrl_country =  country, # País, 
                                     Ctrl_stateProvince = stateprovince, #Estado, 
                                     Ctrl_municipality = county, #Município, 
-                                    Ctrl_locality = locality,  #'Descrição.da.Localidade'
+                                    Ctrl_locality = locality,  # Descrição.da.Localidade'
                                     Ctrl_year = yearcollected, 
                                     Ctrl_month = monthcollected, 
                                     Ctrl_day = daycollected,
@@ -4874,8 +4855,8 @@ app_prepare <- function()
                         # CNCFlora_lastParsed = Sys.time(),
                         Ctrl_modified = modified, 
                         Ctrl_institutionCode = institutionCode, 
-                        Ctrl_collectionCode = collectionCode,  #'Herbário.de.Origem',
-                        Ctrl_catalogNumber =  catalogNumber,#'Código.de.Barra',
+                        Ctrl_collectionCode = collectionCode,  # Herbário.de.Origem',
+                        Ctrl_catalogNumber =  catalogNumber,# Código.de.Barra',
                         Ctrl_identificationQualifier = identificationQualifier,
                         Ctrl_identifiedBy = identifiedBy, #Determinador
                         # Ctrl_dateIdentified = lubridate::year(lubridate::ymd(gsub('s. d.','',dateIdentified))),
@@ -4886,14 +4867,14 @@ app_prepare <- function()
                         Ctrl_dateIdentified = str_sub(dateIdentified,1,10) %>% as.character(),
                         
                         Ctrl_typeStatus = typeStatus,
-                        Ctrl_recordNumber = recordNumber, #'Número.da.Coleta', 
+                        Ctrl_recordNumber = recordNumber, # Número.da.Coleta', 
                         Ctrl_recordedBy = recordedBy, # Coletor,
                         Ctrl_fieldNumber = "", 
                         Ctrl_country =  ifelse(countryCode=="BR", "Brazil",countryCode), #occ[["gbif"]]$con
                         Ctrl_stateProvince = stateProvince, #Estado, 
                         # Ctrl_municipality =  ifelse(empty(county),municipality,county), #Município,
                         Ctrl_municipality =  ifelse(is.na(county),municipality,county), #Município,
-                        Ctrl_locality = locality,  #'Descrição.da.Localidade'
+                        Ctrl_locality = locality,  # Descrição.da.Localidade'
                         Ctrl_year = lubridate::year(lubridate::ymd(str_sub(eventDate,1,10))),  
                         Ctrl_month = lubridate::month(lubridate::ymd(str_sub(eventDate,1,10))),
                         Ctrl_day = lubridate::day(lubridate::ymd(str_sub(eventDate,1,10))),
