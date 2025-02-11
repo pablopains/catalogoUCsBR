@@ -2324,19 +2324,19 @@ app_prepare <- function()
                            sidebarMenu(
                              menuItem("Manual de instruções aplicativo", 
                                       icon = icon("book"), 
-                                      href = "https://github.com/pablopains/catalogoUCsBR/blob/main/Manual_aplicativo_catalogoUCsBR_portugues.pdf", 
+                                      href = "http://172.31.5.230/Manual_aplicativo_catalogoUCsBR_portugues.pdf", 
                                       newtab = TRUE),
                              menuItem("Application Instruction Manual", 
                                       icon = icon("book"), 
-                                      href = "https://github.com/pablopains/catalogoUCsBR/blob/main/Manual_aplicativo_catalogoUCsBR_ingles.pdf", 
+                                      href = "http://172.31.5.230/Manual_aplicativo_catalogoUCsBR_ingles.pdf", 
                                       newtab = TRUE),
                              menuItem("Manual para obtenção de dados", 
                                       icon = icon("book"), 
-                                      href = "",
+                                      href = "http://172.31.5.230/Manual_de_Download_Dados_catalogoUCsBR_portugues.pdf",
                                       newtab = TRUE),
                              menuItem("Manual for obtaining data", 
                                       icon = icon("book"), 
-                                      href = "https://github.com/pablopains/catalogoUCsBR/blob/main/User_Guide_Data_Download_catalogoUCsBR_english.pdf",
+                                      href = "http://172.31.5.230/User_Guide_Data_Download_catalogoUCsBR_english.pdf",
                                       newtab = TRUE),
                              menuItem("REFLORA", 
                                       icon = icon("link"), 
@@ -2369,9 +2369,6 @@ app_prepare <- function()
                                                     shinydashboard::box(title = "REFLORA",
                                                                         status = "primary",
                                                                         width = 12,
-                                                                        
-                                                                        shiny::tags$a('Manual de instruções para download CatalogoUCsBR', href = 'https://github.com/pablopains/catalogoUCsBR/blob/main/Manual_download_CatalogoUCsBR.pdf'),
-                                                                        
                                                                         
                                                                         fluidRow(
                                                                           column(width = 12,
@@ -2418,9 +2415,6 @@ app_prepare <- function()
                                                                         status = "primary",
                                                                         width = 12,
                                                                         
-                                                                        shiny::tags$a('Manual de instruções para download CatalogoUCsBR', href = 'https://github.com/pablopains/catalogoUCsBR/blob/main/Manual_download_CatalogoUCsBR.pdf'),
-                                                                        
-                                                                        
                                                                         fluidRow(
                                                                           column(width = 12,
                                                                                  shiny::tags$a('Jabot Geral', href = 'http://jabot.jbrj.gov.br/v3/consulta.php'),
@@ -2445,8 +2439,6 @@ app_prepare <- function()
                                                                         status = "primary",
                                                                         width = 12,
                                                                         
-                                                                        shiny::tags$a('Manual de instruções para download CatalogoUCsBR', href = 'https://github.com/pablopains/catalogoUCsBR/blob/main/Manual_download_CatalogoUCsBR.pdf'),
-                                                                        
                                                                         fluidRow(
                                                                           column(width = 12,
                                                                                  shiny::tags$a('SpeciesLink', href = 'https://specieslink.net/search/'),
@@ -2469,8 +2461,6 @@ app_prepare <- function()
                                                     shinydashboard::box(title = "Arquivos .TXT, em formato Darwin Core, com ocorrência de espécies.",
                                                                         status = "primary",
                                                                         width = 12,
-                                                                        
-                                                                        shiny::tags$a('Manual de instruções para download CatalogoUCsBR', href = 'https://github.com/pablopains/catalogoUCsBR/blob/main/Manual_download_CatalogoUCsBR.pdf'),
                                                                         
                                                                         fluidRow(
                                                                           column(width = 12,
