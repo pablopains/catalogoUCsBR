@@ -889,7 +889,8 @@ app_publication <- function()
       },
       content = function(file) {
         
-        dt <- hot_to_r(input$hot_modelo)
+        dt <- hot_to_r(input$hot_modelo) %>% data.frame(stringsAsFactors = FALSE,
+                                                        check.names = FALSE)
         
         # setting the threshold for the maximum number of characters to be preserved
         n_char_to_truncate_threshold <- 32767
