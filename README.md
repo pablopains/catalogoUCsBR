@@ -29,7 +29,10 @@ You can install the development version of catalogoUCsBR from
 catalogoUCsBR, run
 
 ``` r
-devtools::install_github("pablopains/catalogoUCsBR", dependencies = TRUE)
+install.packages('remotes',  dependencies = T)
+
+remotes::install_github("pablopains/catalogoUCsBR",
+                        dependencies = T)
 ```
 
 # **Botanical experts**
@@ -39,44 +42,24 @@ devtools::install_github("pablopains/catalogoUCsBR", dependencies = TRUE)
 ``` r
 catalogoUCsBR::app_prepare()
 ```
-## **Use the prepare app online**
-
-[prepare app on-line](https://pablopains.shinyapps.io/catalogoUCsBR_prepare/)
 
 ## **Use the review app locally in RStudio**
 
 ``` r
 catalogoUCsBR::app_review()
 ```
-## **Use the review app on-line**
 
-[review app on-line](https://pablopains.shinyapps.io/catalogoUCsBR_review/)
-
-
-## **Use the publication app locally in RStudio**
-
-``` r
-catalogoUCsBR::app_review()
-```
-## **Use the publication app on-line**
-
-[publication app on-line](https://pablopains.shinyapps.io/catalogoUCsBR_publication/)
-
-
-## **Consult the [Instruction manual for data download](https://github.com/pablopains/catalogoUCsBR/blob/main/Manual%20de%20instru%C3%A7%C3%B5es%20para%20download_CatalogoUCsBR.pdf)**
-
-
-## **Consult the [catalogoUCsBR Manual](https://github.com/pablopains/catalogoUCsBR/blob/main/catalogoUCsBR_1.0.0.pdf) for a case study with a complete and replicable workflow**
-
-
+## **Consult the [catalogoUCsBR Manual](https://github.com/pablopains/catalogoUCsBR/blob/main/catalogoUCsBR_1.0.4.pdf) for a case study with a complete and replicable workflow**
 
 Please site catalogoUCsBR as:
 
 ``` r
 print(citation("catalogoUCsBR"), bibtex = FALSE)
-#> To cite package 'catalogoUCsBR' in publications use:
+#> Para citar o pacote 'catalogoUCsBR' em publicações use:
 #> 
-#>   Melo P, Bochorny T, Forzza R (2023). _catalogoUCsBR: An R package for
-#>   preparing species listings for the Plant Catalog of Units of
-#>   Brazilian Conservation._. R package version 1.0.0.
+#>   Melo P, Bochorny T, Forzza R (2024). _catalogoUCsBR: An R package to
+#>   prepare species lists for the Catalog of Plants of Conservation Units
+#>   in Brazil._. R package version 1.0.0, commit
+#>   2cfbf4e7d21b8de4b88a21e6d6fd02234464e33e,
+#>   <https://github.com/pablopains/catalogoUCsBR>.
 ```

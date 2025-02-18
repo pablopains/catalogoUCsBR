@@ -34,7 +34,10 @@ You can install the development version of catalogoUCsBR from [GitHub](https://g
 To install catalogoUCsBR, run 
 
 ```{r example_install, eval=FALSE}
-devtools::install_github("pablopains/catalogoUCsBR", dependencies = TRUE)
+install.packages('remotes',  dependencies = T)
+
+remotes::install_github("pablopains/catalogoUCsBR",
+                        dependencies = T)
 ```
 
 # **Botanical experts**
