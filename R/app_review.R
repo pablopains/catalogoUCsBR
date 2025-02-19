@@ -612,49 +612,7 @@ app_review <- function()
       spp_sel <<- ''
       Ctrl_FB2020_familyList <<- ''
       Ctrl_new_specieList <<- ''
-      occ_full <<- {}
-      key_list <<- {}
       
-      occ_full_tmp <- {}
-      
-      occ <<- list(reflora=data.frame(),
-                   janot=data.frame(),
-                   splink=data.frame(),
-                   gbif=data.frame(),
-                   all=data.frame(),
-                   
-                   all_results = data.frame(),
-                   
-                   all_collectionCode=data.frame(),
-                   all_mainCollectorLastName=data.frame(),
-                   
-                   occ_vc=data.frame(),
-                   occ_vc_summ=data.frame(),
-                   
-                   collectionCode=data.frame(),
-                   collectionCodeNew=data.frame(),
-                   collectionCodeSummary=data.frame(),
-                   
-                   mainCollectorLastName=data.frame(),
-                   mainCollectorLastNameNew=data.frame(),
-                   mainCollectorLastNameSummary=data.frame(),
-                   # all_updated_collection_collector=data.frame(),
-                   
-                   all_geo = data.frame(),
-                   
-                   wcvp = data.frame(),
-                   fb2020 = data.frame(),
-                   
-                   taxonomicAlignment = data.frame(),
-                   
-                   fb2020_colSearch  = data.frame(),
-                   
-                   
-                   centroids = data.frame(),
-                   
-                   all_cc = data.frame(),
-                   
-                   scientificName_list <- data.frame())
     }
     
     
@@ -1039,11 +997,59 @@ app_review <- function()
     #  Server
     server <- function(input, output, session)
     {
-      Ctrl_observacaoNaoPossivelVerificar <<- ''
-      
-      # Ctrl_family_new_family <<- ''
-      
-      Ctrl_scientificName_new_family  <<- ''
+      # var global
+      {
+        
+        Ctrl_observacaoNaoPossivelVerificar <<- ''
+        
+        # Ctrl_family_new_family <<- ''
+        
+        Ctrl_scientificName_new_family  <<- ''
+        
+        occ_full <<- {}
+        key_list <<- {}
+        
+        occ_full_tmp <- {}
+        
+        occ <<- list(reflora=data.frame(),
+                     janot=data.frame(),
+                     splink=data.frame(),
+                     gbif=data.frame(),
+                     all=data.frame(),
+                     
+                     all_results = data.frame(),
+                     
+                     all_collectionCode=data.frame(),
+                     all_mainCollectorLastName=data.frame(),
+                     
+                     occ_vc=data.frame(),
+                     occ_vc_summ=data.frame(),
+                     
+                     collectionCode=data.frame(),
+                     collectionCodeNew=data.frame(),
+                     collectionCodeSummary=data.frame(),
+                     
+                     mainCollectorLastName=data.frame(),
+                     mainCollectorLastNameNew=data.frame(),
+                     mainCollectorLastNameSummary=data.frame(),
+                     # all_updated_collection_collector=data.frame(),
+                     
+                     all_geo = data.frame(),
+                     
+                     wcvp = data.frame(),
+                     fb2020 = data.frame(),
+                     
+                     taxonomicAlignment = data.frame(),
+                     
+                     fb2020_colSearch  = data.frame(),
+                     
+                     
+                     centroids = data.frame(),
+                     
+                     all_cc = data.frame(),
+                     
+                     scientificName_list <- data.frame())
+      }
       
       dados <- reactive({
         if(NROW(occ_full)<=1){
@@ -2639,4 +2645,6 @@ output$hot_details_key <- renderRHandsontable(
   # shinyApp(ui = ui, server = server)
   
   shinyApp(ui = ui, server = server, options = list(launch.browser = TRUE))
+  # shinyApp(ui = ui, server = server, options = list(launch.browser = TRUE))
+  
 }

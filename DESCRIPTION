@@ -29,7 +29,8 @@ Imports:
     rhandsontable,
     shinyWidgets,
     measurements,
-    downloader
+    downloader,
+    writexl
 Remotes:
     github::pablopains/catalogoUCsBR
 Depends:

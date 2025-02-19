@@ -316,12 +316,16 @@ app_publication <- function()
     
     # variaveis
     {
-      
       UC_Input <<- ""
       fb2020 <<-{}
-      occ_full <<- {}
       distribution <<- {}
       floraAmeacadaBR <<- {}
+      
+      # UC_Input <<- ""
+      # fb2020 <<-{}
+      # occ_full <<- {}
+      # distribution <<- {}
+      # floraAmeacadaBR <<- {}
       
       Ctrl_observacaoNaoPossivelVerificar_list <- c('Não se aplica',
                                                     'Espécimes estão danificados e/ou em condições não adequadas para verificação',
@@ -345,52 +349,10 @@ app_publication <- function()
       Ctrl_FB2020_familyList <<- ''
       Ctrl_new_specieList <<- ''
       
-      key_list <<- {}
       
-      occ_full_tmp <- {}
-      
-      occ <<- list(reflora=data.frame(),
-                   janot=data.frame(),
-                   splink=data.frame(),
-                   gbif=data.frame(),
-                   all=data.frame(),
-                   
-                   all_results = data.frame(),
-                   
-                   all_collectionCode=data.frame(),
-                   all_mainCollectorLastName=data.frame(),
-                   
-                   occ_vc=data.frame(),
-                   occ_vc_summ=data.frame(),
-                   
-                   collectionCode=data.frame(),
-                   collectionCodeNew=data.frame(),
-                   collectionCodeSummary=data.frame(),
-                   
-                   mainCollectorLastName=data.frame(),
-                   mainCollectorLastNameNew=data.frame(),
-                   mainCollectorLastNameSummary=data.frame(),
-                   # all_updated_collection_collector=data.frame(),
-                   
-                   all_geo = data.frame(),
-                   
-                   wcvp = data.frame(),
-                   fb2020 = data.frame(),
-                   
-                   taxonomicAlignment = data.frame(),
-                   
-                   fb2020_colSearch  = data.frame(),
-                   
-                   
-                   centroids = data.frame(),
-                   
-                   all_cc = data.frame(),
-                   
-                   scientificName_list <- data.frame())
     }
   }
   #  Tela APP--
-  
   
   ui <- 
     {
@@ -596,6 +558,53 @@ app_publication <- function()
   server <- function(input, output, session)
   {
     
+    # var global
+    {
+      occ_full <<- {}
+
+      key_list <<- {}
+      
+      occ_full_tmp <- {}
+      
+      occ <<- list(reflora=data.frame(),
+                   janot=data.frame(),
+                   splink=data.frame(),
+                   gbif=data.frame(),
+                   all=data.frame(),
+                   
+                   all_results = data.frame(),
+                   
+                   all_collectionCode=data.frame(),
+                   all_mainCollectorLastName=data.frame(),
+                   
+                   occ_vc=data.frame(),
+                   occ_vc_summ=data.frame(),
+                   
+                   collectionCode=data.frame(),
+                   collectionCodeNew=data.frame(),
+                   collectionCodeSummary=data.frame(),
+                   
+                   mainCollectorLastName=data.frame(),
+                   mainCollectorLastNameNew=data.frame(),
+                   mainCollectorLastNameSummary=data.frame(),
+                   # all_updated_collection_collector=data.frame(),
+                   
+                   all_geo = data.frame(),
+                   
+                   wcvp = data.frame(),
+                   fb2020 = data.frame(),
+                   
+                   taxonomicAlignment = data.frame(),
+                   
+                   fb2020_colSearch  = data.frame(),
+                   
+                   
+                   centroids = data.frame(),
+                   
+                   all_cc = data.frame(),
+                   
+                   scientificName_list <- data.frame())
+    }
     
     loadoccResults <- reactive(
       {
@@ -968,5 +977,7 @@ app_publication <- function()
   # shinyApp(ui = ui, server = server)
   
   shinyApp(ui = ui, server = server, options = list(launch.browser = TRUE))
-
+  
+  # shinyApp(ui = ui, server = server, options = list(launch.browser = TRUE))
+  
 }

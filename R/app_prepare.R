@@ -2147,49 +2147,6 @@ app_prepare <- function()
       
       #  Preparaçao
       {
-        occ_full_tmp <- {}
-        occ_full <<- {}
-        key_list <<- {}
-        
-        occ <<- list(reflora=data.frame(),
-                     jabot=data.frame(),
-                     jabotRB=data.frame(),
-                     splink=data.frame(),
-                     gbif=data.frame(),
-                     all=data.frame(),
-                     
-                     all_results = data.frame(),
-                     
-                     all_collectionCode=data.frame(),
-                     all_mainCollectorLastName=data.frame(),
-                     
-                     occ_vc=data.frame(),
-                     occ_vc_summ=data.frame(),
-                     
-                     collectionCode=data.frame(),
-                     collectionCodeNew=data.frame(),
-                     collectionCodeSummary=data.frame(),
-                     
-                     mainCollectorLastName=data.frame(),
-                     mainCollectorLastNameNew=data.frame(),
-                     mainCollectorLastNameSummary=data.frame(),
-                     # all_updated_collection_collector=data.frame(),
-                     
-                     all_geo = data.frame(),
-                     
-                     wcvp = data.frame(),
-                     fb2020 = data.frame(),
-                     
-                     taxonomicAlignment = data.frame(),
-                     
-                     fb2020_colSearch  = data.frame(),
-                     
-                     
-                     centroids = data.frame(),
-                     
-                     all_cc = data.frame(),
-                     
-                     scientificName_list <- data.frame())
         
         # colunas de busca na taxon
         {
@@ -2935,7 +2892,53 @@ app_prepare <- function()
     # Server
     server <- function(input, output, session)
     {
-      
+      # var global
+      {
+        occ_full_tmp <- {}
+        occ_full <<- {}
+        key_list <<- {}
+        
+        occ <<- list(reflora=data.frame(),
+                     jabot=data.frame(),
+                     jabotRB=data.frame(),
+                     splink=data.frame(),
+                     gbif=data.frame(),
+                     all=data.frame(),
+                     
+                     all_results = data.frame(),
+                     
+                     all_collectionCode=data.frame(),
+                     all_mainCollectorLastName=data.frame(),
+                     
+                     occ_vc=data.frame(),
+                     occ_vc_summ=data.frame(),
+                     
+                     collectionCode=data.frame(),
+                     collectionCodeNew=data.frame(),
+                     collectionCodeSummary=data.frame(),
+                     
+                     mainCollectorLastName=data.frame(),
+                     mainCollectorLastNameNew=data.frame(),
+                     mainCollectorLastNameSummary=data.frame(),
+                     # all_updated_collection_collector=data.frame(),
+                     
+                     all_geo = data.frame(),
+                     
+                     wcvp = data.frame(),
+                     fb2020 = data.frame(),
+                     
+                     taxonomicAlignment = data.frame(),
+                     
+                     fb2020_colSearch  = data.frame(),
+                     
+                     
+                     centroids = data.frame(),
+                     
+                     all_cc = data.frame(),
+                     
+                     scientificName_list <- data.frame())
+        
+      }
       # applyTaxonomicAlignment_Contents
       # backbone
       {
