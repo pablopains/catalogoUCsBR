@@ -4268,7 +4268,8 @@ app_prepare <- function()
                     # validar FORM
                     
                     occ[[source_data]]$Ctrl_scientificNameOriginalSource <- NA
-                    occ[[source_data]]$Ctrl_scientificNameOriginalSource <- occ[[source_data]]$scientifname
+                    # occ[[source_data]]$Ctrl_scientificNameOriginalSource <- occ[[source_data]]$scientifname
+                    occ[[source_data]]$Ctrl_scientificNameOriginalSource <- occ[[source_data]]$scientifcname
                     
                     occ[[source_data]] <- occ[[source_data]] %>%
                       dplyr::mutate(occurrenceID = occurrenceID_GBIF, # occurrenceID,
@@ -4364,158 +4365,156 @@ app_prepare <- function()
           output$jabotContents <- DT::renderDataTable(options = list(scrollX = TRUE),
                                                       {
                                                         jabotLoad()
+                                                        # print('JABOT teste')
                                                       })
           
         }
         
         # jabotBR
         {
-          
-          jabotRBLoad <- reactive({
-            req(input$jabotBRFile)
-            tryCatch(
-              {
-                files_tmp <- input$jabotBRFile$datapath
-                
-                # files_tmp <- 'C:\\Dados\\CNCFlora\\shiny\\cncflora\\scriptsAdd\\CatalogoUCs_v2\\busca_manual\\Serra das Lontras\\jabotRB\\ExportaDarwinCore.csv'
-                
-                nf <- length(files_tmp)
-                occ_tmp <- data.frame({})
-                if(nf>0)
-                {
-                  
-                  i <- 1
-                  for(i in 1:nf)
-                  {
-                    occ_tmp_1 <- read.delim(file = files_tmp[i],
-                                            header = TRUE, 
-                                            sep = "|",
-                                            # quote = '"',
-                                            dec = '.',
-                                            stringsAsFactors = FALSE,
-                                            # fileEncoding = "Windows-1258")
-                                            fileEncoding = "UTF-8")
-                    
-                    occ_tmp <- rbind.data.frame(occ_tmp, occ_tmp_1)   
-                  }
-                }
-                
-                # jabot
-                source_data <- 'jabotRB'   
-                # occ[[source_data]] <<- occ[['jabot']] #jabotLoad()
-                
-                if(NROW(occ_tmp)>0)
-                {
-                  occ[[source_data]] <- occ_tmp
-                  
-                  # padronizar em dwc
-                  {
-                    print(paste0('n. registros: ', nrow(occ[[source_data]])))
-                    print(paste0('n. colunas: ', ncol(occ[[source_data]])))
-                    
-                    occ[[source_data]]$Ctrl_scientificNameOriginalSource <- NA
-                    occ[[source_data]]$Ctrl_scientificNameOriginalSource <- occ[[source_data]]$scientificName
-                    
-                    occ[[source_data]] <- occ[[source_data]] %>%
-                      dplyr::mutate(occurrenceID = occurrenceID,
-                                    source = 'jabotRB',
-                                    comments = '',
-                                    scientificName = ifelse(taxonRank=='fam.',family,
-                                                            ifelse(taxonRank=='gen.',genus,
-                                                                   ifelse(taxonRank=='sp.', paste0(genus, ' ', specificEpithet),
-                                                                          ifelse(taxonRank=='var.', paste0(genus, ' ', specificEpithet, ' var. ', infraspecificEpithet),
-                                                                                 ifelse(taxonRank=='Infr.', paste0(genus, ' ', specificEpithet, ' var. ', infraspecificEpithet),
-                                                                                        
-                                                                                        ifelse(taxonRank=='subsp.', paste0(genus, ' ', specificEpithet, ' subsp. ', infraspecificEpithet),
-                                                                                               ifelse(taxonRank=='f.', paste0(genus, ' ', specificEpithet, ' form. ', infraspecificEpithet), 
-                                                                                                      ""))))))),
-                                    
-                                    taxonRank = ifelse(taxonRank=='fam.','FAMILY',
-                                                       ifelse(taxonRank=='gen.','GENUS',
-                                                              ifelse(taxonRank=='sp.','SPECIES',
-                                                                     ifelse(taxonRank=='var.', 'VARIETY',
-                                                                            ifelse(taxonRank=='Infr.', 'VARIETY',
-                                                                                   
-                                                                                   ifelse(taxonRank=='subsp.', 'SUBSPECIES',
-                                                                                          ifelse(taxonRank=='f.', 'FORM', 
-                                                                                                 ""))))))))
-                    
-                    
-                  }
-                  
-                  # padronizar pre-processamento
-                  {
-                    occ_tmp_2 <- occ[[source_data]] %>%
-                      dplyr::mutate(Ctrl_acceptedNameUsage = '',
-                                    Ctrl_scientificNameAuthorship = scientificNameAuthorship,
-                                    Ctrl_scientificName = scientificName,
-                                    Ctrl_family = family,
-                                    Ctrl_genus = genus,
-                                    Ctrl_specificEpithet = specificEpithet,
-                                    Ctrl_infraspecificEpithet = infraspecificEpithet,
-                                    Ctrl_scientificNameSearched = "",
-                                    Ctrl_scientificNameReference = "",
-                                    Ctrl_bibliographicCitation = 'jabotRB',
-                                    Ctrl_downloadAsSynonym = "",
-                                    Ctrl_taxonRank = taxonRank) %>%
-                      dplyr::mutate(
-                        # CNCFlora_lastParsed = Sys.time(),
-                        Ctrl_modified = modified_incomplete,# modified, 
-                        Ctrl_institutionCode = institutionCode, 
-                        Ctrl_collectionCode = collectionCode,  # Herbário.de.Origem',
-                        Ctrl_catalogNumber =  catalogNumber,# Código.de.Barra',
-                        
-                        # Ctrl_identificationQualifier = check_identificationQualifier(scientificName),
-                        Ctrl_identificationQualifier = identificationQualifier,
-                        
-                        Ctrl_identifiedBy = identifiedBy, #Determinador
-                        
-                        Ctrl_dateIdentified = dateIdentified,#str_sub(dateIdentified,1,10),  
-                        # Ctrl_dateIdentified =  lubridate::year(dateIdentified),
-                        Ctrl_typeStatus = typeStatus, 
-                        Ctrl_recordNumber = recordNumber, # Número.da.Coleta', 
-                        Ctrl_recordedBy = recordedBy, # Coletor,
-                        Ctrl_fieldNumber = "", 
-                        Ctrl_country =  country, # País, 
-                        Ctrl_stateProvince = stateProvince, #Estado, 
-                        Ctrl_municipality =  municipality , #county, #Município, 
-                        Ctrl_locality = locality,  # Descrição.da.Localidade'
-                        Ctrl_year = year, 
-                        Ctrl_month = month, 
-                        Ctrl_day = day,
-                        Ctrl_decimalLatitude = decimalLatitude, 
-                        Ctrl_decimalLongitude = decimalLongitude, 
-                        Ctrl_occurrenceRemarks = paste0(fieldNotes, ', ',occurrenceRemarks), 
-                        
-                        Ctrl_comments = "",
-                        
-                        # memória de registro
-                        # 21-08-2021
-                        Ctrl_occurrenceID = paste0('jabotRB=',catalogNumber) %>% as.character()) %>%
-                      dplyr::select(colunas_ctrl_dwc)
-                    
-                    # occ[['all']] <<- rbind.data.frame(occ[['all']],
-                    #                                   occ_tmp)
-                    
-                    occ[[source_data]] <<- occ_tmp_2
-                  }
-                }
-                
-                return(occ_tmp)
-              },
-              error = function(e) {
-                stop(safeError(e))
-              }
-            )
-          })
-          
-          output$jabotRBContents <- DT::renderDataTable(options = list(scrollX = TRUE),
-                                                        {
-                                                          jabotRBLoad()
-                                                        })
-          
-          
-          
+          # 
+          # jabotRBLoad <- reactive({
+          #   req(input$jabotBRFile)
+          #   tryCatch(
+          #     {
+          #       files_tmp <- input$jabotBRFile$datapath
+          #       
+          #       # files_tmp <- 'C:\\Dados\\CNCFlora\\shiny\\cncflora\\scriptsAdd\\CatalogoUCs_v2\\busca_manual\\Serra das Lontras\\jabotRB\\ExportaDarwinCore.csv'
+          #       
+          #       nf <- length(files_tmp)
+          #       occ_tmp <- data.frame({})
+          #       if(nf>0)
+          #       {
+          #         
+          #         i <- 1
+          #         for(i in 1:nf)
+          #         {
+          #           occ_tmp_1 <- read.delim(file = files_tmp[i],
+          #                                   header = TRUE, 
+          #                                   sep = "|",
+          #                                   # quote = '"',
+          #                                   dec = '.',
+          #                                   stringsAsFactors = FALSE,
+          #                                   # fileEncoding = "Windows-1258")
+          #                                   fileEncoding = "UTF-8")
+          #           
+          #           occ_tmp <- rbind.data.frame(occ_tmp, occ_tmp_1)   
+          #         }
+          #       }
+          #       
+          #       # jabot
+          #       source_data <- 'jabotRB'   
+          #       # occ[[source_data]] <<- occ[['jabot']] #jabotLoad()
+          #       
+          #       if(NROW(occ_tmp)>0)
+          #       {
+          #         occ[[source_data]] <- occ_tmp
+          #         
+          #         # padronizar em dwc
+          #         {
+          #           print(paste0('n. registros: ', nrow(occ[[source_data]])))
+          #           print(paste0('n. colunas: ', ncol(occ[[source_data]])))
+          #           
+          #           occ[[source_data]]$Ctrl_scientificNameOriginalSource <- NA
+          #           occ[[source_data]]$Ctrl_scientificNameOriginalSource <- occ[[source_data]]$scientificName
+          #           
+          #           occ[[source_data]] <- occ[[source_data]] %>%
+          #             dplyr::mutate(occurrenceID = occurrenceID,
+          #                           source = 'jabotRB',
+          #                           comments = '',
+          #                           scientificName = ifelse(taxonRank=='fam.',family,
+          #                                                   ifelse(taxonRank=='gen.',genus,
+          #                                                          ifelse(taxonRank=='sp.', paste0(genus, ' ', specificEpithet),
+          #                                                                 ifelse(taxonRank=='var.', paste0(genus, ' ', specificEpithet, ' var. ', infraspecificEpithet),
+          #                                                                        ifelse(taxonRank=='Infr.', paste0(genus, ' ', specificEpithet, ' var. ', infraspecificEpithet),
+          #                                                                               
+          #                                                                               ifelse(taxonRank=='subsp.', paste0(genus, ' ', specificEpithet, ' subsp. ', infraspecificEpithet),
+          #                                                                                      ifelse(taxonRank=='f.', paste0(genus, ' ', specificEpithet, ' form. ', infraspecificEpithet), 
+          #                                                                                             ""))))))),
+          #                           
+          #                           taxonRank = ifelse(taxonRank=='fam.','FAMILY',
+          #                                              ifelse(taxonRank=='gen.','GENUS',
+          #                                                     ifelse(taxonRank=='sp.','SPECIES',
+          #                                                            ifelse(taxonRank=='var.', 'VARIETY',
+          #                                                                   ifelse(taxonRank=='Infr.', 'VARIETY',
+          #                                                                          
+          #                                                                          ifelse(taxonRank=='subsp.', 'SUBSPECIES',
+          #                                                                                 ifelse(taxonRank=='f.', 'FORM', 
+          #                                                                                        ""))))))))
+          #           
+          #           
+          #         }
+          #         
+          #         # padronizar pre-processamento
+          #         {
+          #           occ_tmp_2 <- occ[[source_data]] %>%
+          #             dplyr::mutate(Ctrl_acceptedNameUsage = '',
+          #                           Ctrl_scientificNameAuthorship = scientificNameAuthorship,
+          #                           Ctrl_scientificName = scientificName,
+          #                           Ctrl_family = family,
+          #                           Ctrl_genus = genus,
+          #                           Ctrl_specificEpithet = specificEpithet,
+          #                           Ctrl_infraspecificEpithet = infraspecificEpithet,
+          #                           Ctrl_scientificNameSearched = "",
+          #                           Ctrl_scientificNameReference = "",
+          #                           Ctrl_bibliographicCitation = 'jabotRB',
+          #                           Ctrl_downloadAsSynonym = "",
+          #                           Ctrl_taxonRank = taxonRank) %>%
+          #             dplyr::mutate(
+          #               # CNCFlora_lastParsed = Sys.time(),
+          #               Ctrl_modified = modified_incomplete,# modified, 
+          #               Ctrl_institutionCode = institutionCode, 
+          #               Ctrl_collectionCode = collectionCode,  # Herbário.de.Origem',
+          #               Ctrl_catalogNumber =  catalogNumber,# Código.de.Barra',
+          #               
+          #               # Ctrl_identificationQualifier = check_identificationQualifier(scientificName),
+          #               Ctrl_identificationQualifier = identificationQualifier,
+          #               
+          #               Ctrl_identifiedBy = identifiedBy, #Determinador
+          #               
+          #               Ctrl_dateIdentified = dateIdentified,#str_sub(dateIdentified,1,10),  
+          #               # Ctrl_dateIdentified =  lubridate::year(dateIdentified),
+          #               Ctrl_typeStatus = typeStatus, 
+          #               Ctrl_recordNumber = recordNumber, # Número.da.Coleta', 
+          #               Ctrl_recordedBy = recordedBy, # Coletor,
+          #               Ctrl_fieldNumber = "", 
+          #               Ctrl_country =  country, # País, 
+          #               Ctrl_stateProvince = stateProvince, #Estado, 
+          #               Ctrl_municipality =  municipality , #county, #Município, 
+          #               Ctrl_locality = locality,  # Descrição.da.Localidade'
+          #               Ctrl_year = year, 
+          #               Ctrl_month = month, 
+          #               Ctrl_day = day,
+          #               Ctrl_decimalLatitude = decimalLatitude, 
+          #               Ctrl_decimalLongitude = decimalLongitude, 
+          #               Ctrl_occurrenceRemarks = paste0(fieldNotes, ', ',occurrenceRemarks), 
+          #               
+          #               Ctrl_comments = "",
+          #               
+          #               # memória de registro
+          #               # 21-08-2021
+          #               Ctrl_occurrenceID = paste0('jabotRB=',catalogNumber) %>% as.character()) %>%
+          #             dplyr::select(colunas_ctrl_dwc)
+          #           
+          #           # occ[['all']] <<- rbind.data.frame(occ[['all']],
+          #           #                                   occ_tmp)
+          #           
+          #           occ[[source_data]] <<- occ_tmp_2
+          #         }
+          #       }
+          #       
+          #       return(occ_tmp)
+          #     },
+          #     error = function(e) {
+          #       stop(safeError(e))
+          #     }
+          #   )
+          # })
+          # 
+          # output$jabotRBContents <- DT::renderDataTable(options = list(scrollX = TRUE),
+          #                                               {
+          #                                                 jabotRBLoad()
+          #                                               })
         }
         
         # splink
