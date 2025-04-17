@@ -7,28 +7,28 @@
 #'        Rafaela Forzza
 #'        
 #' @seealso \code{\link[utils]{download.file}}, \code{\link[utils]{aspell}}
-#' 
-#' @import devtools
-#' @import plyr
-#' @import dplyr
-#' @import tidyr
-#' @import readr
-#' @import stringr
-#' @import lubridate
-#' @import jsonlite
-#' @import sqldf
-#' @import rvest
-#' @import shiny
-#' @import shinydashboard
-#' @import rhandsontable
-#' @import DT
-#' @import rhandsontable
-#' @import shinyWidgets
-#' @import measurements
-#' @import downloader
-#' @import glue
-#' @import tidyverse
-#' 
+#' @importFrom dplyr filter mutate select arrange add_row rename distinct count
+#' @importFrom dplyr summarise group_by left_join bind_rows
+#' @importFrom tidyr %>%
+#' @importFrom stringr str_split str_replace_all str_to_title str_to_lower
+#' @importFrom stringr str_detect str_sub str_locate str_trim str_c
+#' @importFrom lubridate as_datetime year month day ymd dmy
+#' @importFrom shiny shinyApp fluidRow column actionButton downloadButton
+#' @importFrom shiny renderDataTable reactive eventReactive req
+#' @importFrom shinydashboard dashboardPage dashboardHeader dashboardSidebar
+#' @importFrom shinydashboard dashboardBody box sidebarMenu menuItem
+#' @importFrom DT renderDataTable dataTableOutput
+#' @importFrom rhandsontable renderRHandsontable rHandsontableOutput hot_table hot_col
+#' @importFrom readr read_csv read_delim read_excel locale
+#' @importFrom jsonlite fromJSON toJSON
+#' @importFrom glue glue trim
+#' @importFrom textclean replace_non_ascii
+#' @importFrom measurements conv_unit
+#' @importFrom downloader download
+#' @importFrom writexl write_xlsx
+#' @importFrom utils read.csv write.csv download.file
+#' @importFrom stats na.omit
+#' @importFrom magrittr %>%
 #' @examples
 #' \donttest{
 #' app_prepare()

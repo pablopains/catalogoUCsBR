@@ -8,24 +8,26 @@
 #'        
 #' @seealso \code{\link[utils]{download.file}}, \code{\link[utils]{aspell}}
 #' 
-#' @import dplyr
-#' @import tidyr
-#' @import readr
-#' @import stringr
-#' @import lubridate
-#' @import jsonlite
-#' @import sqldf
-#' @import shiny
-#' @import shinydashboard
-#' @import DT
-#' @import rhandsontable
-#' @import shinyWidgets
-#' @import measurements
-#' @import downloader
-#' @import writexl
-#' @import tidyverse
-#' @import purrr
-#' 
+#' @importFrom dplyr %>% select filter arrange_at left_join mutate group_by summarise n distinct
+#' @importFrom tidyr separate
+#' @importFrom readr read_csv read_delim locale
+#' @importFrom stringr str_split str_sub str_locate str_detect
+#' @importFrom lubridate year month day
+#' @importFrom jsonlite fromJSON
+#' @importFrom sqldf sqldf
+#' @importFrom shiny shinyApp reactive req validate need withProgress incProgress
+#' @importFrom shinydashboard dashboardPage dashboardHeader dashboardSidebar dashboardBody sidebarMenu menuItem
+#' @importFrom DT datatable
+#' @importFrom rhandsontable rhandsontable hot_table hot_col
+#' @importFrom shinyWidgets pickerInput
+#' @importFrom measurements conv_unit
+#' @importFrom downloader download
+#' @importFrom writexl write_xlsx
+#' @importFrom tidyverse everything
+#' @importFrom purrr map_df
+#' @importFrom utils download.file unzip
+#' @importFrom stats na.omit
+#'  
 #' @examples
 #' \donttest{
 #' app_publication()

@@ -1,0 +1,37 @@
+Package: catalogoUCsBR
+Type: Package
+Title: An R package to prepare species lists for the Catalog of Plants of Conservation Units in Brazil.
+Version: 1.0.0
+Date: 2024-05-09
+Authors@R: c(person("Pablo", "Melo", email = "pablopains@yahoo.com.br", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3004-2984")),
+	    person("Thuane", "Bochorny", email = "tbochorny@gmail.com", role = c("aut"), comment = c(ORCID = "0000-0003-4278-4520")),
+	    person("Rafaela", "Forzza", email = "rafaela@jbrj.gov.br", role = c("aut"), comment = c(ORCID = "0000-0002-7035-9313")))
+Maintainer: Pablo Melo <pablopains@yahoo.com.br>
+Description: The catalogoUCsBR package is designed to convert herbarium species occurrence data from JABOT, Reflora, speciesLink, and GBIF data portals into a suitable format to prepare plant species lists revised for the Catalog of Plants of Conservation Units in Brazil. The package provides tools to verify and standardize scientific names of species, join duplicates, and select species records as a voucher to compose lists of plant species in UCs in Brazil, helping to understand and protect the biodiversity in protected areas.
+License: GPL (>= 2) | file LICENSE
+Encoding: UTF-8
+LazyData: FALSE
+LazyDataCompression: xz
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports:
+    dplyr,
+    tidyr,
+    readr,
+    stringr,
+    lubridate,
+    jsonlite,
+    sqldf,
+    shiny,
+    shinydashboard,
+    rhandsontable,
+    DT,
+    rhandsontable,
+    shinyWidgets,
+    measurements,
+    downloader,
+    writexl
+Remotes:
+    github::pablopains/catalogoUCsBR
+Depends:
+    R (>= 3.5.0)
