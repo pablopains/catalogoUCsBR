@@ -1202,7 +1202,7 @@ app_prepare <- function()
                 
                 # Transformação padrão GBIF de híbrido para wcvp 
                 searchedName_raw <- searchedName
-                # searchedName <- gsub('×','x ',searchedName)
+                searchedName <- gsub('\\?','',searchedName)
                 searchedName <- gsub('×','× ',searchedName)
                 searchedName_ori <- searchedName
                 
@@ -1328,6 +1328,7 @@ app_prepare <- function()
                             taxonAuthors= taxon_authors,
                             taxonAuthors_last= taxon_authors_last))
               }
+              
               
               # searchedName = "Acacia plumosa"
               # searchedName = "Furnarius rufus"
