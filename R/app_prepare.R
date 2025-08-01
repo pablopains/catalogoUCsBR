@@ -1202,7 +1202,7 @@ app_prepare <- function()
                 
                 # Transformação padrão GBIF de híbrido para wcvp 
                 searchedName_raw <- searchedName
-                searchedName <- gsub('[\\\\^$.|*+?(){}\\[\\]]','',searchedName)
+                searchedName <- stringr::str_replace_all(searchedName, "[\\^$.|*+?(){}\\[\\]]", "")
                 searchedName <- gsub('×','× ',searchedName)
                 searchedName_ori <- searchedName
                 
